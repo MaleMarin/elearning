@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========== TOKENS / PALETA ========== */
+:root {
+  --cream: #F6F1E8;
+  --cream-warm: #efe9df;
+  --cream-dark: #e6e0d5;
+  --canvas: #F6F1E8;
+  --canvas-sidebar: #ebe6dd;
+  --ink: #1F2430;
+  --ink-muted: #5c6370;
+  --primary: #7569DE;
+  --primary-hover: #6355d4;
+  --coral: #FE6845;
+  --coral-hover: #e55a3a;
+  --amber: #FFA046;
+  --success: #9ECB45;
+  --card: #FFFFFF;
+  --line: rgba(31, 36, 48, 0.10);
+  --line-subtle: rgba(31, 36, 48, 0.08);
+  --error: #c53030;
+  --text: var(--ink);
+  --text-muted: var(--ink-muted);
+
+  /* Sistema de elevación (0 = plano, 3 = más alto) */
+  --elevation-0: none;
+  --elevation-1: 0 1px 0 0 rgba(255, 255, 255, 0.7) inset,
+                 0 2px 8px rgba(31, 36, 48, 0.06),
+                 0 1px 2px rgba(31, 36, 48, 0.04);
+  --elevation-2: 0 1px 0 0 rgba(255, 255, 255, 0.8) inset,
+                 0 4px 16px rgba(31, 36, 48, 0.08),
+                 0 2px 4px rgba(31, 36, 48, 0.04);
+  --elevation-3: 0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
+                 0 8px 24px rgba(31, 36, 48, 0.10),
+                 0 2px 8px rgba(31, 36, 48, 0.06);
+
+  --shadow-card: var(--elevation-1);
+  --shadow-card-hover: var(--elevation-2);
+  --shadow-sidebar: 0 2px 8px rgba(31, 36, 48, 0.04);
+}
+
+html {
+  font-size: 18px;
+}
+
+/* ========== FONDO CANVAS ========== */
+body {
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 700px at 20% 10%, rgba(117, 105, 222, 0.10), transparent 55%),
+    radial-gradient(900px 600px at 85% 15%, rgba(255, 160, 70, 0.10), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(246, 241, 232, 1) 55%, rgba(246, 241, 232, 1) 100%);
+}
+
+/* ========== UTILIDADES DE ELEVACIÓN ========== */
+.elevation-0 {
+  box-shadow: var(--elevation-0);
+}
+.elevation-1 {
+  box-shadow: var(--elevation-1);
+}
+.elevation-2 {
+  box-shadow: var(--elevation-2);
+}
+.elevation-3 {
+  box-shadow: var(--elevation-3);
+}
+.hover-elevation-1:hover {
+  box-shadow: var(--elevation-1);
+}
+.hover-elevation-2:hover {
+  box-shadow: var(--elevation-2);
+}
+.hover-elevation-3:hover {
+  box-shadow: var(--elevation-3);
+}
+
+/* ========== CARDS (e1/e2 + inset highlight, hover lift) ========== */
+@layer components {
+  .card-premium {
+    background: var(--card) !important;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(31, 36, 48, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.70), 0 10px 30px rgba(31, 36, 48, 0.08) !important;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .card-premium:hover {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.70), 0 18px 50px rgba(31, 36, 48, 0.10) !important;
+    transform: translateY(-1px);
+  }
+  .card-white {
+    background: var(--card) !important;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(31, 36, 48, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.70), 0 10px 30px rgba(31, 36, 48, 0.08) !important;
+  }
+}
+
+/* ========== BOTONES (volumen discreto, hover lift, focus ring) ========== */
+.btn-primary {
+  @apply px-6 py-3 text-lg font-medium rounded-full min-h-[44px] min-w-[44px] inline-flex items-center justify-center transition-all duration-200;
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 6px rgba(31, 36, 48, 0.08), 0 1px 2px rgba(117, 105, 222, 0.2);
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 36, 48, 0.10), 0 2px 4px rgba(117, 105, 222, 0.25);
+}
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(117, 105, 222, 0.35);
+}
+
+.btn-coral {
+  @apply px-5 py-2.5 text-base font-medium rounded-full min-h-[44px] inline-flex items-center justify-center transition-all duration-200;
+  background: var(--coral);
+  color: white;
+  box-shadow: 0 2px 6px rgba(31, 36, 48, 0.08), 0 1px 2px rgba(254, 104, 69, 0.2);
+}
+.btn-coral:hover {
+  background: var(--coral-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 36, 48, 0.10), 0 2px 4px rgba(254, 104, 69, 0.25);
+}
+.btn-coral:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(254, 104, 69, 0.35);
+}
+
+.btn-ghost {
+  @apply px-4 py-2.5 text-base font-medium rounded-full min-h-[44px] inline-flex items-center justify-center transition-all duration-200;
+  color: var(--primary);
+  background: rgba(117, 105, 222, 0.06);
+  border: 1px solid rgba(31, 36, 48, 0.06);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.5) inset;
+}
+.btn-ghost:hover {
+  background: rgba(117, 105, 222, 0.10);
+  transform: translateY(-1px);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6) inset, 0 2px 6px rgba(31, 36, 48, 0.06);
+}
+.btn-ghost:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* ========== PROGRESS BAR ========== */
+.progress-bar {
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(31, 36, 48, 0.08);
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--amber) 100%);
+  transition: width 0.4s ease;
+}
+
+/* ========== SIDEBAR / PANEL (separación sutil del canvas) ========== */
+.sidebar-elevation {
+  background: var(--canvas-sidebar);
+  border-right: 1px solid var(--line-subtle);
+  box-shadow: var(--shadow-sidebar);
+}
+.panel-elevation {
+  background: var(--canvas-sidebar);
+  border-left: 1px solid var(--line-subtle);
+  box-shadow: var(--shadow-sidebar);
+}
+
+/* ========== FOCUS RING GLOBAL ========== */
+.ring-focus:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+.text-contrast { color: var(--ink); }
+.text-muted { color: var(--ink-muted); }
