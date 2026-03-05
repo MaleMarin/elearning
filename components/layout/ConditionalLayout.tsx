@@ -1,10 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Sidebar } from "./Sidebar";
-import { RightPanel } from "./RightPanel";
+import { AppShell } from "./AppShell";
 
-const STANDALONE_PATHS = ["/login", "/no-inscrito"];
+const STANDALONE_PATHS = ["/login", "/registro", "/no-inscrito"];
 
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -14,11 +13,5 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
     return <div className="min-h-screen">{children}</div>;
   }
 
-  return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 min-w-0 p-6 relative z-10">{children}</main>
-      <RightPanel />
-    </div>
-  );
+  return <AppShell>{children}</AppShell>;
 }

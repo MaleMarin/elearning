@@ -1,6 +1,10 @@
-import Link from "next/link";
+"use client";
 
-interface EmptyStateProps {
+import Link from "next/link";
+import { SurfaceCard } from "./SurfaceCard";
+import { PrimaryButton } from "./Buttons";
+
+export interface EmptyStateProps {
   title: string;
   description: string;
   ctaLabel?: string;
@@ -10,6 +14,10 @@ interface EmptyStateProps {
   className?: string;
 }
 
+/**
+ * Estado vacío amigable. No usar textos secos tipo "No hay X."
+ * Ejemplo: "Todavía no hay sesiones programadas. Cuando el mentor publique la próxima, aparecerá aquí."
+ */
 export function EmptyState({
   title,
   description,
@@ -20,38 +28,30 @@ export function EmptyState({
   className = "",
 }: EmptyStateProps) {
   return (
-    <div
-      className={`card-white p-8 text-center max-w-md mx-auto ${className}`}
+    <SurfaceCard
+      padding="lg"
+      size="md"
+      clickable={false}
+      className={`text-center max-w-md mx-auto ${className}`}
       role="status"
       aria-live="polite"
     >
       {icon && (
-        <div className="mb-4 flex justify-center text-[var(--text-muted)] text-4xl" aria-hidden>
+        <div className="mb-4 flex justify-center text-[var(--muted)] text-4xl" aria-hidden>
           {icon}
         </div>
       )}
-      <h2 className="text-xl font-semibold text-[var(--text)] mb-2">{title}</h2>
-      <p className="text-base text-[var(--text-muted)] mb-6">{description}</p>
+      <h2 className="text-xl font-semibold text-[var(--ink)] mb-2">{title}</h2>
+      <p className="text-base text-[var(--muted)] mb-6 leading-relaxed">{description}</p>
       {ctaLabel && (
         <>
           {ctaHref ? (
-            <Link
-              href={ctaHref}
-              className="btn-primary inline-flex items-center justify-center min-h-[44px] px-6"
-            >
-              {ctaLabel}
-            </Link>
+            <PrimaryButton href={ctaHref}>{ctaLabel}</PrimaryButton>
           ) : onCtaClick ? (
-            <button
-              type="button"
-              onClick={onCtaClick}
-              className="btn-primary inline-flex items-center justify-center min-h-[44px] px-6"
-            >
-              {ctaLabel}
-            </button>
+            <PrimaryButton onClick={onCtaClick}>{ctaLabel}</PrimaryButton>
           ) : null}
         </>
       )}
-    </div>
+    </SurfaceCard>
   );
 }

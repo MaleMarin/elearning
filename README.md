@@ -149,6 +149,23 @@ Para crear códigos de invitación, insertar en `invitations` desde el SQL Edito
 
 ---
 
+## Rutas de admin (solo documentación)
+
+Estas rutas **no** se muestran como tabla dentro de la app. El producto expone un dashboard en `/admin` con tarjetas que enlazan a:
+
+| Ruta | Uso |
+|------|-----|
+| `/admin` | Dashboard admin: enlaces a Cursos y Cohortes |
+| `/admin/cursos` | Lista de cursos, crear curso |
+| `/admin/cursos/[courseId]` | Editar curso, módulos, asignar cohorte |
+| `/admin/cursos/[courseId]/modulos/[moduleId]` | Editar módulo, listar/crear lecciones |
+| `/admin/cursos/[courseId]/modulos/[moduleId]/leccion/[lessonId]` | Editor de lección |
+| `/admin/cohortes` | Cohortes e invitaciones (solo rol admin) |
+
+Ruta alumno: **`/curso`** (singular) — un solo curso asignado por cohorte (`cohort_courses.is_primary`). Lecciones en **`/curso/lecciones/[lessonId]`**.
+
+---
+
 ## UI/UX
 
 - Idioma: español neutro.

@@ -45,7 +45,7 @@ export default function TareasPage() {
           title="No tienes tareas pendientes"
           description="Cuando te asignen tareas con fechas límite aparecerán aquí."
           ctaLabel="Ver curso"
-          ctaHref="/cursos"
+          ctaHref="/curso"
           icon="✅"
         />
       </div>

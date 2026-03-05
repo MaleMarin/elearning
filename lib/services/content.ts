@@ -12,7 +12,7 @@ export async function ensureContentEditor() {
 }
 
 export async function getEditableCourses() {
-  const { role } = await ensureContentEditor();
+  const { user, role } = await ensureContentEditor();
   const supabase = await createServerSupabaseClient();
   if (role === "admin") {
     const { data, error } = await supabase
@@ -25,6 +25,7 @@ export async function getEditableCourses() {
   const { data: members } = await supabase
     .from("cohort_members")
     .select("cohort_id")
+    .eq("user_id", user.id)
     .eq("role", "mentor");
   const cohortIds = (members ?? []).map((m) => m.cohort_id);
   if (cohortIds.length === 0) return [];
@@ -54,11 +55,21 @@ export async function getCourse(courseId: string) {
   return data;
 }
 
-export async function createCourse(title: string, status: PublishStatus = "draft") {
+export async function createCourse(
+  title: string,
+  status: PublishStatus = "draft",
+  description?: string | null
+) {
   const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
   const { data, error } = await supabase
     .from("courses")
-    .insert({ title, status })
+    .insert({
+      title,
+      status,
+      description: description ?? null,
+      created_by: user?.id ?? null,
+    })
     .select()
     .single();
   if (error) throw new Error(error.message);
@@ -67,7 +78,7 @@ export async function createCourse(title: string, status: PublishStatus = "draft
 
 export async function updateCourse(
   courseId: string,
-  updates: { title?: string; status?: PublishStatus }
+  updates: { title?: string; description?: string | null; status?: PublishStatus }
 ) {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
@@ -91,16 +102,34 @@ export async function getModules(courseId: string) {
   return data ?? [];
 }
 
+export async function getModule(moduleId: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("modules")
+    .select("*")
+    .eq("id", moduleId)
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 export async function createModule(
   courseId: string,
   title: string,
   orderIndex: number,
-  status: PublishStatus = "draft"
+  status: PublishStatus = "draft",
+  description?: string | null
 ) {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("modules")
-    .insert({ course_id: courseId, title, order_index: orderIndex, status })
+    .insert({
+      course_id: courseId,
+      title,
+      order_index: orderIndex,
+      description: description ?? null,
+      status,
+    })
     .select()
     .single();
   if (error) throw new Error(error.message);
@@ -109,7 +138,7 @@ export async function createModule(
 
 export async function updateModule(
   moduleId: string,
-  updates: { title?: string; order_index?: number; status?: PublishStatus }
+  updates: { title?: string; description?: string | null; order_index?: number; status?: PublishStatus }
 ) {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
@@ -251,17 +280,17 @@ export async function getCohortCourses(courseId: string) {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("cohort_courses")
-    .select("id, cohort_id, course_id")
+    .select("id, cohort_id, course_id, is_primary")
     .eq("course_id", courseId);
   if (error) throw new Error(error.message);
   return data ?? [];
 }
 
-export async function assignCourseToCohort(courseId: string, cohortId: string) {
+export async function assignCourseToCohort(courseId: string, cohortId: string, isPrimary = true) {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("cohort_courses")
-    .insert({ course_id: courseId, cohort_id: cohortId })
+    .insert({ course_id: courseId, cohort_id: cohortId, is_primary: isPrimary })
     .select()
     .single();
   if (error) throw new Error(error.message);

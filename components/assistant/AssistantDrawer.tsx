@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { MessageCircle, X } from "lucide-react";
+import { X } from "lucide-react";
 import { AssistantChat } from "./AssistantChat";
 import type { AssistantMode } from "@/lib/types/database";
 import type { LessonContext } from "@/lib/types/database";
@@ -51,15 +51,6 @@ export function AssistantDrawer({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center text-white transition-all duration-200 bg-[var(--primary)] border border-[var(--line-subtle)] elevation-2 hover:translateY(-1px) hover-elevation-3 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--primary)]/40"
-        aria-label="Abrir asistente (Tutor, Soporte, Comunidad)"
-      >
-        <MessageCircle className="w-7 h-7" strokeWidth={2} />
-      </button>
-
       {open && (
         <div
           className="fixed inset-0 z-50 flex justify-end bg-black/20 backdrop-blur-sm"

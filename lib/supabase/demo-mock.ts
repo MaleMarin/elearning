@@ -15,33 +15,35 @@ export const DEMO_USER = {
 /** Nombre para saludo en UI (demo). */
 export const DEMO_USER_DISPLAY_NAME = "Estudiante";
 
-const DEMO_COURSE = { id: "demo-course-id", title: "Curso demo", status: "published" };
+const DEMO_COURSE = { id: "demo-course-id", title: "Fundamentos del programa", status: "published" };
 export const DEMO_MODULES = [
-  { id: "demo-m1", title: "Semana 1", order_index: 0 },
-  { id: "demo-m2", title: "Semana 2", order_index: 1 },
+  { id: "demo-m1", title: "Módulo 1: Introducción y contexto", order_index: 0 },
+  { id: "demo-m2", title: "Módulo 2: Herramientas y metodología", order_index: 1 },
+  { id: "demo-m3", title: "Módulo 3: Práctica guiada", order_index: 2 },
+  { id: "demo-m4", title: "Módulo 4: Integración y cierre", order_index: 3 },
 ];
 export const DEMO_LESSONS = [
-  { id: "demo-l1", title: "Introducción", module_id: "demo-m1", order_index: 0, summary: "Resumen demo.", content: "Contenido placeholder.", status: "published" },
-  { id: "demo-l2", title: "Contenido principal", module_id: "demo-m1", order_index: 1, summary: "Resumen.", content: "Contenido.", status: "published" },
+  { id: "demo-l1", title: "Introducción al programa", module_id: "demo-m1", order_index: 0, summary: "Conoce los objetivos del curso y cómo aprovecharlo al máximo.", content: "Contenido placeholder.", status: "published" },
+  { id: "demo-l2", title: "Contenido principal y ejercicios", module_id: "demo-m1", order_index: 1, summary: "Desarrolla las competencias clave con ejemplos y actividades.", content: "Contenido.", status: "published" },
 ];
 const DEMO_SESSION = {
   id: "demo-session-1",
   cohort_id: "demo-cohort",
-  title: "Sesión demo",
+  title: "Sesión en vivo: Preguntas y repaso",
   scheduled_at: new Date(Date.now() + 86400000).toISOString(),
   meeting_url: "https://zoom.us/j/demo",
 };
 const DEMO_TASK = {
   id: "demo-task-1",
-  title: "Tarea demo",
+  title: "Entrega: Ejercicio práctico del Módulo 1",
   due_at: new Date(Date.now() + 172800000).toISOString(),
   completed_at: null,
   cohort_id: "demo-cohort",
-  instructions: "Instrucciones de ejemplo.",
+  instructions: "Completa el ejercicio y sube tu evidencia según las instrucciones.",
 };
 const DEMO_POSTS = [
-  { id: "demo-p1", title: "Bienvenida", body: "Post de ejemplo.", pinned: true, created_at: new Date().toISOString(), user_id: "demo-user-id" },
-  { id: "demo-p2", title: "Duda sobre el curso", body: "Contenido de ejemplo.", pinned: false, created_at: new Date().toISOString(), user_id: "demo-user-id" },
+  { id: "demo-p1", title: "Bienvenida al grupo", body: "Hola a todos, bienvenidos al curso. Aquí podéis compartir dudas y recursos. ¡Nos vemos en la primera sesión!", pinned: true, created_at: new Date().toISOString(), user_id: "demo-user-id" },
+  { id: "demo-p2", title: "Duda sobre la tarea del Módulo 1", body: "¿Alguien ya entregó el ejercicio? Me gustaría contrastar criterios antes de enviar.", pinned: false, created_at: new Date().toISOString(), user_id: "demo-user-id" },
 ];
 
 function emptyData() {
@@ -83,6 +85,7 @@ export function createDemoBrowserMock() {
   const auth = {
     getUser: () => Promise.resolve({ data: { user: DEMO_USER }, error: null }),
     signInWithPassword: () => Promise.resolve({ data: { user: DEMO_USER }, error: null }),
+    signUp: () => Promise.resolve({ data: { user: DEMO_USER }, error: null }),
     signOut: () => Promise.resolve({ error: null }),
     onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
   };

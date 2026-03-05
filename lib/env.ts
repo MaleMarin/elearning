@@ -11,11 +11,12 @@ const env = (key: string): string | undefined =>
 export function getDemoMode(): boolean {
   const v = env("NEXT_PUBLIC_DEMO_MODE");
   if (v === "true" || v === "1") return true;
+  const hasSupabase =
+    (env("NEXT_PUBLIC_SUPABASE_URL") ?? "").trim() !== "" &&
+    (env("NEXT_PUBLIC_SUPABASE_ANON_KEY") ?? "").trim() !== "";
+  if (!hasSupabase && env("NODE_ENV") === "development") return true;
   if (v === "false" || v === "0") return false;
-  if (env("NODE_ENV") === "development") {
-    const hasSupabase = (env("NEXT_PUBLIC_SUPABASE_URL") ?? "").trim() !== "" && (env("NEXT_PUBLIC_SUPABASE_ANON_KEY") ?? "").trim() !== "";
-    if (!hasSupabase) return true;
-  }
+  if (!hasSupabase) return true;
   return false;
 }
 
@@ -27,8 +28,8 @@ const CRITICAL_KEYS = [
 /**
  * Valida que las envs críticas estén definidas.
  * Si DEMO_MODE=true no lanza (las keys pueden faltar).
- * En desarrollo, si faltan ambas keys se asume demo para no bloquear.
- * Si DEMO_MODE=false (modo real) lanza con mensaje claro si falta alguna.
+ * En desarrollo, si faltan las keys no se lanza para no bloquear (se asume demo).
+ * Solo en producción con DEMO_MODE=false se exigen las variables.
  */
 export function validateEnv(): void {
   if (getDemoMode()) return;
@@ -37,6 +38,7 @@ export function validateEnv(): void {
     return v === undefined || v === "";
   });
   if (missing.length === 0) return;
+  if (env("NODE_ENV") === "development") return;
   throw new Error(
     `Faltan variables de entorno requeridas (modo real): ${missing.join(", ")}. ` +
       "Copia .env.example a .env.local y complétalas, o usa NEXT_PUBLIC_DEMO_MODE=true para modo demo."

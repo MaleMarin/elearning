@@ -8,16 +8,28 @@ export const dynamic = "force-dynamic";
 /**
  * POST /api/enroll/redeem
  * Body: { code: string }
- * Valida el código de invitación y crea enrollment (cohort_members) si hay cupo.
- * Solo usuarios autenticados; no requiere estar inscrito.
+ * Canje atómico vía RPC public.redeem_invitation(p_code, p_user_id):
+ * valida invitación (existe, is_active, no expirada, uses < max_uses),
+ * cohorte activa, capacidad, upsert enrollment + incrementa uses en una transacción (FOR UPDATE).
  */
 export async function POST(request: NextRequest) {
-  if (getDemoMode()) return NextResponse.json({ ok: true, cohortId: "demo-cohort-id" });
+  if (getDemoMode()) {
+    return NextResponse.json({
+      ok: true,
+      cohortId: "demo-cohort-id",
+      enrollmentStatus: "active",
+    });
+  }
 
   const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.json({ error: "Debes iniciar sesión para canjear un código" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Debes iniciar sesión para canjear un código" },
+      { status: 401 }
+    );
   }
 
   let body: { code?: string };
@@ -29,52 +41,34 @@ export async function POST(request: NextRequest) {
 
   const code = typeof body.code === "string" ? body.code.trim().toUpperCase() : "";
   if (!code) {
-    return NextResponse.json({ error: "Falta el código de invitación" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Falta el código de invitación" },
+      { status: 400 }
+    );
   }
 
   const admin = createAdminClient();
+  const { data: cohortId, error } = await admin.rpc("redeem_invitation", {
+    p_code: code,
+    p_user_id: user.id,
+  });
 
-  const { data: inv, error: invError } = await admin
-    .from("invitations")
-    .select("id, cohort_id, max_uses, uses, expires_at")
-    .eq("code", code)
-    .single();
-
-  if (invError || !inv) {
-    return NextResponse.json({ error: "Código no válido o no encontrado" }, { status: 404 });
+  if (error) {
+    const msg =
+      error.message?.includes("Código no válido") ||
+      error.message?.includes("caducado") ||
+      error.message?.includes("usos disponibles") ||
+      error.message?.includes("no está activo") ||
+      error.message?.includes("no está activa") ||
+      error.message?.includes("capacidad máxima")
+        ? error.message
+        : "No se pudo canjear el código. Inténtalo de nuevo.";
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 
-  if (inv.uses >= inv.max_uses) {
-    return NextResponse.json({ error: "Este código ya no tiene usos disponibles" }, { status: 400 });
-  }
-
-  if (inv.expires_at && new Date(inv.expires_at) < new Date()) {
-    return NextResponse.json({ error: "Este código ha caducado" }, { status: 400 });
-  }
-
-  const { error: memberError } = await admin
-    .from("cohort_members")
-    .insert({
-      cohort_id: inv.cohort_id,
-      user_id: user.id,
-      role: "student",
-    });
-
-  if (memberError) {
-    if (memberError.code === "23505") {
-      return NextResponse.json({ error: "Ya estás inscrito en esta cohorte" }, { status: 400 });
-    }
-    return NextResponse.json({ error: memberError.message }, { status: 500 });
-  }
-
-  const { error: updateError } = await admin
-    .from("invitations")
-    .update({ uses: inv.uses + 1 })
-    .eq("id", inv.id);
-
-  if (updateError) {
-    return NextResponse.json({ error: "Error al actualizar el código" }, { status: 500 });
-  }
-
-  return NextResponse.json({ ok: true, cohortId: inv.cohort_id });
+  return NextResponse.json({
+    ok: true,
+    cohortId: cohortId as string,
+    enrollmentStatus: "active",
+  });
 }

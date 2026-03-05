@@ -28,8 +28,9 @@ export async function PATCH(
     await ensureContentEditor();
     const { id } = await params;
     const body = await req.json();
-    const updates: { title?: string; status?: PublishStatus } = {};
+    const updates: { title?: string; description?: string | null; status?: PublishStatus } = {};
     if (typeof body.title === "string") updates.title = body.title.trim();
+    if (typeof body.description === "string") updates.description = body.description.trim() || null;
     if (body.status === "draft" || body.status === "published") updates.status = body.status;
     const course = await updateCourse(id, updates);
     return NextResponse.json({ course });

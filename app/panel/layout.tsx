@@ -22,7 +22,7 @@ export default async function PanelLayout({
 
   const role = profile?.role ?? "student";
   if (role !== "admin" && role !== "mentor") {
-    redirect("/");
+    redirect("/inicio");
   }
 
   return <>{children}</>;

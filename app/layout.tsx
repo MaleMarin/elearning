@@ -12,26 +12,43 @@ export const metadata: Metadata = {
 
 const criticalCss = `
   :root {
-    --cream: #F6F1E8;
-    --canvas: #F6F1E8;
-    --canvas-sidebar: #ebe6dd;
-    --line: rgba(31,36,48,0.1);
-    --line-subtle: rgba(31,36,48,0.08);
+    --bg: #F3F2EF;
+    --surface: #FFFFFF;
+    --surface-soft: #FAFAF8;
     --ink: #1F2430;
-    --ink-muted: #5c6370;
-    --text: #1F2430;
+    --muted: #6B7280;
+    --line: rgba(31,36,48,0.08);
+    --line-subtle: rgba(31,36,48,0.08);
+    --shadow-card: 0 10px 30px rgba(31,36,48,0.06);
+    --shadow-card-hover: 0 16px 40px rgba(31,36,48,0.08);
+    --shadow-card-inset: inset 0 1px 0 rgba(255,255,255,0.65);
     --primary: #7569DE;
-    --card: #fff;
+    --primary-soft: #EEEAFD;
+    --coral: #FE6845;
+    --coral-soft: #FFF0EB;
+    --amber: #FFA046;
+    --amber-soft: #FFF4E6;
+    --success: #9ECB45;
+    --success-soft: #F3F9E7;
+    --sidebar-bg: #EFEEE9;
+    --cream: #F3F2EF;
+    --canvas: #F3F2EF;
+    --canvas-sidebar: #EFEEE9;
+    --ink-muted: #6B7280;
+    --card: #FFFFFF;
   }
   html { font-size: 18px; box-sizing: border-box; }
   *, *::before, *::after { box-sizing: inherit; }
   body {
     margin: 0;
     min-height: 100vh;
-    background: radial-gradient(1200px 700px at 20% 10%, rgba(117,105,222,0.10), transparent 55%), radial-gradient(900px 600px at 85% 15%, rgba(255,160,70,0.10), transparent 55%), linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(246,241,232,1) 55%, rgba(246,241,232,1) 100%);
-    color: var(--ink) !important;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    color: #1F2430;
+    background: #F3F2EF;
+    font-family: "Avenir Light", "Avenir Next", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
+  a { color: inherit; text-decoration: none; }
   .flex { display: flex; }
   .min-h-screen { min-height: 100vh; }
   .flex-1 { flex: 1 1 0%; }
@@ -46,10 +63,10 @@ const criticalCss = `
   .gap-4 { gap: 1rem; }
   .overflow-y-auto { overflow-y: auto; }
   .card-premium {
-    background: var(--card);
-    border-radius: 1.25rem;
-    border: 1px solid rgba(31,36,48,0.08);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.70), 0 10px 30px rgba(31,36,48,0.08);
+    background: var(--surface);
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.65), 0 10px 30px rgba(31,36,48,0.06);
   }
   .relative { position: relative; }
   .z-10 { z-index: 10; }
@@ -62,7 +79,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="min-h-screen bg-[var(--cream)] text-[var(--text)]" style={{ backgroundColor: "var(--cream)", color: "var(--ink)" }}>
+      <body className="min-h-screen bg-[#F3F2EF] text-[#1F2430] font-sans antialiased">
         <style dangerouslySetInnerHTML={{ __html: criticalCss }} />
         <AssistantProvider>
           <ConditionalLayout>{children}</ConditionalLayout>

@@ -3,34 +3,43 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getDemoMode } from "@/lib/env";
 import { getSupabaseConfig } from "@/lib/config";
 
-const PLATFORM_PATHS = [
-  "/",
-  "/cursos",
-  "/sesiones",
+/** Rutas que exigen sesión + enrollment activo (acceso a la experiencia de curso). */
+const PRIVATE_APP_PATHS = [
+  "/inicio",
+  "/curso",
+  "/sesiones-en-vivo",
   "/tareas",
   "/comunidad",
   "/certificado",
+  "/cursos",
+  "/mi-perfil",
   "/soporte",
-  "/perfil",
-  "/panel",
 ];
-const SKIP_ENROLLMENT_PATHS = ["/login", "/no-inscrito", "/auth/callback"];
+const SKIP_AUTH_PATHS = ["/login", "/registro", "/no-inscrito", "/auth/callback"];
 
-function isPlatformPath(pathname: string): boolean {
-  if (pathname === "/") return true;
-  return PLATFORM_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+function isPrivateAppPath(pathname: string): boolean {
+  return PRIVATE_APP_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 
-function skipEnrollmentCheck(pathname: string): boolean {
+function skipAuthCheck(pathname: string): boolean {
   if (pathname.startsWith("/api") || pathname.startsWith("/_next")) return true;
-  return SKIP_ENROLLMENT_PATHS.includes(pathname);
+  return SKIP_AUTH_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 
 export async function updateSession(request: NextRequest) {
   if (getDemoMode()) return NextResponse.next({ request });
 
   let response = NextResponse.next({ request });
-  const { url, anonKey } = getSupabaseConfig();
+  let url: string;
+  let anonKey: string;
+  try {
+    const config = getSupabaseConfig();
+    url = config.url;
+    anonKey = config.anonKey;
+  } catch (e) {
+    console.error("[middleware] Supabase config missing:", e);
+    return NextResponse.next({ request });
+  }
   const supabase = createServerClient(
     url,
     anonKey,
@@ -61,8 +70,29 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (skipEnrollmentCheck(pathname)) return response;
-  if (!isPlatformPath(pathname)) return response;
+  if (pathname.startsWith("/admin")) {
+    if (!user) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    const role = profile?.role ?? "student";
+    if (pathname.startsWith("/admin/cohortes") && role !== "admin") {
+      return NextResponse.redirect(new URL("/inicio", request.url));
+    }
+    if (role !== "admin" && role !== "mentor") {
+      return NextResponse.redirect(new URL("/inicio", request.url));
+    }
+    return response;
+  }
+
+  if (skipAuthCheck(pathname)) return response;
+  if (!isPrivateAppPath(pathname)) return response;
 
   if (!user) {
     const loginUrl = new URL("/login", request.url);

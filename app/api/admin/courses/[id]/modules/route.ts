@@ -31,8 +31,9 @@ export async function POST(
     const title = body.title as string;
     const orderIndex = Number(body.order_index) ?? 0;
     const status = (body.status as PublishStatus) ?? "draft";
+    const description = typeof body.description === "string" ? body.description.trim() || null : null;
     if (!title?.trim()) return NextResponse.json({ error: "Falta title" }, { status: 400 });
-    const module_ = await createModule(courseId, title.trim(), orderIndex, status);
+    const module_ = await createModule(courseId, title.trim(), orderIndex, status, description);
     return NextResponse.json({ module: module_ });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Error";

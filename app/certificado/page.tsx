@@ -42,7 +42,7 @@ export default function CertificadoPage() {
           title="Tu certificado aparecerá cuando completes el programa"
           description="Al finalizar el curso y cumplir los requisitos, podrás descargar tu certificado desde aquí."
           ctaLabel="Ver curso"
-          ctaHref="/cursos"
+          ctaHref="/curso"
           icon="🎓"
         />
       </div>
