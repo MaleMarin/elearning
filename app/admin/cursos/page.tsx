@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+
+const IS_DEV = process.env.NODE_ENV === "development";
 import Link from "next/link";
 import {
   SurfaceCard,
