@@ -1,0 +1,382 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+  :root {
+    --bg: #e8eaf0;
+    --blue: #1428d4;
+    --dark: #0a0f8a;
+    --mint: #00e5a0;
+    --sh: #c2c8d6;
+    --li: #ffffff;
+    --t1: #0a0f8a;
+    --t2: #4a5580;
+    --t3: #8892b0;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background: var(--bg); }
+
+  .root { display:flex; height:100vh; min-height:600px; font-family:'Syne',sans-serif; background:var(--bg); overflow:hidden; }
+
+  /* ── SIDEBAR ── */
+  .sb { width:72px; display:flex; flex-direction:column; align-items:center; padding:20px 0 16px; gap:4px; flex-shrink:0; background:var(--bg); box-shadow:5px 0 16px var(--sh),1px 0 4px var(--li); position:relative; z-index:5; }
+  .sb-logo { width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--dark));display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:5px 5px 12px var(--sh),-3px -3px 8px var(--li);flex-shrink:0; }
+  .sb-spacer { flex:1; }
+  .nb { width:46px;height:46px;border-radius:13px;border:none;cursor:pointer;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:all .18s;position:relative; }
+  .nb.on { background:rgba(20,40,212,.06);box-shadow:inset 3px 3px 7px var(--sh),inset -3px -3px 7px var(--li);color:var(--blue); }
+  .nb:not(.on) { box-shadow:4px 4px 9px var(--sh),-4px -4px 9px var(--li);color:var(--t3); }
+  .nb svg { pointer-events:none; }
+  .nb-tip { position:absolute;left:56px;background:var(--dark);color:#fff;font-size:10px;font-weight:600;padding:4px 9px;border-radius:7px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;font-family:'Space Mono',monospace;z-index:20; }
+  .nb:hover .nb-tip { opacity:1; }
+
+  /* ── MAIN ── */
+  .main { flex:1;overflow-y:auto;padding:18px 16px;min-width:0; }
+
+  /* topbar */
+  .topbar { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px; }
+  .topbar-left h1 { font-size:18px;font-weight:800;color:var(--dark);letter-spacing:-.4px;line-height:1; }
+  .topbar-left p { font-size:10px;color:var(--t3);margin-top:2px;font-family:'Space Mono',monospace; }
+  .topbar-right { display:flex;align-items:center;gap:8px; }
+  .date-chip { background:var(--bg);border-radius:10px;padding:6px 11px;box-shadow:inset 2px 2px 5px var(--sh),inset -2px -2px 5px var(--li);font-size:10px;color:var(--t2);font-family:'Space Mono',monospace; }
+  .online-dot { display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t3);font-family:'Space Mono',monospace; }
+  .online-dot span { width:7px;height:7px;background:var(--mint);border-radius:50%;box-shadow:0 0 5px rgba(0,229,160,.8); }
+
+  /* sec strip */
+  .sec { display:flex;align-items:center;gap:8px;margin-bottom:14px;background:var(--bg);border-radius:11px;padding:8px 13px;box-shadow:inset 3px 3px 7px var(--sh),inset -3px -3px 7px var(--li); }
+  .sec-dot { width:6px;height:6px;background:var(--mint);border-radius:50%;box-shadow:0 0 5px rgba(0,229,160,.7);flex-shrink:0;animation:pulse 2s infinite; }
+  .sec span { font-size:10px;color:var(--t3);font-family:'Space Mono',monospace; }
+  .sec strong { color:#00b87d; }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* hero */
+  .hero { border-radius:18px;padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--dark) 0%,var(--blue) 65%,#1a3ee8 100%);box-shadow:7px 7px 18px rgba(10,15,138,.35),-4px -4px 12px rgba(255,255,255,.6); }
+  .hero::before { content:'';position:absolute;top:-30px;right:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05); }
+  .hero::after { content:'';position:absolute;bottom:-20px;right:40px;width:90px;height:90px;border-radius:50%;background:rgba(0,229,160,.12); }
+  .hero-tag { font-size:9px;color:rgba(255,255,255,.5);font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px; }
+  .hero-name { font-size:18px;font-weight:800;color:#fff;margin-bottom:3px;letter-spacing:-.3px; }
+  .hero-sub { font-size:10px;color:rgba(255,255,255,.6);margin-bottom:16px; }
+  .hero-prog-row { display:flex;justify-content:space-between;margin-bottom:6px; }
+  .hero-prog-row span:first-child { font-size:10px;color:rgba(255,255,255,.5);font-family:'Space Mono',monospace; }
+  .hero-prog-row span:last-child { font-size:12px;font-weight:700;color:var(--mint);font-family:'Space Mono',monospace; }
+  .prog-track { height:5px;background:rgba(255,255,255,.15);border-radius:3px;position:relative; }
+  .prog-fill { height:100%;width:68%;background:linear-gradient(90deg,var(--mint),#00c98a);border-radius:3px;position:relative; }
+  .prog-fill::after { content:'';position:absolute;right:-4px;top:-4px;width:13px;height:13px;background:var(--mint);border-radius:50%;border:2px solid rgba(255,255,255,.3);box-shadow:0 0 8px rgba(0,229,160,.9); }
+  .hero-btns { display:flex;gap:8px;margin-top:16px; }
+  .btn-hero-p { padding:9px 18px;border-radius:10px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;background:#fff;color:var(--dark);box-shadow:3px 3px 8px rgba(0,0,0,.15); }
+  .btn-hero-s { padding:9px 18px;border-radius:10px;border:2px solid rgba(255,255,255,.4);cursor:pointer;font-family:'Syne',sans-serif;font-size:12px;font-weight:600;background:transparent;color:#fff; }
+
+  /* stats */
+  .stats { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px; }
+  .sc { background:var(--bg);border-radius:14px;padding:14px 11px;box-shadow:5px 5px 11px var(--sh),-5px -5px 11px var(--li); }
+  .sc-ico { width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;font-size:13px;box-shadow:inset 2px 2px 4px var(--sh),inset -2px -2px 4px var(--li); }
+  .sc-val { font-size:18px;font-weight:800;color:var(--dark);font-family:'Space Mono',monospace;line-height:1;margin-bottom:2px; }
+  .sc-lbl { font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px; }
+
+  /* checkin */
+  .ci { background:var(--bg);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:5px 5px 12px var(--sh),-5px -5px 12px var(--li); }
+  .sec-title { font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:11px;font-family:'Space Mono',monospace; }
+  .ci-btns { display:flex;gap:8px; }
+  .ci-btn { flex:1;padding:9px 4px;border:none;border-radius:11px;cursor:pointer;font-family:'Syne',sans-serif;font-size:11px;font-weight:600;background:var(--bg);color:var(--t2);box-shadow:3px 3px 7px var(--sh),-3px -3px 7px var(--li);transition:all .15s; }
+  .ci-btn.sel,.ci-btn:active { box-shadow:inset 2px 2px 6px var(--sh),inset -2px -2px 6px var(--li);background:rgba(20,40,212,.05);color:var(--blue); }
+
+  /* two-col */
+  .two { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px; }
+
+  /* lecciones */
+  .panel { background:var(--bg);border-radius:16px;padding:16px;box-shadow:5px 5px 12px var(--sh),-5px -5px 12px var(--li); }
+  .les { display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:10px;margin-bottom:6px;cursor:pointer; }
+  .les:last-child { margin-bottom:0; }
+  .les.curr { box-shadow:inset 2px 2px 5px var(--sh),inset -2px -2px 5px var(--li);background:rgba(20,40,212,.04); }
+  .les:not(.curr) { box-shadow:3px 3px 7px var(--sh),-3px -3px 7px var(--li); }
+  .lnum { width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'Space Mono',monospace;flex-shrink:0; }
+  .lnum.done { background:rgba(0,229,160,.15);color:#00b87d;box-shadow:inset 2px 2px 4px rgba(0,229,160,.2),inset -2px -2px 4px rgba(255,255,255,.8); }
+  .lnum.cur { background:var(--blue);color:#fff;box-shadow:3px 3px 7px rgba(20,40,212,.4),-2px -2px 5px rgba(255,255,255,.6); }
+  .lnum.lock { background:rgba(136,146,176,.12);color:var(--t3);box-shadow:inset 2px 2px 4px var(--sh),inset -2px -2px 4px var(--li); }
+  .linfo { flex:1;min-width:0; }
+  .lt { font-size:11px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px; }
+  .lm { font-size:9px;color:var(--t3);font-family:'Space Mono',monospace; }
+
+  /* logros */
+  .logros { display:grid;grid-template-columns:repeat(3,1fr);gap:7px; }
+  .logro { display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 5px;border-radius:10px;cursor:pointer; }
+  .logro.on { box-shadow:3px 3px 7px var(--sh),-3px -3px 7px var(--li); }
+  .logro.off { opacity:.35;box-shadow:inset 2px 2px 4px var(--sh),inset -2px -2px 4px var(--li); }
+  .logro-ico { width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px; }
+  .logro-name { font-size:7px;text-align:center;color:var(--t2);font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.2; }
+
+  /* actividad */
+  .act-card { background:var(--bg);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:5px 5px 12px var(--sh),-5px -5px 12px var(--li); }
+  .act-row { display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(194,200,214,.3); }
+  .act-row:last-child { border-bottom:none; }
+  .act-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
+  .act-txt { flex:1;font-size:10px;color:var(--t2);line-height:1.4; }
+  .act-txt strong { color:var(--t1);font-weight:600; }
+  .act-time { font-size:9px;color:var(--t3);font-family:'Space Mono',monospace;flex-shrink:0; }
+
+  /* ctas */
+  .cta-p { width:100%;padding:13px;border-radius:13px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;background:linear-gradient(135deg,var(--blue),var(--dark));color:#fff;box-shadow:5px 5px 12px rgba(10,15,138,.35),-3px -3px 8px rgba(255,255,255,.7);margin-bottom:9px;display:flex;align-items:center;justify-content:center;gap:7px; }
+  .cta-s { width:100%;padding:11px;border-radius:13px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:11px;font-weight:600;background:var(--bg);color:var(--blue);box-shadow:4px 4px 9px var(--sh),-4px -4px 9px var(--li); }
+
+  /* ── RIGHT PANEL ── */
+  .rp { width:240px;flex-shrink:0;padding:18px 14px;overflow-y:auto;background:var(--bg);box-shadow:-4px 0 14px var(--sh),-1px 0 4px var(--li); }
+
+  /* perfil */
+  .profile-card { background:var(--bg);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:5px 5px 12px var(--sh),-5px -5px 12px var(--li);display:flex;flex-direction:column;align-items:center;text-align:center; }
+  .profile-av { width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--blue),var(--dark));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;margin-bottom:10px;box-shadow:4px 4px 10px var(--sh),-3px -3px 7px var(--li); }
+  .profile-name { font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px; }
+  .profile-role { font-size:9px;color:var(--t3);font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px; }
+  .profile-stats { display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%; }
+  .ps { background:var(--bg);border-radius:10px;padding:8px 6px;box-shadow:inset 2px 2px 5px var(--sh),inset -2px -2px 5px var(--li);text-align:center; }
+  .ps-val { font-size:14px;font-weight:800;color:var(--dark);font-family:'Space Mono',monospace;line-height:1;margin-bottom:2px; }
+  .ps-lbl { font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px; }
+
+  /* calendario */
+  .cal-card { background:var(--bg);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:5px 5px 12px var(--sh),-5px -5px 12px var(--li); }
+  .cal-head { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px; }
+  .cal-title { font-size:11px;font-weight:700;color:var(--t1); }
+  .cal-nav { display:flex;gap:4px; }
+  .cal-btn { width:22px;height:22px;border-radius:7px;border:none;cursor:pointer;background:var(--bg);color:var(--t3);font-size:11px;display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 5px var(--sh),-2px -2px 5px var(--li); }
+  .cal-days { display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:6px; }
+  .cal-day-lbl { font-size:8px;color:var(--t3);text-align:center;font-family:'Space Mono',monospace;padding:2px 0; }
+  .cal-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:3px; }
+  .cd { width:100%;aspect-ratio:1;border-radius:7px;border:none;cursor:pointer;font-size:9px;font-family:'Space Mono',monospace;font-weight:600;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--t3);box-shadow:2px 2px 4px var(--sh),-2px -2px 4px var(--li);transition:all .15s; }
+  .cd.today { background:var(--blue);color:#fff;box-shadow:3px 3px 7px rgba(20,40,212,.4),-2px -2px 5px rgba(255,255,255,.5); }
+  .cd.has-event { position:relative; }
+  .cd.has-event::after { content:'';position:absolute;bottom:2px;width:4px;height:4px;background:var(--mint);border-radius:50%; }
+  .cd.empty { background:transparent;box-shadow:none;cursor:default;color:transparent; }
+
+  /* notificaciones */
+  .notif-card { background:var(--bg);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:5px 5px 12px var(--sh),-5px -5px 12px var(--li); }
+  .notif-row { display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid rgba(194,200,214,.25); }
+  .notif-row:last-child { border-bottom:none; }
+  .notif-ico { width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0; }
+  .notif-txt { flex:1;min-width:0; }
+  .notif-title { font-size:10px;font-weight:600;color:var(--t1);margin-bottom:1px;line-height:1.3; }
+  .notif-sub { font-size:8px;color:var(--t3);font-family:'Space Mono',monospace; }
+  .notif-new { width:6px;height:6px;background:var(--mint);border-radius:50%;flex-shrink:0;margin-top:4px; }
+
+  /* notas */
+  .notes-card { background:var(--bg);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:5px 5px 12px var(--sh),-5px -5px 12px var(--li); }
+  .notes-input { width:100%;border:none;background:var(--bg);border-radius:10px;padding:10px;font-family:'Syne',sans-serif;font-size:11px;color:var(--t2);resize:none;outline:none;box-shadow:inset 3px 3px 7px var(--sh),inset -3px -3px 7px var(--li);line-height:1.5;min-height:80px; }
+  .notes-input::placeholder { color:var(--t3); }
+  .notes-save { width:100%;margin-top:7px;padding:8px;border-radius:9px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;background:var(--bg);color:var(--blue);box-shadow:3px 3px 7px var(--sh),-3px -3px 7px var(--li); }
+
+  /* help btn */
+  .help-btn { width:100%;padding:10px;border-radius:12px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;background:var(--bg);color:var(--t2);box-shadow:4px 4px 9px var(--sh),-4px -4px 9px var(--li);display:flex;align-items:center;justify-content:center;gap:6px; }
+</style>
+
+<div class="root">
+
+  <!-- SIDEBAR -->
+  <aside class="sb">
+    <div class="sb-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    <button class="nb on" onclick="setNav(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span class="nb-tip">Inicio</span></button>
+    <button class="nb" onclick="setNav(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="nb-tip">Mi Curso</span></button>
+    <button class="nb" onclick="setNav(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="nb-tip">Sesiones</span></button>
+    <button class="nb" onclick="setNav(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span class="nb-tip">Tareas</span></button>
+    <button class="nb" onclick="setNav(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nb-tip">Comunidad</span></button>
+    <button class="nb" onclick="setNav(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="nb-tip">Mi Colega</span></button>
+    <button class="nb" onclick="setNav(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span class="nb-tip">Laboratorio</span></button>
+    <div class="sb-spacer"></div>
+    <button class="nb" onclick="setNav(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><span class="nb-tip">Configuración</span></button>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Política Digital</h1>
+        <p>// Módulo 3 · Ciberseguridad · Cohorte 2026-A</p>
+      </div>
+      <div class="topbar-right">
+        <div class="date-chip" id="dateChip">Dom 15 Mar 2026</div>
+        <div class="online-dot"><span></span>En línea</div>
+      </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div class="sec">
+      <div class="sec-dot"></div>
+      <span>Cifrado <strong>AES-256</strong> · Sesión verificada · JWT 2h TTL · Datos protegidos</span>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-tag">Buenas tardes, servidora pública</div>
+      <div class="hero-name">María Antonia Flores</div>
+      <div class="hero-sub">Ciberseguridad para Gobierno Digital · La innovación no es un destino, es una forma de caminar.</div>
+      <div class="hero-prog-row"><span>Progreso del curso</span><span>68%</span></div>
+      <div class="prog-track"><div class="prog-fill"></div></div>
+      <div class="hero-btns">
+        <button class="btn-hero-p">Continuar →</button>
+        <button class="btn-hero-s">Ver programa</button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="sc"><div class="sc-ico" style="background:rgba(0,229,160,.13)">📶</div><div class="sc-val">7/10</div><div class="sc-lbl">Lecciones</div></div>
+      <div class="sc"><div class="sc-ico" style="background:rgba(20,40,212,.1)">🕐</div><div class="sc-val">18h</div><div class="sc-lbl">Horas</div></div>
+      <div class="sc"><div class="sc-ico" style="background:rgba(255,186,0,.13)">⭐</div><div class="sc-val">8.7</div><div class="sc-lbl">Calificación</div></div>
+      <div class="sc"><div class="sc-ico" style="background:rgba(229,57,53,.1)">🔥</div><div class="sc-val">7d</div><div class="sc-lbl">Racha</div></div>
+    </div>
+
+    <!-- CHECKIN -->
+    <div class="ci">
+      <div class="sec-title">Check-in · ¿Cómo llegaste hoy?</div>
+      <div class="ci-btns">
+        <button class="ci-btn" onclick="selectCI(this)">😊 Bien</button>
+        <button class="ci-btn" onclick="selectCI(this)">😐 Regular</button>
+        <button class="ci-btn" onclick="selectCI(this)">😓 Difícil</button>
+        <button class="ci-btn" onclick="selectCI(this)">💪 Excelente</button>
+      </div>
+    </div>
+
+    <!-- LECCIONES + LOGROS -->
+    <div class="two">
+      <div class="panel">
+        <div class="sec-title">Módulo 3 · Lecciones</div>
+        <div class="les"><div class="lnum done">✓</div><div class="linfo"><div class="lt">Cifrado E2E</div><div class="lm">8 min · Completado</div></div></div>
+        <div class="les curr"><div class="lnum cur">2</div><div class="linfo"><div class="lt">Autenticación</div><div class="lm">12 min · En curso</div></div></div>
+        <div class="les"><div class="lnum lock">3</div><div class="linfo"><div class="lt">Zero Trust</div><div class="lm">15 min · Pendiente</div></div></div>
+      </div>
+      <div class="panel">
+        <div class="sec-title">Mis logros</div>
+        <div class="logros">
+          <div class="logro on"><div class="logro-ico" style="background:rgba(0,229,160,.15)">🔐</div><div class="logro-name">Cifrado</div></div>
+          <div class="logro on"><div class="logro-ico" style="background:rgba(20,40,212,.12)">🛡️</div><div class="logro-name">Defensor</div></div>
+          <div class="logro on"><div class="logro-ico" style="background:rgba(255,186,0,.14)">⭐</div><div class="logro-name">Top 10%</div></div>
+          <div class="logro off"><div class="logro-ico" style="background:rgba(136,146,176,.1)">🧠</div><div class="logro-name">Experto</div></div>
+          <div class="logro off"><div class="logro-ico" style="background:rgba(136,146,176,.1)">🌐</div><div class="logro-name">Red Gov</div></div>
+          <div class="logro off"><div class="logro-ico" style="background:rgba(136,146,176,.1)">🏆</div><div class="logro-name">Graduado</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVIDAD -->
+    <div class="act-card">
+      <div class="sec-title">Actividad reciente</div>
+      <div class="act-row"><div class="act-dot" style="background:#00e5a0"></div><div class="act-txt"><strong>Quiz completado</strong> — Módulo 2: 92/100 puntos</div><div class="act-time">Hace 2h</div></div>
+      <div class="act-row"><div class="act-dot" style="background:#1428d4"></div><div class="act-txt"><strong>Lección terminada</strong> — Cifrado E2E y protocolos</div><div class="act-time">Ayer</div></div>
+      <div class="act-row"><div class="act-dot" style="background:#ffc107"></div><div class="act-txt"><strong>Logro desbloqueado</strong> — Defensor Digital</div><div class="act-time">Lun</div></div>
+    </div>
+
+    <!-- CTAs -->
+    <button class="cta-p">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Continuar — Lección 2: Autenticación
+    </button>
+    <button class="cta-s">Ir al Laboratorio de Simulación</button>
+
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="rp">
+
+    <!-- PERFIL -->
+    <div class="profile-card">
+      <div class="profile-av">MA</div>
+      <div class="profile-name">María A. Flores</div>
+      <div class="profile-role">Servidora Pública · CDMX</div>
+      <div class="profile-stats">
+        <div class="ps"><div class="ps-val">68%</div><div class="ps-lbl">Progreso</div></div>
+        <div class="ps"><div class="ps-val">5</div><div class="ps-lbl">Logros</div></div>
+        <div class="ps"><div class="ps-val">8.7</div><div class="ps-lbl">Calific.</div></div>
+        <div class="ps"><div class="ps-val">7d</div><div class="ps-lbl">Racha</div></div>
+      </div>
+    </div>
+
+    <!-- CALENDARIO -->
+    <div class="cal-card">
+      <div class="cal-head">
+        <span class="cal-title">Marzo 2026</span>
+        <div class="cal-nav">
+          <button class="cal-btn">‹</button>
+          <button class="cal-btn">›</button>
+        </div>
+      </div>
+      <div class="cal-days">
+        <div class="cal-day-lbl">L</div><div class="cal-day-lbl">M</div><div class="cal-day-lbl">X</div><div class="cal-day-lbl">J</div><div class="cal-day-lbl">V</div><div class="cal-day-lbl">S</div><div class="cal-day-lbl">D</div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+
+    <!-- NOTIFICACIONES -->
+    <div class="notif-card">
+      <div class="sec-title">Notificaciones</div>
+      <div class="notif-row">
+        <div class="notif-ico" style="background:rgba(0,229,160,.15)">📋</div>
+        <div class="notif-txt"><div class="notif-title">Quiz disponible</div><div class="notif-sub">Módulo 3 · Hoy 16:00</div></div>
+        <div class="notif-new"></div>
+      </div>
+      <div class="notif-row">
+        <div class="notif-ico" style="background:rgba(20,40,212,.12)">🎙️</div>
+        <div class="notif-txt"><div class="notif-title">Sesión en vivo</div><div class="notif-sub">Mañana 10:00 AM</div></div>
+        <div class="notif-new"></div>
+      </div>
+      <div class="notif-row">
+        <div class="notif-ico" style="background:rgba(255,186,0,.14)">⭐</div>
+        <div class="notif-txt"><div class="notif-title">Nuevo logro cerca</div><div class="notif-sub">Completa 1 lección más</div></div>
+        <div class="notif-new" style="background:transparent"></div>
+      </div>
+      <div class="notif-row">
+        <div class="notif-ico" style="background:rgba(229,57,53,.1)">📝</div>
+        <div class="notif-txt"><div class="notif-title">Tarea pendiente</div><div class="notif-sub">Vence el 18 Mar</div></div>
+        <div class="notif-new"></div>
+      </div>
+    </div>
+
+    <!-- NOTAS -->
+    <div class="notes-card">
+      <div class="sec-title">Mis notas</div>
+      <textarea class="notes-input" placeholder="Escribe aquí tus notas de la sesión..."></textarea>
+      <button class="notes-save">Guardar nota →</button>
+    </div>
+
+    <!-- ¿CÓMO FUNCIONA? -->
+    <button class="help-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      ¿Cómo funciona?
+    </button>
+
+  </aside>
+</div>
+
+<script>
+function setNav(el) {
+  document.querySelectorAll('.nb').forEach(n => n.classList.remove('on'));
+  el.classList.add('on');
+}
+function selectCI(btn) {
+  document.querySelectorAll('.ci-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+// Calendario de Marzo 2026
+(function buildCal() {
+  const grid = document.getElementById('calGrid');
+  const events = [10, 15, 18, 22, 25];
+  const firstDay = 6; // Domingo = 6 (0=Lunes)
+  const days = 31;
+  for (let i = 0; i < firstDay; i++) {
+    const e = document.createElement('button');
+    e.className = 'cd empty'; e.textContent = '';
+    grid.appendChild(e);
+  }
+  for (let d = 1; d <= days; d++) {
+    const e = document.createElement('button');
+    let cls = 'cd';
+    if (d === 15) cls += ' today';
+    if (events.includes(d) && d !== 15) cls += ' has-event';
+    e.className = cls;
+    e.textContent = d;
+    grid.appendChild(e);
+  }
+})();
+
+// Fecha actual
+document.getElementById('dateChip').textContent = 'Dom 15 Mar 2026';
+</script>

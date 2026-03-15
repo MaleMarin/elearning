@@ -16,6 +16,7 @@ const DEMO_PROFILE: profileService.UserProfile = {
   linkedIn: null,
   preferredLanguage: "es",
   reminderFrequency: "weekly",
+  contentMode: "leer",
   totalMinutesOnPlatform: 120,
   lastActivityDate: new Date().toISOString().slice(0, 10),
   streakDays: 2,
@@ -45,6 +46,7 @@ export async function GET(req: NextRequest) {
       totalMinutesOnPlatform: 0,
       lastActivityDate: null,
       streakDays: 0,
+      contentMode: "leer",
     };
     return NextResponse.json(data);
   } catch {
@@ -85,6 +87,9 @@ export async function PUT(req: NextRequest) {
     }
     if (typeof body.accessibilityReduceMotion === "boolean") updates.accessibilityReduceMotion = body.accessibilityReduceMotion;
     if (typeof body.accessibilityHighContrast === "boolean") updates.accessibilityHighContrast = body.accessibilityHighContrast;
+    if (body.contentMode !== undefined && ["leer", "escuchar", "ver"].includes(body.contentMode)) {
+      updates.contentMode = body.contentMode as profileService.ContentMode;
+    }
     await profileService.updateProfile(auth.uid, updates);
     if (updates.institution !== undefined || updates.position !== undefined) {
       const profile = await profileService.getProfile(auth.uid);

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "dev:fresh": "lsof -ti:3000 | xargs kill -9 2>/dev/null; next dev -p 3000",
+    "dev:3001": "next dev -p 3001",
     "dev:any": "next dev",
     "build": "next build",
     "start": "next start",
@@ -41,6 +42,7 @@
     "d3": "^7.9.0",
     "firebase": "^12.10.0",
     "firebase-admin": "^13.7.0",
+    "googleapis": "^144.0.0",
     "idb": "^8.0.3",
     "jose": "^6.2.1",
     "jszip": "^3.10.1",
@@ -75,6 +77,7 @@
     "jest-environment-jsdom": "^30.3.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
+    "terser": "^5.46.0",
     "ts-jest": "^29.4.6",
     "tsx": "^4.19.2",
     "typescript": "^5"

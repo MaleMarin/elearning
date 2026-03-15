@@ -7,7 +7,7 @@ import * as firebaseContent from "@/lib/services/firebase-content";
 export const dynamic = "force-dynamic";
 
 function demoEnrolledResponse() {
-  return NextResponse.json({ enrolled: true, cohortId: "demo-cohort-id", cohortName: "Cohorte demo" });
+  return NextResponse.json({ enrolled: true, cohortId: "demo-cohort-id", cohortName: "Grupo demo" });
 }
 
 /**

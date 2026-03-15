@@ -30,7 +30,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   "mi-perfil": "Mi perfil",
   admin: "Admin",
   cursos: "Cursos",
-  cohortes: "Cohortes",
+  cohortes: "Grupos",
   felicidades: "Felicidades",
   "panel": "Panel",
   contenido: "Contenido",

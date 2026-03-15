@@ -170,7 +170,7 @@ export function Sidebar() {
             }}
             title={cohortName}
           >
-            Grupo demo
+            Grupo
           </span>
         )}
       </div>

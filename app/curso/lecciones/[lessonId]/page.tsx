@@ -26,6 +26,9 @@ import { getDemoMode } from "@/lib/env";
 import type { MicroSimulation as SimType } from "@/lib/services/simulations";
 import { prefetchNextModules } from "@/lib/offline/prefetch";
 import { addPendingProgress } from "@/lib/offline/sync-manager";
+import LessonComplete from "@/components/learning/LessonComplete";
+import FlashcardDeck from "@/components/learning/FlashcardDeck";
+import LessonNotes from "@/components/lessons/LessonNotes";
 import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 
 export default function CursoLeccionPage() {
@@ -38,11 +41,16 @@ export default function CursoLeccionPage() {
   const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [completing, setCompleting] = useState(false);
+  const [showLessonComplete, setShowLessonComplete] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const [simulation, setSimulation] = useState<SimType | null>(null);
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [tab, setTab] = useState<"contenido" | "preguntas">("contenido");
   const contentRef = useRef<HTMLDivElement>(null);
+  const [flashcards, setFlashcards] = useState<{ frente: string; reverso: string }[]>([]);
+  const [flashcardsLoading, setFlashcardsLoading] = useState(false);
+  const [flashcardsGenerating, setFlashcardsGenerating] = useState(false);
+  const [contentMode, setContentMode] = useState<"leer" | "escuchar" | "ver">("leer");
 
   useEffect(() => {
     const el = contentRef.current;
@@ -153,6 +161,49 @@ export default function CursoLeccionPage() {
     return () => clearTimeout(t);
   }, [toast]);
 
+  useEffect(() => {
+    fetch("/api/profile", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p: { contentMode?: "leer" | "escuchar" | "ver" } | null) => {
+        if (p?.contentMode && ["leer", "escuchar", "ver"].includes(p.contentMode))
+          setContentMode(p.contentMode);
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!lessonId) return;
+    setFlashcardsLoading(true);
+    fetch(`/api/flashcards?lessonId=${encodeURIComponent(lessonId)}`, { credentials: "include" })
+      .then((r) => r.json())
+      .then((d: { flashcards?: { frente: string; reverso: string }[] }) => {
+        setFlashcards(Array.isArray(d?.flashcards) ? d.flashcards : []);
+      })
+      .catch(() => setFlashcards([]))
+      .finally(() => setFlashcardsLoading(false));
+  }, [lessonId]);
+
+  const handleGenerarFlashcards = useCallback(() => {
+    if (!api?.lesson || flashcardsGenerating) return;
+    setFlashcardsGenerating(true);
+    const useBlocksHere = Array.isArray(api.lesson.blocks) && api.lesson.blocks.length > 0;
+    const lessonContent = useBlocksHere && api.lesson.blocks
+      ? [api.lesson.title, getPlainTextFromBlocks(api.lesson.blocks)].filter(Boolean).join("\n\n")
+      : (api.lesson.content ?? api.lesson.title ?? "");
+    fetch("/api/flashcards/generar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ lessonId, lessonContent, numCards: 5 }),
+    })
+      .then((r) => r.json())
+      .then((d: { flashcards?: { frente: string; reverso: string }[] }) => {
+        if (Array.isArray(d?.flashcards)) setFlashcards(d.flashcards);
+      })
+      .catch(() => {})
+      .finally(() => setFlashcardsGenerating(false));
+  }, [api?.lesson, flashcardsGenerating, lessonId]);
+
   const markComplete = useCallback(() => {
     if (!api?.courseId || completing) return;
     setCompleting(true);
@@ -172,6 +223,7 @@ export default function CursoLeccionPage() {
             router.push("/curso/evaluacion-final");
             return;
           }
+          setShowLessonComplete(true);
           if (!getDemoMode()) {
             fetch("/api/audit", {
               method: "POST",
@@ -251,14 +303,22 @@ export default function CursoLeccionPage() {
     : null;
 
   return (
-    <div className="max-w-3xl w-full space-y-6">
-      <nav className="text-sm text-[var(--ink-muted)]" aria-label="Breadcrumb">
-        <Link href="/curso" className="hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] rounded">
-          Curso
-        </Link>
-        {" · "}
-        <span className="text-[var(--ink)] font-medium">{lesson.title}</span>
-      </nav>
+    <>
+      {showLessonComplete && (
+        <LessonComplete
+          lessonTitle={lesson.title}
+          xp={10}
+          onContinue={() => setShowLessonComplete(false)}
+        />
+      )}
+      <div className="max-w-3xl w-full space-y-6">
+        <nav className="text-sm text-[var(--ink-muted)]" aria-label="Breadcrumb">
+          <Link href="/curso" className="hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] rounded">
+            Curso
+          </Link>
+          {" · "}
+          <span className="text-[var(--ink)] font-medium">{lesson.title}</span>
+        </nav>
 
       {/* Barra de progreso de lectura (scroll). */}
       <div
@@ -367,43 +427,91 @@ export default function CursoLeccionPage() {
           }
           storageId={lessonId}
           title={lesson.title}
+          autoplay={contentMode === "escuchar"}
         />
       </section>
 
-      {lesson.video_embed_url && (
-        <div className="rounded-xl overflow-hidden border border-[var(--line-subtle)] bg-[var(--ink)] aspect-video">
-          <iframe
-            src={lesson.video_embed_url}
-            title={`Video: ${lesson.title}`}
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-      )}
+      {(() => {
+        const hasVideo = !!(lesson.video_url || lesson.video_embed_url);
+        const videoBlock = lesson.video_url ? (
+          <div key="v" className="rounded-xl overflow-hidden border border-[var(--line-subtle)] bg-[var(--ink)] aspect-video">
+            <video controls style={{ width: "100%", borderRadius: 12 }} className="w-full h-full">
+              <source src={lesson.video_url} type="video/mp4" />
+              {(lesson as { subtitulos_url?: string | null }).subtitulos_url && (
+                <track
+                  kind="subtitles"
+                  src={(lesson as { subtitulos_url?: string }).subtitulos_url!}
+                  srcLang="es"
+                  label="Español"
+                  default
+                />
+              )}
+              Tu navegador no soporta video HTML5.
+            </video>
+          </div>
+        ) : lesson.video_embed_url ? (
+          <div key="v" className="rounded-xl overflow-hidden border border-[var(--line-subtle)] bg-[var(--ink)] aspect-video">
+            <iframe
+              src={lesson.video_embed_url}
+              title={`Video: ${lesson.title}`}
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        ) : null;
+
+        const textBlock = (
+          <SurfaceCard key="text" padding="lg" clickable={false} ref={contentRef}>
+            {useBlocks ? (
+              <LessonContent
+                blocks={lesson.blocks ?? []}
+                lessonId={lessonId}
+                h5pContentById={h5pContentById}
+              />
+            ) : contentHtml ? (
+              <div
+                className="reading-width prose prose-neutral text-[var(--ink)] prose-p:mb-3 prose-p:leading-relaxed prose-strong:font-semibold"
+                dangerouslySetInnerHTML={{ __html: contentHtml }}
+              />
+            ) : (
+              <p className="text-[var(--ink-muted)]">Sin contenido adicional.</p>
+            )}
+          </SurfaceCard>
+        );
+
+        if (!hasVideo) return textBlock;
+        if (contentMode === "ver") {
+          return (
+            <>
+              {videoBlock}
+              <details className="mt-4 rounded-xl border border-[var(--line)] overflow-hidden">
+                <summary className="px-4 py-3 font-medium text-[var(--ink)] cursor-pointer bg-[var(--surface-soft)]">
+                  Ver texto y contenido
+                </summary>
+                <div className="p-4">{textBlock}</div>
+              </details>
+            </>
+          );
+        }
+        return (
+          <>
+            {textBlock}
+            <details className="mt-4 rounded-xl border border-[var(--line)] overflow-hidden">
+              <summary className="px-4 py-3 font-medium text-[var(--ink)] cursor-pointer bg-[var(--surface-soft)]">
+                Ver video
+              </summary>
+              <div className="p-4">{videoBlock}</div>
+            </details>
+          </>
+        );
+      })()}
 
       {lesson.h5pContent && !useBlocks && (
         <SurfaceCard padding="lg" clickable={false}>
           <H5PPlayer content={lesson.h5pContent} title="Contenido interactivo" />
         </SurfaceCard>
       )}
-
-      <SurfaceCard padding="lg" clickable={false} ref={contentRef}>
-        {useBlocks ? (
-          <LessonContent
-            blocks={lesson.blocks ?? []}
-            lessonId={lessonId}
-            h5pContentById={h5pContentById}
-          />
-        ) : contentHtml ? (
-          <div
-            className="reading-width prose prose-neutral text-[var(--ink)] prose-p:mb-3 prose-p:leading-relaxed prose-strong:font-semibold"
-            dangerouslySetInnerHTML={{ __html: contentHtml }}
-          />
-        ) : (
-          <p className="text-[var(--ink-muted)]">Sin contenido adicional.</p>
-        )}
-      </SurfaceCard>
 
       {simulation && (
         <MicroSimulation simulation={simulation} />
@@ -438,6 +546,29 @@ export default function CursoLeccionPage() {
       </div>
 
       <LearningJournal lessonId={lessonId} userId={userId} />
+
+      <SurfaceCard padding="lg" clickable={false} className="mt-6">
+        <h3 className="text-base font-semibold text-[var(--ink)] mb-3">Flashcards</h3>
+        {flashcardsLoading ? (
+          <p className="text-sm text-[var(--ink-muted)]">Cargando…</p>
+        ) : flashcards.length > 0 ? (
+          <FlashcardDeck cards={flashcards} />
+        ) : (
+          <div className="space-y-3">
+            <p className="text-sm text-[var(--ink-muted)]">Genera tarjetas de repaso con IA a partir del contenido de esta lección.</p>
+            <button
+              type="button"
+              onClick={handleGenerarFlashcards}
+              disabled={flashcardsGenerating}
+              className="px-4 py-2 rounded-xl bg-[var(--azul)] text-white font-medium text-sm hover:opacity-90 disabled:opacity-60"
+            >
+              {flashcardsGenerating ? "Generando…" : "Generar flashcards con IA"}
+            </button>
+          </div>
+        )}
+      </SurfaceCard>
+
+      <LessonNotes lessonId={lessonId} />
         </>
       )}
 
@@ -471,6 +602,7 @@ export default function CursoLeccionPage() {
           />
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

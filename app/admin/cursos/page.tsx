@@ -193,7 +193,7 @@ export default function AdminCursosPage() {
 
         <PageSection
           title="Cursos"
-          subtitle="Crea y edita cursos, módulos y lecciones. Asigna cursos a cohortes."
+          subtitle="Crea y edita cursos, módulos y lecciones. Asigna cursos a grupos."
         >
           {error !== null && (
             <div className="mb-6">

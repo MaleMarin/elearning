@@ -9,6 +9,7 @@ import { getFirebaseAdminAuth } from "@/lib/firebase/admin";
 import { getFirebaseAdminFirestore } from "@/lib/firebase/admin";
 import { getDemoMode } from "@/lib/env";
 import { PRECISAR_SESSION_COOKIE, verifyDemoSessionCookie, isDemoCookieValue } from "@/lib/auth/session-cookie";
+import { DEMO_USER_DISPLAY_NAME } from "@/lib/supabase/demo-mock";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
   if (getDemoMode() || isDemoCookieValue(cookieValue)) {
     const user = await verifyDemoSessionCookie(cookieValue);
     if (!user) return NextResponse.json({ error: "invalid_session" }, { status: 401 });
-    return NextResponse.json({ uid: user.uid, email: user.email, role: user.role, mfaEnabled: false });
+    return NextResponse.json({ uid: user.uid, email: user.email, role: user.role, mfaEnabled: false, full_name: DEMO_USER_DISPLAY_NAME });
   }
 
   try {
@@ -32,7 +33,9 @@ export async function GET(req: NextRequest) {
 
     const db = getFirebaseAdminFirestore();
     const profileSnap = await db.collection("profiles").doc(uid).get();
-    const role = (profileSnap.data()?.role as string) ?? "student";
+    const profileData = profileSnap.data();
+    const role = (profileData?.role as string) ?? "student";
+    const full_name = (profileData?.full_name as string)?.trim() || email?.split("@")[0] || "Estudiante";
 
     let mfaEnabled = false;
     try {
@@ -42,7 +45,7 @@ export async function GET(req: NextRequest) {
       // ignore
     }
 
-    return NextResponse.json({ uid, email, role, mfaEnabled });
+    return NextResponse.json({ uid, email, role, mfaEnabled, full_name });
   } catch {
     return NextResponse.json({ error: "invalid_session" }, { status: 401 });
   }

@@ -25,7 +25,7 @@ export async function GET(
     if (!challengeId || !teamId) return NextResponse.json({ error: "challengeId y teamId requeridos" }, { status: 400 });
     if (!useFirebase()) return NextResponse.json({ error: "No disponible" }, { status: 501 });
     const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
-    if (!enrollment) return NextResponse.json({ error: "No perteneces a una cohorte" }, { status: 403 });
+    if (!enrollment) return NextResponse.json({ error: "No perteneces a un grupo" }, { status: 403 });
     const team = await challenges.getTeam(enrollment.cohort_id, challengeId, teamId);
     if (!team) return NextResponse.json({ error: "Equipo no encontrado" }, { status: 404 });
     if (!team.miembros.includes(auth.uid)) return NextResponse.json({ error: "No eres miembro del equipo" }, { status: 403 });
@@ -46,7 +46,7 @@ export async function POST(
     if (!challengeId || !teamId) return NextResponse.json({ error: "challengeId y teamId requeridos" }, { status: 400 });
     if (!useFirebase()) return NextResponse.json({ error: "No disponible" }, { status: 501 });
     const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
-    if (!enrollment) return NextResponse.json({ error: "No perteneces a una cohorte" }, { status: 403 });
+    if (!enrollment) return NextResponse.json({ error: "No perteneces a un grupo" }, { status: 403 });
     const team = await challenges.getTeam(enrollment.cohort_id, challengeId, teamId);
     if (!team) return NextResponse.json({ error: "Equipo no encontrado" }, { status: 404 });
     if (!team.miembros.includes(auth.uid)) return NextResponse.json({ error: "No eres miembro del equipo" }, { status: 403 });

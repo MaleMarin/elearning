@@ -1,5 +1,5 @@
 /**
- * GET: ranking semanal de la cohorte del usuario.
+ * GET: ranking semanal del grupo del usuario.
  * Query: weekId (opcional, por defecto semana actual).
  */
 import { NextRequest, NextResponse } from "next/server";

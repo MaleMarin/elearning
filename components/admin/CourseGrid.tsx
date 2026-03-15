@@ -48,7 +48,7 @@ export function CourseGrid({
             <th className="px-4 py-3 font-semibold text-[var(--ink)]">Estado</th>
             <th className="px-4 py-3 font-semibold text-[var(--ink)]">Alumnos</th>
             <th className="px-4 py-3 font-semibold text-[var(--ink)]">Progreso prom.</th>
-            <th className="px-4 py-3 font-semibold text-[var(--ink)]">Cohortes</th>
+            <th className="px-4 py-3 font-semibold text-[var(--ink)]">Grupos</th>
             <th className="px-4 py-3 font-semibold text-[var(--ink)] text-right">Acciones</th>
           </tr>
         </thead>
@@ -87,7 +87,7 @@ export function CourseGrid({
                     </SecondaryButton>
                     <SecondaryButton href={`/admin/cohortes?course=${c.id}`} className="text-sm inline-flex items-center gap-1">
                       <UsersRound className="w-3.5 h-3.5" />
-                      Cohortes
+                      Grupos
                     </SecondaryButton>
                     <SecondaryButton
                       onClick={() => onDuplicate(c)}

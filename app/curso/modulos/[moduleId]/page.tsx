@@ -12,6 +12,7 @@ import {
   ModuleAccessGate,
   ModuleLanding,
 } from "@/components/modules";
+import ModuleNPS from "@/components/learning/ModuleNPS";
 import { EmptyState, PrimaryButton } from "@/components/ui";
 import type { ModuleContentApiResponse } from "@/app/api/modules/[moduleId]/content/route";
 
@@ -31,6 +32,7 @@ export default function ModuloPage() {
   const [data, setData] = useState<ModuleContentApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>("inicio");
+  const [npsDone, setNpsDone] = useState(false);
 
   useEffect(() => {
     if (!moduleId) {
@@ -200,14 +202,23 @@ export default function ModuloPage() {
                 </p>
               </div>
             ) : (
-              <div className="rounded-[16px] p-6 bg-[var(--neu-bg)]" style={{ boxShadow: "var(--neu-shadow-out-sm)" }}>
-                <p className="font-medium text-[var(--ink)] mb-3">Quiz del módulo</p>
-                <Link
-                  href={`/curso/quiz/${quizId}`}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--azul)] text-white font-medium hover:opacity-90"
-                >
-                  Ir al quiz →
-                </Link>
+              <div className="space-y-6">
+                <div className="rounded-[16px] p-6 bg-[var(--neu-bg)]" style={{ boxShadow: "var(--neu-shadow-out-sm)" }}>
+                  <p className="font-medium text-[var(--ink)] mb-3">Quiz del módulo</p>
+                  <Link
+                    href={`/curso/quiz/${quizId}`}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--azul)] text-white font-medium hover:opacity-90"
+                  >
+                    Ir al quiz →
+                  </Link>
+                </div>
+                {!npsDone && (
+                  <ModuleNPS
+                    moduloId={moduleId}
+                    moduloTitulo={mod.title}
+                    onComplete={() => setNpsDone(true)}
+                  />
+                )}
               </div>
             )}
           </>

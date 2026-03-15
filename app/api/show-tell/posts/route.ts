@@ -1,5 +1,5 @@
 /**
- * GET: lista posts Show & Tell de la cohorte del usuario.
+ * GET: lista posts Show & Tell del grupo del usuario.
  * POST: crea post (body: type "video" | "text", videoUrl?, textContent?). Moderación en textContent.
  */
 import { NextRequest, NextResponse } from "next/server";
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
   try {
     const auth = await getAuthFromRequest(req);
     const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
-    if (!enrollment) return NextResponse.json({ error: "Sin cohorte activa" }, { status: 403 });
+    if (!enrollment) return NextResponse.json({ error: "Sin grupo activo" }, { status: 403 });
     const body = await req.json();
     const type = body.type === "video" ? "video" : "text";
     if (type === "video") {

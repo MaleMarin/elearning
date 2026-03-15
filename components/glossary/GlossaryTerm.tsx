@@ -80,7 +80,7 @@ export function GlossaryTerm({
         </p>
         {isCommunityChoice && (
           <p className="mt-1 text-xs text-[var(--primary)] font-medium">
-            Definición más votada de la cohorte
+            Definición más votada del grupo
           </p>
         )}
       </div>

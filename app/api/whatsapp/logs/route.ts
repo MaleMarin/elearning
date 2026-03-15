@@ -3,7 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-/** GET: message_logs. Usuario: solo los suyos. Mentor: ?cohortId= para su cohorte. Admin: todos o ?cohortId= */
+/** GET: message_logs. Usuario: solo los suyos. Mentor: ?cohortId= para su grupo. Admin: todos o ?cohortId= */
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient();

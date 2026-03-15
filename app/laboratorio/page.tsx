@@ -65,6 +65,16 @@ export default function LaboratorioPage() {
         hablasHumano={data.hablasHumano}
         simulador={data.simulador}
       />
+      <Link href="/laboratorio/escape" className="mt-6 block">
+        <div
+          className="rounded-xl p-5 border border-[var(--primary)]/30 bg-[var(--primary-soft)]/20 hover:bg-[var(--primary-soft)]/30 transition-colors"
+          style={{ boxShadow: "var(--neu-shadow-out-sm)" }}
+        >
+          <span className="text-lg" aria-hidden>🚨</span>
+          <h2 className="text-base font-semibold text-[var(--ink)] mt-2">Simulador de crisis · Ciberseguridad</h2>
+          <p className="text-sm text-[var(--ink-muted)] mt-1">Toma decisiones en un escenario de brecha de datos y cumple la LFPDPPP.</p>
+        </div>
+      </Link>
     </div>
   );
 }

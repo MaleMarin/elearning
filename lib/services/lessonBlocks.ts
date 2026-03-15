@@ -99,7 +99,12 @@ export interface ChecklistBlock extends BaseBlock {
 
 export interface H5PBlock extends BaseBlock {
   type: "h5p";
-  contentId: string;
+  /** ID de contenido H5P interno (reproductor propio). */
+  contentId?: string;
+  /** URL del contenido H5P externo (iframe + xAPI). */
+  src?: string;
+  title?: string;
+  height?: number;
 }
 
 export type LessonBlock =

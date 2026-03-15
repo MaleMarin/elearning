@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/courses
- * Cursos publicados asignados a la cohorte del usuario (enrollment active).
+ * Cursos publicados asignados al grupo del usuario (enrollment active).
  * Solo devuelve cursos con status = 'published'.
  */
 export async function GET() {

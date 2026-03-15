@@ -26,16 +26,16 @@ export default function HablasHumanoPage() {
         <span className="text-[var(--ink-muted)]">·</span>
       </div>
       <h1 className="text-2xl font-bold text-[var(--ink)]">¿Hablas humano?</h1>
-      <p className="text-[var(--ink-muted)] mt-1 mb-6">5 modos para traducir el lenguaje tech. Sin calificaciones.</p>
+      <p className="text-[var(--ink-muted)] mt-1 mb-6">5 modos para traducir el lenguaje tech. 80 términos. Sin calificaciones.</p>
 
       {modo === null ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {[
-            { id: "modo1" as const, icon: "🔤", title: "¿Qué dijo el informático?", desc: "Frase técnica → elige qué significa." },
-            { id: "modo2" as const, icon: "📝", title: "Traduce esto", desc: "Explica la frase técnica a tu jefe o a tu abuela." },
-            { id: "modo3" as const, icon: "🎯", title: "Bingo de la reunión", desc: "Marca términos tech cuando los escuches en una reunión." },
-            { id: "modo4" as const, icon: "❓", title: "¿Mito o realidad tech?", desc: "20 afirmaciones: mito o verdad." },
-            { id: "modo5" as const, icon: "🤝", title: "El Intérprete", desc: "Media entre informático y director." },
+            { id: "modo1" as const, icon: "🔤", title: "DEFINIR", desc: "¿Qué significa esta palabra?" },
+            { id: "modo2" as const, icon: "📝", title: "USAR", desc: "Usa esta palabra en una oración." },
+            { id: "modo3" as const, icon: "🎯", title: "CLASIFICAR", desc: "¿A qué categoría pertenece?" },
+            { id: "modo4" as const, icon: "❓", title: "COMPARAR", desc: "¿Cuál es la diferencia entre X e Y?" },
+            { id: "modo5" as const, icon: "🤝", title: "APLICAR", desc: "¿En qué situación de gobierno usarías esto?" },
           ].map((m) => (
             <SurfaceCard key={m.id} padding="lg" onClick={() => setModo(m.id)} className="cursor-pointer">
               <span className="text-2xl" aria-hidden>{m.icon}</span>

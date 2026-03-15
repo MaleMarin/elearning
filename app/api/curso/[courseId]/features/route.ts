@@ -1,6 +1,6 @@
 /**
  * GET /api/curso/[courseId]/features
- * Devuelve los feature flags del curso solo si el usuario está inscrito en una cohorte
+ * Devuelve los feature flags del curso solo si el usuario está inscrito en un grupo
  * cuyo curso primario es este courseId.
  */
 import { NextRequest, NextResponse } from "next/server";
@@ -33,7 +33,7 @@ export async function GET(
     const auth = await getAuthFromRequest(_req);
     const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
     if (!enrollment) {
-      return NextResponse.json({ error: "Sin cohorte activa" }, { status: 403 });
+      return NextResponse.json({ error: "Sin grupo activo" }, { status: 403 });
     }
     const primaryCourseId = await firebaseContent.getPrimaryCourseForCohort(enrollment.cohort_id);
     if (primaryCourseId !== courseId) {

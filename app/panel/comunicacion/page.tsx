@@ -59,11 +59,11 @@ export default function CentroComunicacionPage() {
       </nav>
       <h1 className="text-2xl font-bold text-[var(--text)] mb-4">Centro de Comunicación</h1>
       <p className="text-[var(--text-muted)] mb-6">
-        Envía recordatorios por WhatsApp a una cohorte usando plantillas aprobadas. Revisa el estado de entrega abajo.
+        Envía recordatorios por WhatsApp a un grupo usando plantillas aprobadas. Revisa el estado de entrega abajo.
       </p>
 
       <div className="card-white p-6 mb-6">
-        <h2 className="text-lg font-semibold text-[var(--text)] mb-4">Enviar recordatorio a cohorte</h2>
+        <h2 className="text-lg font-semibold text-[var(--text)] mb-4">Enviar recordatorio a grupo</h2>
         <div className="flex flex-wrap gap-4 items-end">
           <label className="min-w-[200px]">
             <span className="block font-medium text-[var(--text)] mb-1">Cohorte</span>
@@ -72,7 +72,7 @@ export default function CentroComunicacionPage() {
               onChange={(e) => setSelectedCohort(e.target.value)}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 min-h-[48px]"
             >
-              <option value="">Seleccionar cohorte</option>
+              <option value="">Seleccionar grupo</option>
               {cohorts.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -105,7 +105,7 @@ export default function CentroComunicacionPage() {
             disabled={sending || !selectedCohort || !templateName.trim()}
             className="btn-primary disabled:opacity-50"
           >
-            {sending ? "Enviando…" : "Enviar a cohorte"}
+            {sending ? "Enviando…" : "Enviar a grupo"}
           </button>
         </div>
         {error && <p className="text-[var(--error)] text-sm mt-3" role="alert">{error}</p>}
@@ -114,7 +114,7 @@ export default function CentroComunicacionPage() {
       <div className="card-white p-6">
         <h2 className="text-lg font-semibold text-[var(--text)] mb-3">Estado de entrega</h2>
         <p className="text-[var(--text-muted)] text-sm mb-4">
-          {selectedCohort ? "Logs de la cohorte seleccionada." : "Selecciona una cohorte para filtrar (admin ve todos)."}
+          {selectedCohort ? "Logs del grupo seleccionado." : "Selecciona un grupo para filtrar (admin ve todos)."}
         </p>
         {logs.length === 0 ? (
           <p className="text-[var(--text-muted)]">No hay envíos aún.</p>

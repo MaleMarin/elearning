@@ -12,6 +12,16 @@ const withPWA = require("@ducanh2912/next-pwa").default({
   workboxOptions: {
     runtimeCaching: [
       {
+        urlPattern: /^https:\/\/fonts\.googleapis\.com/,
+        handler: "CacheFirst",
+        options: { cacheName: "google-fonts", expiration: { maxEntries: 10 } },
+      },
+      {
+        urlPattern: /\/_next\/static\//,
+        handler: "CacheFirst",
+        options: { cacheName: "static-assets" },
+      },
+      {
         urlPattern: /^https?:\/\/[^/]+\/api\/curso(\/|$)/,
         handler: "NetworkFirst",
         options: {
@@ -36,6 +46,8 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 });
 
 const nextConfig = {
+  // Minificación con SWC (evita error "terser" en build/Vercel)
+  swcMinify: true,
   async rewrites() {
     return [
       // Si algo pide /next/static/* (sin _), servir desde /_next/static/* para evitar 404 y MIME type HTML

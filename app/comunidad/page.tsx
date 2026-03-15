@@ -24,7 +24,7 @@ export default function ComunidadPage() {
   const [unansweredLoading, setUnansweredLoading] = useState(false);
   const [digestResult, setDigestResult] = useState<string | null>(null);
   const [unansweredResult, setUnansweredResult] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"general" | "mi-cohorte">("mi-cohorte");
+  const [activeTab, setActiveTab] = useState<"general" | "mi-grupo">("mi-grupo");
   const [reportingId, setReportingId] = useState<string | null>(null);
   const [reportResult, setReportResult] = useState<string | null>(null);
 
@@ -140,15 +140,15 @@ export default function ComunidadPage() {
           <button
             type="button"
             role="tab"
-            aria-selected={activeTab === "mi-cohorte"}
-            onClick={() => setActiveTab("mi-cohorte")}
+            aria-selected={activeTab === "mi-grupo"}
+            onClick={() => setActiveTab("mi-grupo")}
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-              activeTab === "mi-cohorte"
+              activeTab === "mi-grupo"
                 ? "border-[var(--primary)] text-[var(--primary)]"
                 : "border-transparent text-[var(--text-muted)] hover:text-[var(--text)]"
             }`}
           >
-            Mi cohorte
+            Mi grupo
           </button>
           <button
             type="button"
@@ -166,9 +166,9 @@ export default function ComunidadPage() {
         </div>
       )}
 
-      {activeTab === "mi-cohorte" && cohortId && (
+      {activeTab === "mi-grupo" && cohortId && (
         <p className="text-sm text-[var(--text-muted)] mb-4">
-          Foro privado de tu cohorte. Solo los miembros pueden ver y participar. El facilitador puede fijar anuncios y abrir hilos por módulo.
+          Foro privado de tu grupo. Solo los miembros pueden ver y participar. El facilitador puede fijar anuncios y abrir hilos por módulo.
         </p>
       )}
 

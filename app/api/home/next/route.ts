@@ -37,7 +37,7 @@ function demoNext(): HomeNextResponse {
 
 /**
  * GET /api/home/next
- * Next best action para /inicio: cohorte activa → curso primary → primera lección publicada.
+ * Next best action para /inicio: grupo activo → curso primary → primera lección publicada.
  * Usa Firebase cuando useFirebase(), si no Supabase.
  */
 export async function GET(req: NextRequest): Promise<NextResponse<HomeNextResponse | { error: string }>> {

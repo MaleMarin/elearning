@@ -10,7 +10,7 @@ const cache = new Map<string, { data: CourseFeatures; ts: number }>();
 /**
  * Hook para leer los feature flags de un curso (vista alumno).
  * Usa la API /api/curso/[courseId]/features; solo devuelve datos si el usuario
- * está inscrito en una cohorte cuyo curso primario es este courseId.
+ * está inscrito en un grupo cuyo curso primario es este courseId.
  * Con cache en memoria para no cambiar frecuentemente.
  */
 export function useCourseFeatures(courseId: string | null): CourseFeatures | null {

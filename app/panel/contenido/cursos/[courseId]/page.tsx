@@ -148,9 +148,9 @@ export default function PanelCoursePage() {
       )}
 
       <div className="card-white p-4 mb-6">
-        <h2 className="text-lg font-semibold text-[var(--text)] mb-3">Asignar a cohorte</h2>
+        <h2 className="text-lg font-semibold text-[var(--text)] mb-3">Asignar a grupo</h2>
         <p className="text-[var(--text-muted)] text-sm mb-2">
-          Los mentores solo pueden editar cursos asignados a sus cohortes. Asigna este curso a una cohorte para que aparezca en el panel de los mentores.
+          Los mentores solo pueden editar cursos asignados a sus grupos. Asigna este curso a un grupo para que aparezca en el panel de los mentores.
         </p>
         <div className="flex gap-2 flex-wrap items-center mb-2">
           <select
@@ -158,7 +158,7 @@ export default function PanelCoursePage() {
             onChange={(e) => setAssignCohortId(e.target.value)}
             className="px-3 py-2 border rounded-lg min-h-[48px] min-w-[200px]"
           >
-            <option value="">Seleccionar cohorte</option>
+            <option value="">Seleccionar grupo</option>
             {cohorts.filter((c) => !cohortCourses.some((cc) => cc.cohort_id === c.id)).map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}

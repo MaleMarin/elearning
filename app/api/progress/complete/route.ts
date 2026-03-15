@@ -10,6 +10,7 @@ import * as firebaseProgress from "@/lib/services/firebase-progress";
 import * as firebaseContent from "@/lib/services/firebase-content";
 import * as spacedRepetition from "@/lib/services/spacedRepetition";
 import { logAudit } from "@/lib/services/audit-logs";
+import { logAudit as logGlobalAudit } from "@/lib/services/audit-log";
 import { trackLessonCompleted } from "@/lib/xapi/statements";
 import * as points from "@/lib/services/points";
 import { getLessonBlocks } from "@/lib/services/lessonBlocks.server";
@@ -89,6 +90,13 @@ export async function POST(
 
     trackLessonCompleted(auth.uid, lessonId, lesson?.title ?? lessonId);
     logAudit(auth.uid, "lesson_complete", { lessonId, courseId }).catch(() => {});
+    logGlobalAudit({
+      userId: auth.uid,
+      action: "lesson_completed",
+      resourceId: lessonId,
+      resourceType: "lesson",
+      metadata: { courseId },
+    }).catch(() => {});
 
     // Brecha 6: extraer conceptos y actualizar grafo de conocimiento (en segundo plano)
     (async () => {

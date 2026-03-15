@@ -2,22 +2,36 @@
 
 import { useState, useEffect } from "react";
 import { useTheme } from "@/lib/hooks/useTheme";
+import type { ContentMode } from "@/lib/services/profile";
+
+const MODOS: { id: ContentMode; emoji: string; label: string; desc: string }[] = [
+  { id: "leer", emoji: "📖", label: "Prefiero leer", desc: "Texto y diagramas" },
+  { id: "escuchar", emoji: "🎧", label: "Prefiero escuchar", desc: "Audio de las lecciones" },
+  { id: "ver", emoji: "🎥", label: "Prefiero ver", desc: "Video explicativo" },
+];
 
 interface LearningPreferencesProps {
   preferredLanguage: "es" | "en";
   reminderFrequency: "daily" | "weekly" | "live_only" | "never";
-  onSave: (data: { preferredLanguage?: "es" | "en"; reminderFrequency?: string }) => Promise<void>;
+  contentMode?: ContentMode;
+  onSave: (data: {
+    preferredLanguage?: "es" | "en";
+    reminderFrequency?: string;
+    contentMode?: ContentMode;
+  }) => Promise<void>;
   demo?: boolean;
 }
 
 export function LearningPreferences({
   preferredLanguage: initialLang,
   reminderFrequency: initialFreq,
+  contentMode: initialContentMode = "leer",
   onSave,
   demo = false,
 }: LearningPreferencesProps) {
   const [preferredLanguage, setPreferredLanguage] = useState<"es" | "en">(initialLang);
   const [reminderFrequency, setReminderFrequency] = useState(initialFreq);
+  const [contentMode, setContentMode] = useState<ContentMode>(initialContentMode);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const { theme, setTheme } = useTheme();
@@ -25,12 +39,13 @@ export function LearningPreferences({
   useEffect(() => {
     setPreferredLanguage(initialLang);
     setReminderFrequency(initialFreq);
-  }, [initialLang, initialFreq]);
+    setContentMode(initialContentMode);
+  }, [initialLang, initialFreq, initialContentMode]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await onSave({ preferredLanguage, reminderFrequency });
+      await onSave({ preferredLanguage, reminderFrequency, contentMode });
       setToast("Preferencias actualizadas");
       setTimeout(() => setToast(null), 3000);
     } finally {
@@ -47,6 +62,30 @@ export function LearningPreferences({
     <div className="card-premium p-6">
       <p className="section-label mb-2">Preferencias</p>
       <h2 className="heading-section mb-4">Aprendizaje y notificaciones</h2>
+
+      <div className="mb-4">
+        <span className="font-medium text-[var(--text)] block mb-2">Modo de contenido preferido</span>
+        <p className="text-sm text-[var(--muted)] mb-2">En las lecciones se priorizará tu opción preferida.</p>
+        <div className="flex flex-wrap gap-2">
+          {MODOS.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => setContentMode(m.id)}
+              aria-pressed={contentMode === m.id}
+              className="px-4 py-2 rounded-lg border min-w-[140px] text-left transition-colors"
+              style={{
+                borderColor: contentMode === m.id ? "var(--primary)" : "var(--line)",
+                background: contentMode === m.id ? "rgba(20, 40, 212, 0.08)" : "var(--surface)",
+              }}
+            >
+              <span className="text-lg" aria-hidden>{m.emoji}</span>
+              <span className="block font-medium text-[var(--text)]">{m.label}</span>
+              <span className="block text-xs text-[var(--muted)]">{m.desc}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <label className="block mb-4">
         <span className="font-medium text-[var(--text)]">Idioma preferido</span>

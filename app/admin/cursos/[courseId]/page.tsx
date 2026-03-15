@@ -330,12 +330,12 @@ export default function AdminCursoEditPage() {
         <SurfaceCard padding="lg" clickable={false}>
           <h2 className="text-lg font-semibold text-[var(--ink)] mb-4 flex items-center gap-2">
             <Users className="w-5 h-5 text-[var(--primary)]" />
-            Asignar a cohorte
+            Asignar a grupo
           </h2>
           {availableCohorts.length > 0 ? (
             <form onSubmit={handleAssign} className="flex flex-wrap gap-3 items-end mb-4">
               <div className="min-w-[200px]">
-                <label className="block text-xs font-medium text-[var(--ink-muted)] mb-1">Cohorte</label>
+                <label className="block text-xs font-medium text-[var(--ink-muted)] mb-1">Grupo</label>
                 <select
                   value={assignCohortId}
                   onChange={(e) => setAssignCohortId(e.target.value)}
@@ -355,7 +355,7 @@ export default function AdminCursoEditPage() {
             </form>
           ) : null}
           {cohortCourses.length === 0 ? (
-            <p className="text-[var(--ink-muted)] text-sm">Este curso no está asignado a ninguna cohorte.</p>
+            <p className="text-[var(--ink-muted)] text-sm">Este curso no está asignado a ningún grupo.</p>
           ) : (
             <ul className="space-y-2">
               {cohortCourses.map((cc) => (

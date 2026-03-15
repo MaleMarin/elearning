@@ -13,7 +13,7 @@ export const DEMO_USER = {
 } as const;
 
 /** Nombre para saludo en UI (demo). */
-export const DEMO_USER_DISPLAY_NAME = "Estudiante";
+export const DEMO_USER_DISPLAY_NAME = "Maria Flores";
 
 const DEMO_COURSE = { id: "demo-course-id", title: "Fundamentos del programa", status: "published" };
 export const DEMO_MODULES = [

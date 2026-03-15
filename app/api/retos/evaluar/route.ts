@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       )
       .join("\n\n");
 
-    const prompt = `Eres un experto en política pública. Evalúa las siguientes propuestas de equipos de una cohorte.
+    const prompt = `Eres un experto en política pública. Evalúa las siguientes propuestas de equipos de un grupo.
 
 Reto: ${challenge.titulo}
 Descripción: ${challenge.descripcion}

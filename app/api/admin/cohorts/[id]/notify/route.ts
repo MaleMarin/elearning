@@ -27,7 +27,7 @@ export async function POST(
       return NextResponse.json({ ok: true, notified: 0 });
     }
     const body = await req.json().catch(() => ({}));
-    const title = typeof body.title === "string" ? body.title.trim() : "Notificación de tu cohorte";
+    const title = typeof body.title === "string" ? body.title.trim() : "Notificación de tu grupo";
     const bodyText = typeof body.body === "string" ? body.body.trim() : "";
     const db = getFirebaseAdminFirestore();
     const batch = db.batch();

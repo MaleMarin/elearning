@@ -114,6 +114,10 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (!enrolled) {
+    // En desarrollo permitir ver el dashboard sin inscripción para pruebas
+    if (process.env.NODE_ENV === "development") {
+      return response;
+    }
     return NextResponse.redirect(new URL("/no-inscrito", origin));
   }
 

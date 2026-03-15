@@ -91,7 +91,7 @@ export function FindColleague({ onMatched }: FindColleagueProps) {
       <p className="text-sm text-[var(--ink-muted)]">
         Activa la opción para que el sistema te empareje con otro alumno (diferente institución y cargo) y completen un módulo juntos en 7 días.
       </p>
-      {!hasCohort && <p className="text-sm text-amber-700">Necesitas estar inscrito en una cohorte activa.</p>}
+      {!hasCohort && <p className="text-sm text-amber-700">Necesitas estar inscrito en un grupo activo.</p>}
       {hasCohort && (
         <label className="flex items-center gap-3 cursor-pointer">
           <input

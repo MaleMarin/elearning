@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json([
       {
         id: "demo-cohort-id",
-        name: "Cohorte demo",
+        name: "Grupo demo",
         description: null,
         starts_at: null,
         ends_at: null,
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}));
     return NextResponse.json({
       id: "demo-cohort-id",
-      name: body.name ?? "Cohorte demo",
+      name: body.name ?? "Grupo demo",
       description: body.description ?? null,
       starts_at: body.startsAt ?? null,
       ends_at: body.endsAt ?? null,
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       if (auth.role !== "admin") return NextResponse.json({ error: "Solo administradores" }, { status: 403 });
       const body = await request.json().catch(() => ({}));
       const name = (typeof body.nombre === "string" ? body.nombre.trim() : "") || (typeof body.name === "string" ? body.name.trim() : "");
-      if (!name) return NextResponse.json({ error: "Falta el nombre de la cohorte" }, { status: 400 });
+      if (!name) return NextResponse.json({ error: "Falta el nombre del grupo" }, { status: 400 });
 
       const courseId = typeof body.courseId === "string" ? body.courseId.trim() : "";
       const facilitadorId = typeof body.facilitadorId === "string" ? body.facilitadorId.trim() : "";
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Cuerpo inválido" }, { status: 400 });
   }
   const name = typeof body.name === "string" ? body.name.trim() : "";
-  if (!name) return NextResponse.json({ error: "Falta el nombre de la cohorte" }, { status: 400 });
+  if (!name) return NextResponse.json({ error: "Falta el nombre del grupo" }, { status: 400 });
   const { data, error } = await auth.supabase
     .from("cohorts")
     .insert({

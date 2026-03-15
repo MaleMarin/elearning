@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import arcjet, { tokenBucket } from "@arcjet/next";
+import arcjet, { tokenBucket, shield } from "@arcjet/next";
 import { updateSession } from "@/lib/supabase/middleware";
 
 const aj =
@@ -13,6 +13,7 @@ const aj =
         interval: 900,
         capacity: 10,
       }),
+      shield({ mode: "LIVE" }),
     ],
   });
 

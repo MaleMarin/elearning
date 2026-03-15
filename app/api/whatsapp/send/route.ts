@@ -16,7 +16,7 @@ async function ensureSender() {
   return { supabase, user, role };
 }
 
-/** POST: enviar plantilla a un número o a una cohorte. Body: { to?, cohortId?, templateName, language?, components?, cohortId (si envío a cohorte) } */
+/** POST: enviar plantilla a un número o a un grupo. Body: { to?, cohortId?, templateName, language?, components?, cohortId (si envío a grupo) } */
 export async function POST(req: NextRequest) {
   try {
     const { supabase, user, role } = await ensureSender();

@@ -22,7 +22,7 @@ export async function GET(
     return NextResponse.json({
       terms: [
         { id: "t1", term: "Innovación pública", officialDefinition: "Cambio que genera valor para la ciudadanía desde el sector público." },
-        { id: "t2", term: "Cohorte", officialDefinition: "Grupo de alumnos que cursan juntos el programa." },
+        { id: "t2", term: "Grupo", officialDefinition: "Grupo de alumnos que cursan juntos el programa." },
       ],
     });
   }

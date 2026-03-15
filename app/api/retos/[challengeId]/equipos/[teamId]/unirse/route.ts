@@ -19,7 +19,7 @@ export async function POST(
     if (!challengeId || !teamId) return NextResponse.json({ error: "challengeId y teamId requeridos" }, { status: 400 });
     if (!useFirebase()) return NextResponse.json({ error: "No disponible" }, { status: 501 });
     const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
-    if (!enrollment) return NextResponse.json({ error: "No perteneces a una cohorte" }, { status: 403 });
+    if (!enrollment) return NextResponse.json({ error: "No perteneces a un grupo" }, { status: 403 });
     const ok = await challenges.joinTeam(enrollment.cohort_id, challengeId, teamId, auth.uid);
     if (!ok) return NextResponse.json({ error: "No se pudo unir al equipo" }, { status: 400 });
     const team = await challenges.getTeam(enrollment.cohort_id, challengeId, teamId);

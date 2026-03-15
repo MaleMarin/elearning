@@ -1,6 +1,6 @@
 /**
  * GET: preguntas de la trivia semanal (semana actual).
- * POST: enviar puntaje { score }. Requiere auth; guarda en Firestore por cohorte.
+ * POST: enviar puntaje { score }. Requiere auth; guarda en Firestore por grupo.
  */
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/firebase/auth-request";
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
   if (!getDemoMode()) {
     const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
     cohortId = enrollment?.cohort_id ?? null;
-    if (!cohortId) return NextResponse.json({ error: "Sin cohorte activa" }, { status: 403 });
+    if (!cohortId) return NextResponse.json({ error: "Sin grupo activo" }, { status: 403 });
   } else {
     cohortId = "demo-cohort-id";
   }

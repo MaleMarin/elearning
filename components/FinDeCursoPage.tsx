@@ -15,11 +15,11 @@ export interface FinDeCursoPageProps {
   horas?: number;
   calificacion?: string;
   leccionesTotal?: number;
-  badges?: Badge[];
+  logros?: Badge[];
   carta?: string;
   cartaFecha?: string;
   idCert?: string;
-  cohorte?: string;
+  grupo?: string;
   /** URL base para verificación (ej. https://politicadigital.gob.mx o origin). */
   verifyUrl?: string;
 }
@@ -38,11 +38,11 @@ export default function FinDeCursoPage({
   horas = 40,
   calificacion = "9.2",
   leccionesTotal = 12,
-  badges = DEFAULT_BADGES,
+  logros = DEFAULT_BADGES,
   carta,
   cartaFecha = "10 de enero de 2025",
   idCert = "PD-2025-0842-MX",
-  cohorte = "2025-I",
+  grupo = "2025-I",
   verifyUrl,
 }: FinDeCursoPageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -210,7 +210,7 @@ export default function FinDeCursoPage({
               <span className="fc-logo-sub">Innovación Pública · México</span>
             </div>
           </div>
-          <div className="fc-badge-pill">★ Programa completado · Cohorte {cohorte}</div>
+          <div className="fc-badge-pill">★ Programa completado · Grupo {grupo}</div>
           <h1 className="fc-title">¡Lo<br /><em>lograste!</em></h1>
           <p className="fc-alumno">{nombre}</p>
           <div className="fc-divider">
@@ -244,7 +244,7 @@ export default function FinDeCursoPage({
         <section className="fc-section">
           <p className="fc-section-label">Badges obtenidos</p>
           <div className="fc-badges">
-            {badges.map((b, i) => (
+            {logros.map((b, i) => (
               <div key={i} className="fc-badge-item">
                 <span className="fc-badge-icon">{b.icon}</span>
                 <div className="fc-badge-name">{b.name}</div>
@@ -295,7 +295,7 @@ export default function FinDeCursoPage({
             <Link href="/mentores" className="fc-next-item">
               <div className="fc-next-num">4</div>
               <div>
-                <div className="fc-next-title">Sé mentor de la próxima cohorte</div>
+                <div className="fc-next-title">Sé mentor del próximo grupo</div>
                 <div className="fc-next-desc">Tu experiencia puede guiar a otros funcionarios</div>
               </div>
               <span className="fc-next-arrow">→</span>

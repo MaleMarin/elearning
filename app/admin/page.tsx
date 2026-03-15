@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { MetricCard } from "@/components/admin/MetricCard";
+import MultiCursoDashboard from "@/components/admin/MultiCursoDashboard";
 import { PrimaryButton } from "@/components/ui";
 import { getDemoMode } from "@/lib/env";
 import { Send, Database, Loader2 } from "lucide-react";
@@ -90,6 +91,18 @@ export default function AdminDashboardPage() {
         <h1 className="text-2xl font-semibold text-[var(--ink)]">Dashboard</h1>
         <p className="text-sm text-[var(--texto-sub)] mt-1">Resumen del programa y alumnos en riesgo.</p>
       </div>
+
+      {/* Dashboard multi-curso */}
+      <section
+        className="rounded-[16px] p-4 sm:p-6"
+        style={{
+          background: "var(--neu-bg)",
+          boxShadow: "var(--neu-shadow-out-sm)",
+        }}
+      >
+        <h2 className="text-lg font-semibold text-[var(--ink)] mb-4">Métricas por curso</h2>
+        <MultiCursoDashboard />
+      </section>
 
       {/* Métricas principales */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -264,7 +277,7 @@ export default function AdminDashboardPage() {
             Cursos
           </PrimaryButton>
           <PrimaryButton href="/admin/cohortes" className="!inline-flex items-center gap-2">
-            Cohortes
+            Grupos
           </PrimaryButton>
           <PrimaryButton href="/admin/alumnos/importar" className="!inline-flex items-center gap-2">
             Importar alumnos

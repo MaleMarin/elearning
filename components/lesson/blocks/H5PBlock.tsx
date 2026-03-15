@@ -1,6 +1,7 @@
 "use client";
 
 import { H5PPlayer } from "@/components/lesson/H5PPlayer";
+import H5PEmbed from "@/components/lessons/H5PEmbed";
 import type { H5PBlock as H5PBlockType } from "@/lib/services/lessonBlocks";
 import type { H5PContentPayload } from "@/lib/services/h5p";
 
@@ -13,10 +14,19 @@ interface H5PBlockProps {
 }
 
 export function H5PBlock({ block, content, lessonId }: H5PBlockProps) {
+  if (block.src) {
+    return (
+      <H5PEmbed
+        src={block.src}
+        title={block.title ?? "Contenido interactivo H5P"}
+        height={block.height ?? 400}
+      />
+    );
+  }
   if (!content) {
     return (
       <div className="rounded-xl border border-[var(--line)] p-6 text-[var(--text-muted)]">
-        Contenido interactivo no disponible (ID: {block.contentId}).
+        Contenido interactivo no disponible (ID: {block.contentId ?? "—"}).
       </div>
     );
   }

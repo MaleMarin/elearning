@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Syne, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ConditionalLayout } from "@/components/layout/ConditionalLayout";
 import { AssistantProvider } from "@/contexts/AssistantContext";
@@ -14,6 +14,20 @@ export const dynamic = "force-dynamic";
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-syne",
+  display: "swap",
+});
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
   display: "swap",
 });
 
@@ -126,7 +140,7 @@ export default async function RootLayout({
 
   return (
     <html lang="es" data-tenant={tenant?.tenantId ?? undefined}>
-      <body className={`${plusJakarta.className} min-h-screen text-[var(--ink)] antialiased`} style={{ background: "#f0f2f5" }}>
+      <body className={`${plusJakarta.className} ${syne.variable} ${spaceMono.variable} min-h-screen text-[var(--ink)] antialiased`} style={{ background: "#f0f2f5" }}>
         <style dangerouslySetInnerHTML={{ __html: criticalCss + tenantCss }} />
         <a
           href="#main-content"

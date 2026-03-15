@@ -220,7 +220,7 @@ export default function SimuladorIdPage() {
           </div>
           {cohortAverage != null && (
             <p className="text-center text-[var(--ink-muted)] text-sm">
-              Promedio de tu cohorte (anónimo): {cohortAverage} pts
+              Promedio de tu grupo (anónimo): {cohortAverage} pts
             </p>
           )}
 

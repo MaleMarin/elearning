@@ -74,7 +74,7 @@ export default function EgresadosPage() {
           Red de egresados
         </h1>
         <p className="text-sm text-[var(--ink-muted)] mb-6">
-          Directorio de quienes completaron Política Digital. Filtra por institución, región o cohorte. Los egresados llevan el badge &quot;Egresado Política Digital&quot;.
+          Directorio de quienes completaron Política Digital. Filtra por institución, región o grupo. Los egresados llevan el badge &quot;Egresado Política Digital&quot;.
         </p>
         {loading ? (
           <p className="text-[var(--ink-muted)]">Cargando…</p>

@@ -47,13 +47,13 @@ export async function runStagingSeed(supabase: SupabaseClient): Promise<SeedResu
     { onConflict: "id" }
   );
 
-  // Cohorte 4 semanas
+  // Grupo 4 semanas
   const { data: cohort, error: cohortErr } = await supabase
     .from("cohorts")
-    .insert({ name: "Cohorte Demo – 4 semanas" })
+    .insert({ name: "Grupo Demo – 4 semanas" })
     .select("id")
     .single();
-  if (cohortErr || !cohort) return { ok: false, error: cohortErr?.message ?? "No se creó la cohorte" };
+  if (cohortErr || !cohort) return { ok: false, error: cohortErr?.message ?? "No se creó el grupo" };
   const cohortId = cohort.id;
 
   // Curso

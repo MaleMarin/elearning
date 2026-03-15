@@ -1,5 +1,5 @@
 /**
- * Retos de cohorte — Firestore cohorts/{cohortId}/challenges/{challengeId} (Brecha 8).
+ * Retos de grupo — Firestore cohorts/{cohortId}/challenges/{challengeId} (Brecha 8).
  */
 import type { DocumentSnapshot } from "firebase-admin/firestore";
 import { Timestamp } from "firebase-admin/firestore";
@@ -215,7 +215,7 @@ export async function getTeamMessages(cohortId: string, challengeId: string, tea
   });
 }
 
-/** Reto activo para una cohorte (estado === "activo"). */
+/** Reto activo para un grupo (estado === "activo"). */
 export async function getActiveChallengeForCohort(cohortId: string): Promise<CohortChallenge | null> {
   const db = getFirebaseAdminFirestore();
   const snap = await db

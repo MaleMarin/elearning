@@ -46,7 +46,7 @@ export function MentorCard({ mentor, onRequest, requested, disabled }: MentorCar
           </p>
         )}
         {mentor.cohortName && (
-          <p className="text-xs text-[var(--ink-muted)] mt-1">Cohorte: {mentor.cohortName}</p>
+          <p className="text-xs text-[var(--ink-muted)] mt-1">Grupo: {mentor.cohortName}</p>
         )}
         {onRequest && (
           <button

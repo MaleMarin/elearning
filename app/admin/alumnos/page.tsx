@@ -23,7 +23,7 @@ export default function AdminAlumnosPage() {
         <div>
           <h1 className="text-2xl font-semibold text-[var(--ink)]">Alumnos</h1>
           <p className="text-sm text-[var(--texto-sub)] mt-1">
-            Filtra por cohorte, progreso o estado de certificado. Ver perfil, enviar mensaje o emitir certificado.
+            Filtra por grupo, progreso o estado de certificado. Ver perfil, enviar mensaje o emitir certificado.
           </p>
         </div>
         <PrimaryButton href="/admin/alumnos/importar" className="inline-flex items-center gap-2">
@@ -44,13 +44,13 @@ export default function AdminAlumnosPage() {
         ) : (
           <>
             <p className="text-sm text-[var(--texto-sub)] mb-4">
-              Filtros: por cohorte / por progreso (&gt;80%, &gt;50%, &lt;30%) / por estado certificado.
+              Filtros: por grupo / por progreso (&gt;80%, &gt;50%, &lt;30%) / por estado certificado.
             </p>
             <p className="text-sm text-[var(--texto-sub)]">
-              Columnas: Foto | Nombre | Institución | Cohorte | Progreso | Último acceso | Estado cert | Acciones.
+              Columnas: Foto | Nombre | Institución | Grupo | Progreso | Último acceso | Estado cert | Acciones.
             </p>
             <p className="text-sm text-[var(--texto-sub)] mt-2">
-              Integra aquí la tabla de alumnos con los endpoints de tu API (cohortes, progreso, certificados).
+              Integra aquí la tabla de alumnos con los endpoints de tu API (grupos, progreso, certificados).
             </p>
           </>
         )}

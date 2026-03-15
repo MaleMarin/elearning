@@ -143,7 +143,7 @@ export async function addProposal(
   };
 }
 
-/** Obtiene el ID de la propuesta más votada para un término (definición "oficial de la cohorte"). */
+/** Obtiene el ID de la propuesta más votada para un término (definición "oficial del grupo"). */
 export async function getTopProposalId(courseId: string, termId: string): Promise<string | null> {
   const snap = await termsRef(courseId)
     .doc(termId)

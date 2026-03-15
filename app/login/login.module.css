@@ -262,12 +262,18 @@
   border: none;
   color: #0a0f8a;
   font-weight: 600;
+  font-size: 14px;
   box-shadow: 4px 4px 12px rgba(0,229,160,0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   text-decoration: none;
+  transition: box-shadow 0.2s, transform 0.1s;
+}
+.neu-btn-demo:hover {
+  box-shadow: 5px 5px 14px rgba(0,229,160,0.45);
+  transform: translateY(-1px);
 }
 .neu-subtitle-hint { margin-bottom: 12px; }
 .neu-subtitle-admin-wrap { margin-top: 16px; margin-bottom: 0; text-align: center; }

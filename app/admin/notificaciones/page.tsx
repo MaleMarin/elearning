@@ -129,13 +129,13 @@ export default function AdminNotificacionesPage() {
               onChange={(e) => setScope(e.target.value as "cohort" | "user")}
               className="mt-1 block w-full max-w-xs px-4 py-3 rounded-lg border border-[var(--line)] bg-[var(--surface)] min-h-[48px]"
             >
-              <option value="cohort">A una cohorte</option>
+              <option value="cohort">A un grupo</option>
               <option value="user">A un alumno (por ID)</option>
             </select>
           </label>
           {scope === "cohort" && (
             <label className="block">
-              <span className="font-medium text-[var(--text)]">Cohorte</span>
+              <span className="font-medium text-[var(--text)]">Grupo</span>
               <select
                 value={cohortId}
                 onChange={(e) => setCohortId(e.target.value)}
@@ -208,7 +208,7 @@ export default function AdminNotificacionesPage() {
             onChange={(e) => setLogsCohortId(e.target.value)}
             className="px-3 py-2 rounded-lg border border-[var(--line)] bg-[var(--surface)]"
           >
-            <option value="">Todas las cohortes</option>
+            <option value="">Todos los grupos</option>
             {cohorts.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}

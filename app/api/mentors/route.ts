@@ -11,8 +11,8 @@ export async function GET(req: NextRequest) {
   if (getDemoMode()) {
     return NextResponse.json({
       mentors: [
-        { userId: "m1", fullName: "María García", institution: "Ministerio Salud", position: "Jefa de proyectos", photoURL: null, cohortName: "Cohorte 2025-1", createdAt: "" },
-        { userId: "m2", fullName: "Carlos López", institution: "ONG Transparencia", position: "Coordinador", photoURL: null, cohortName: "Cohorte 2025-1", createdAt: "" },
+        { userId: "m1", fullName: "María García", institution: "Ministerio Salud", position: "Jefa de proyectos", photoURL: null, cohortName: "Grupo 2025-1", createdAt: "" },
+        { userId: "m2", fullName: "Carlos López", institution: "ONG Transparencia", position: "Coordinador", photoURL: null, cohortName: "Grupo 2025-1", createdAt: "" },
       ],
     });
   }

@@ -95,7 +95,7 @@ export async function deleteEnrollmentRule(id: string): Promise<void> {
   await db().collection(COLLECTION).doc(id).delete();
 }
 
-/** Añade usuario a una cohorte (enrollment + cohort.alumnos). Idempotente. */
+/** Añade usuario a un grupo (enrollment + cohort.alumnos). Idempotente. */
 async function addUserToCohort(userId: string, cohortId: string): Promise<void> {
   const existing = await db()
     .collection("enrollments")

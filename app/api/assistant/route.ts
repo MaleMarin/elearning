@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { DEMO_USER, DEMO_USER_DISPLAY_NAME } from "@/lib/supabase/demo-mock";
+import { getAuthFromRequest } from "@/lib/firebase/auth-request";
+import { getFirebaseAdminFirestore } from "@/lib/firebase/admin";
+import { useFirebase } from "@/lib/env";
 import {
   getOrCreateThread,
   addMessage,
 } from "@/lib/services/assistant";
+import { getDrivePdfContext } from "@/lib/services/drive-pdfs";
 import { streamText } from "ai";
 import {
   getModelWithFallback,
@@ -29,16 +34,28 @@ export async function GET() {
 const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 const MAX_MESSAGES = 10;
 
-const STUDENT_SYSTEM_PROMPT = (context: AssistantContext) => `
-Eres el asistente virtual de Política Digital, una plataforma de e-learning 
-sobre innovación pública para funcionarios del Estado.
+const STUDENT_SYSTEM_PROMPT = (context: AssistantContext) => {
+  const nombreAlumno = context.userName ?? "el alumno";
+  return `
+Eres PD, el asistente virtual de Política Digital, una plataforma de e-learning 
+sobre innovación pública para funcionarios del Estado. Te presentas siempre como "PD".
+
+## Cómo saludar y conversar
+- Al iniciar o al saludar, di: "Hola, soy PD. ¿Cómo estás, ${nombreAlumno}?" (o similar).
+- Siempre responde y conversa con el alumno que está en su dashboard o en el curso; usa su nombre (${nombreAlumno}) cuando sea natural.
+- Mantén el tono cercano y orientado a su contexto (curso, módulo, progreso).
 
 ## Tu personalidad (Principio de Personalización de Mayer)
 - Hablas como un colega cercano y experimentado, no como un sistema robótico
 - Usas lenguaje cotidiano, directo y cálido — nunca términos técnicos innecesarios
 - Eres breve: máximo 3 párrafos por respuesta
-- Usas el nombre del alumno si lo conoces: ${context.userName ?? "el alumno"}
+- Usas el nombre del alumno: ${nombreAlumno}
 - Cuando no entiendes algo, lo dices con humor y pides que reformulen
+
+## En qué te basas (fuentes de verdad)
+Tu respuesta debe apoyarse siempre en:
+1. **Material y agenda del curso**: lecciones, módulos, programa y progreso del alumno que tienes en el contexto. No inventes contenidos; usa solo lo que corresponde al curso.
+2. **Documentos y audios que el alumno suba** (estilo NotebookLM de Google): si el usuario adjunta PDFs, presentaciones, textos o audios, extrae y usa ese contenido para resumir, responder preguntas y citar. Resúmenes, preguntas y respuestas sobre lo subido deben basarse únicamente en ese material.
 
 ## Tu rol principal
 Eres un FACILITADOR, no un profesor. Tu trabajo es:
@@ -95,6 +112,7 @@ Si hay un problema técnico:
 Siempre en español. Si el alumno escribe en otro idioma, responde en español
 y menciona amablemente que el programa es en español.
 `;
+};
 
 /** System prompt para modo roleplay: el bot adopta un personaje y al recibir FINALIZAR_ROLEPLAY da feedback. */
 const ROLEPLAY_SYSTEM_PROMPT = (context: AssistantContext) => {
@@ -224,20 +242,45 @@ const DEMO_MESSAGE =
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    let userId: string;
+    let role: string;
+    let userDisplayName: string | null = null;
+    let userEmail: string | null = null;
+
+    if (useFirebase()) {
+      try {
+        const auth = await getAuthFromRequest(req);
+        userId = auth.uid;
+        role = auth.role;
+        userEmail = auth.email ?? null;
+        const db = getFirebaseAdminFirestore();
+        const profileSnap = await db.collection("profiles").doc(auth.uid).get();
+        const fullName = (profileSnap.data()?.full_name as string)?.trim();
+        userDisplayName = fullName || userEmail?.split("@")[0] || null;
+      } catch {
+        return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+      }
+    } else {
+      const supabase = await createServerSupabaseClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+      }
+      userId = user.id;
+      userEmail = user.email ?? null;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, full_name")
+        .eq("id", user.id)
+        .single();
+      role = (profile?.role ?? "student") as string;
+      const fn = (profile as { full_name?: string } | null)?.full_name;
+      userDisplayName = (typeof fn === "string" && fn.trim() ? fn.trim() : null) ?? userEmail?.split("@")[0] ?? null;
+      if (userId === DEMO_USER.id) userDisplayName = DEMO_USER_DISPLAY_NAME;
     }
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-    const role = (profile?.role ?? "student") as string;
     if (!["student", "mentor", "admin"].includes(role)) {
       return NextResponse.json(
         { error: "Rol no autorizado para el asistente" },
@@ -245,7 +288,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { ok, remaining } = checkRateLimit(`assistant:${user.id}`);
+    const { ok, remaining } = checkRateLimit(`assistant:${userId}`);
     if (!ok) {
       return NextResponse.json(
         { error: "Demasiadas solicitudes. Intenta en un minuto." },
@@ -261,7 +304,7 @@ export async function POST(req: NextRequest) {
         const mod = await (loadKv() as Promise<{ kv?: { get: (k: string) => Promise<unknown>; set: (k: string, v: string, o?: { ex: number }) => Promise<unknown> } }>).catch(() => null);
         const kv = mod?.kv;
         if (kv) {
-          const key = `bot:active:${user.id}`;
+          const key = `bot:active:${userId}`;
           const isActive = await kv.get(key);
           if (isActive) {
             return NextResponse.json(
@@ -288,7 +331,7 @@ export async function POST(req: NextRequest) {
     const lessonCtx = rawContext && "lessonTitle" in rawContext ? (rawContext as LessonContext) : null;
     const assistantContext: AssistantContext = {
       role: role === "admin" ? "admin" : "student",
-      userName: typeof rawContext === "object" && rawContext && "userName" in rawContext ? (rawContext.userName as string) : undefined,
+      userName: (typeof rawContext === "object" && rawContext && "userName" in rawContext ? (rawContext.userName as string) : null) || userDisplayName || userEmail?.split("@")[0] || undefined,
       lessonName: typeof rawContext === "object" && rawContext && "lessonName" in rawContext ? (rawContext.lessonName as string) : lessonCtx?.lessonTitle,
       moduleName: typeof rawContext === "object" && rawContext && "moduleName" in rawContext ? (rawContext.moduleName as string) : lessonCtx?.moduleTitle,
       progress: typeof rawContext === "object" && rawContext && "progress" in rawContext ? Number(rawContext.progress) : undefined,
@@ -322,7 +365,44 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const systemPrompt = buildSystemPrompt(mode, assistantContext);
+    const uploadedDocuments = body.uploadedDocuments as string[] | undefined;
+    let systemPrompt = buildSystemPrompt(mode, assistantContext);
+
+    // Contexto desde carpeta de Google Drive (ej. Elearning -PD)
+    const driveFolderId = process.env.GOOGLE_DRIVE_PDF_FOLDER_ID?.trim();
+    if (driveFolderId && mode === "tutor") {
+      const driveContext = await getDrivePdfContext(driveFolderId);
+      if (driveContext) {
+        systemPrompt += `
+
+## Material de la carpeta Elearning -PD (Google Drive)
+El siguiente contenido viene de PDFs en la carpeta compartida del curso. Úsalo para responder preguntas, resumir y citar. Responde siempre en español.
+
+---
+${driveContext}
+`;
+      }
+    }
+
+    if (Array.isArray(uploadedDocuments) && uploadedDocuments.length > 0) {
+      const docBlock = uploadedDocuments
+        .filter((d) => typeof d === "string" && d.trim().length > 0)
+        .join("\n\n---\n\n");
+      if (docBlock) {
+        systemPrompt += `
+
+## Documentos o audios subidos por el usuario (estilo NotebookLM)
+El usuario ha subido contenido (documento o transcripción de audio). Debes:
+- Resumirlo si pide un resumen.
+- Responder preguntas sobre el contenido.
+- Citar el documento cuando sea relevante.
+Responde siempre en español.
+
+---
+${docBlock.slice(0, 100000)}
+`;
+      }
+    }
 
     if (DEMO_MODE) {
       return NextResponse.json(
@@ -348,8 +428,12 @@ export async function POST(req: NextRequest) {
     }
 
     let tid: string | null = threadId ?? null;
-    if (!tid) {
-      tid = await getOrCreateThread(mode, user.id, { cohortId, courseId });
+    if (!tid && !useFirebase()) {
+      try {
+        tid = await getOrCreateThread(mode, userId, { cohortId, courseId });
+      } catch {
+        tid = null;
+      }
     }
 
     const providersToTry = available.includes(provider)

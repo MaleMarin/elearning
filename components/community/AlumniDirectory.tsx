@@ -70,7 +70,7 @@ export function AlumniDirectory({
             onChange={(e) => onFilterChange("cohortId", e.target.value)}
             className="px-3 py-2 rounded-lg border border-[var(--line)] text-sm"
           >
-            <option value="">Todas las cohortes</option>
+            <option value="">Todos los grupos</option>
             {cohortOptions.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
@@ -89,7 +89,7 @@ export function AlumniDirectory({
                 {a.institution && <p className="text-sm text-[var(--ink-muted)] flex items-center gap-1"><Building2 className="w-3.5 h-3.5" /> {a.institution}</p>}
                 {a.position && <p className="text-sm text-[var(--ink-muted)] flex items-center gap-1"><Briefcase className="w-3.5 h-3.5" /> {a.position}</p>}
                 {a.region && <p className="text-sm text-[var(--ink-muted)] flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {a.region}</p>}
-                {a.cohortName && <p className="text-xs text-[var(--ink-muted)] mt-1">Cohorte {a.cohortName}</p>}
+                {a.cohortName && <p className="text-xs text-[var(--ink-muted)] mt-1">Grupo {a.cohortName}</p>}
                 {a.linkedIn && (
                   <a href={a.linkedIn} target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--primary)] inline-flex items-center gap-1 mt-1">
                     LinkedIn <ExternalLink className="w-3 h-3" />

@@ -123,7 +123,7 @@ export function TriviaGame({ onBack }: TriviaGameProps) {
         <p className="text-[var(--ink-muted)] mt-1">Obtuviste {score} de {questions.length} aciertos.</p>
         {ranking.length > 0 && (
           <div className="mt-6">
-            <h3 className="text-sm font-semibold text-[var(--ink)] mb-2">Ranking semanal (tu cohorte)</h3>
+            <h3 className="text-sm font-semibold text-[var(--ink)] mb-2">Ranking semanal (tu grupo)</h3>
             <ul className="space-y-1 text-sm">
               {ranking.slice(0, 10).map((r, i) => (
                 <li key={r.userId} className="flex justify-between">

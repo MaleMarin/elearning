@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     const auth = await getAuthFromRequest(req);
     const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
     const cohortId = enrollment?.cohort_id ?? null;
-    if (!cohortId) return NextResponse.json({ error: "Sin cohorte" }, { status: 404 });
+    if (!cohortId) return NextResponse.json({ error: "Sin grupo" }, { status: 404 });
     const primaryCourseId = await firebaseContent.getPrimaryCourseForCohort(cohortId);
     if (primaryCourseId !== courseId) return NextResponse.json({ error: "Curso no coincide" }, { status: 403 });
     const summary = await grades.getStudentGradeSummary(auth.uid, courseId);

@@ -1,5 +1,5 @@
 /**
- * GET: reto activo de la cohorte del usuario (para sidebar badge) — Brecha 8.
+ * GET: reto activo del grupo del usuario (para sidebar badge) — Brecha 8.
  */
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/firebase/auth-request";

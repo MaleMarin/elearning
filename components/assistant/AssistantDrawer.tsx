@@ -147,6 +147,7 @@ export function AssistantDrawer({
   );
   const [providers, setProviders] = useState<LLMProvider[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userDisplayName, setUserDisplayName] = useState<string>("");
   const [provider, setProvider] = useState<LLMProvider>(() => {
     if (typeof window === "undefined") return "anthropic";
     const stored = window.localStorage.getItem(STORAGE_KEY) as LLMProvider | null;
@@ -160,7 +161,12 @@ export function AssistantDrawer({
   useEffect(() => {
     fetch("/api/auth/me", { credentials: "include" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((data: { role?: string } | null) => setIsAdmin(data?.role === "admin"))
+      .then((data: { role?: string; full_name?: string } | null) => {
+        if (data) {
+          setIsAdmin(data.role === "admin");
+          setUserDisplayName((data.full_name as string)?.trim() || "");
+        }
+      })
       .catch(() => setIsAdmin(false));
   }, []);
 
@@ -188,15 +194,15 @@ export function AssistantDrawer({
           aria-labelledby="assistant-dialog-title"
         >
           <div
-            className="w-full max-w-lg bg-[var(--cream)] flex flex-col h-full"
+            className="w-full max-w-lg flex flex-col h-full bg-[var(--neu-bg)] rounded-l-2xl"
             style={{
               fontSize: "18px",
-              boxShadow: "0 0 0 1px rgba(31,36,48,0.06), -8px 0 32px rgba(31,36,48,0.12), -2px 0 8px rgba(31,36,48,0.06)",
+              boxShadow: "var(--neu-shadow-out), -4px 0 24px rgba(31,36,48,0.08)",
             }}
           >
-            <div className="flex items-center justify-between gap-2 p-4 border-b border-[var(--line)] bg-white rounded-t-2xl shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset]">
-              <h2 id="assistant-dialog-title" className="text-xl font-semibold text-[var(--ink)] shrink-0 flex items-center gap-2">
-                Asistente
+            <div className="flex items-center justify-between gap-2 p-4 rounded-tl-2xl bg-[var(--neu-bg)] shrink-0" style={{ boxShadow: "var(--neu-shadow-in-sm)" }}>
+              <h2 id="assistant-dialog-title" className="text-xl font-semibold text-[var(--azul)] shrink-0 flex items-center gap-2">
+                {userDisplayName ? `Hola soy PD, ¿cómo estás ${userDisplayName}?` : "Hola soy PD"}
                 {isAdmin && (
                   <span
                     style={{
@@ -231,24 +237,27 @@ export function AssistantDrawer({
               </button>
             </div>
 
-            <div className="flex border-b border-[var(--line)] bg-white px-2">
+            <div className="flex gap-1 px-2 py-2 bg-[var(--neu-bg)]" style={{ boxShadow: "var(--neu-shadow-in-sm)" }}>
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 py-3 px-4 font-medium rounded-t-xl transition-colors min-h-[48px] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--primary)] ${
+                  className={`flex-1 py-3 px-4 font-medium rounded-xl min-h-[48px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--acento)] ${
                     activeTab === tab.id
-                      ? "text-[var(--primary)] bg-[var(--cream)]"
-                      : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--cream)]/50"
+                      ? "text-[var(--azul)] bg-[var(--neu-bg)]"
+                      : "text-[var(--ink-muted)] hover:text-[var(--ink)] bg-[var(--neu-bg)]"
                   }`}
+                  style={{
+                    boxShadow: activeTab === tab.id ? "var(--neu-shadow-in)" : "var(--neu-shadow-out-sm)",
+                  }}
                 >
                   {tab.label}
                 </button>
               ))}
             </div>
 
-            <div className="flex-1 overflow-hidden flex flex-col min-h-0 bg-[var(--cream)]">
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0 bg-[var(--neu-bg)]">
               <div className="flex-1 overflow-auto">
                 <AssistantChat
                   mode={activeTab}

@@ -20,6 +20,10 @@ export interface CursoLessonDetail {
   summary: string;
   content: string | null;
   video_embed_url: string | null;
+  /** URL directa a video MP4 (para reproductor con subtítulos). */
+  video_url?: string | null;
+  /** URL a archivo .srt de subtítulos. */
+  subtitulos_url?: string | null;
   estimated_minutes: number | null;
   module_id: string;
   moduleId: string;
@@ -57,7 +61,7 @@ export interface CursoLeccionApiResponse {
 
 /**
  * GET /api/curso/lecciones/[lessonId]
- * Lección publicada que pertenece al curso primario de la cohorte del usuario.
+ * Lección publicada que pertenece al curso primario del grupo del usuario.
  * Devuelve lesson + prev/next para navegación.
  */
 export async function GET(
@@ -207,6 +211,8 @@ export async function GET(
         summary: (lessonRaw.summary as string) ?? "",
         content: (lessonRaw.content as string) ?? null,
         video_embed_url: (lessonRaw.video_embed_url as string) ?? null,
+        video_url: (lessonRaw.video_url as string) ?? null,
+        subtitulos_url: (lessonRaw.subtitulos_url as string) ?? null,
         estimated_minutes: (lessonRaw.estimated_minutes as number) ?? null,
         module_id: moduleId,
         moduleId,

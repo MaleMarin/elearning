@@ -21,7 +21,7 @@ export async function GET(req: Request) {
     if (useFirebase()) {
       const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
       if (!enrollment) {
-        return NextResponse.json({ error: "Sin cohorte activa" }, { status: 403 });
+        return NextResponse.json({ error: "Sin grupo activo" }, { status: 403 });
       }
       const courseId = await firebaseContent.getPrimaryCourseForCohort(enrollment.cohort_id);
       if (!courseId) {

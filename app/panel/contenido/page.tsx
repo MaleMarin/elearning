@@ -47,7 +47,7 @@ export default function PanelContenidoPage() {
     <div className="max-w-3xl">
       <h1 className="text-2xl font-bold text-[var(--text)] mb-4">Panel de contenido</h1>
       <p className="text-[var(--text-muted)] mb-6">
-        Cursos, módulos y lecciones. Solo ves los cursos que puedes editar (admin: todos; mentor: asignados a tus cohortes).
+        Cursos, módulos y lecciones. Solo ves los cursos que puedes editar (admin: todos; mentor: asignados a tus grupos).
       </p>
 
       <div className="card-white p-4 mb-6">
@@ -74,7 +74,7 @@ export default function PanelContenidoPage() {
       <section className="card-white p-4">
         <h2 className="text-lg font-semibold text-[var(--text)] mb-3">Cursos</h2>
         {courses.length === 0 ? (
-          <p className="text-[var(--text-muted)]">No hay cursos. Crea uno arriba o asígnalo a una cohorte (mentor) para verlo aquí.</p>
+          <p className="text-[var(--text-muted)]">No hay cursos. Crea uno arriba o asígnalo a un grupo (mentor) para verlo aquí.</p>
         ) : (
           <ul className="space-y-2">
             {courses.map((c) => (

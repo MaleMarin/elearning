@@ -68,14 +68,33 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ idToken, email }),
         credentials: "include",
       });
       const loginData = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((loginData as { error?: string }).error ?? "Error al crear sesión");
+      if (!res.ok) {
+        if (res.status === 429) {
+          setError((loginData as { error?: string }).error ?? "Cuenta bloqueada por demasiados intentos.");
+          return;
+        }
+        throw new Error((loginData as { error?: string }).error ?? "Error al crear sesión");
+      }
       window.location.href = redirectTo;
       return;
     } catch (err) {
+      if (!getDemoMode() && email) {
+        const failRes = await fetch("/api/auth/login-failed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+          credentials: "include",
+        }).catch(() => null);
+        if (failRes?.status === 429) {
+          const data = await failRes.json().catch(() => ({}));
+          setError((data as { error?: string }).error ?? "Cuenta bloqueada por 15 minutos.");
+          return;
+        }
+      }
       const code = (err as { code?: string })?.code;
       if (code === "auth/multi-factor-auth-required") {
         const requireMfaRes = await fetch(`/api/auth/require-mfa?email=${encodeURIComponent(email)}`);
@@ -301,12 +320,18 @@ export default function LoginPage() {
             <div className={styles["neu-eyebrow"]}>Bienvenido de vuelta</div>
             <div className={styles["neu-title"]}>Ingresa a tu cuenta</div>
             <div className={styles["neu-subtitle"]}>Continúa donde lo dejaste</div>
+            {searchParams.get("reason") === "inactividad" && (
+              <p className={styles["neu-subtitle"]} style={{ color: "#0a0f8a", fontWeight: 600 }} role="alert">
+                Tu sesión cerró por inactividad. Por seguridad, vuelve a ingresar.
+              </p>
+            )}
 
             <a
               href="/api/auth/demo"
               className={`${styles["neu-btn"]} ${styles["neu-btn-demo"]}`}
+              aria-label="Entrar en modo demo sin correo ni contraseña"
             >
-              Modo demo
+              Modo demo — entrar sin cuenta
             </a>
 
             {showDemoHint && (
@@ -400,6 +425,21 @@ export default function LoginPage() {
                   ¿Eres administrador? Ingresa aquí
                 </Link>
               </p>
+              <p
+                style={{
+                  fontSize: 11,
+                  color: "#8892b0",
+                  textAlign: "center",
+                  marginTop: 20,
+                  fontFamily: "'Syne', sans-serif",
+                }}
+              >
+                Al ingresar aceptas nuestro{" "}
+                <a href="/privacidad" style={{ color: "#1428d4", textDecoration: "none", fontWeight: 600 }}>
+                  Aviso de Privacidad
+                </a>{" "}
+                conforme a la LFPDPPP.
+              </p>
             </form>
               </div>
               <div className={styles["neu-panel-wrap"]}>
@@ -447,6 +487,14 @@ export default function LoginPage() {
             <div className={styles["neu-eyebrow"]}>Únete al programa</div>
             <div className={styles["neu-title"]}>Crea tu cuenta</div>
             <div className={styles["neu-subtitle"]}>Innovación pública desde adentro</div>
+
+            <a
+              href="/api/auth/demo"
+              className={`${styles["neu-btn"]} ${styles["neu-btn-demo"]}`}
+              aria-label="Entrar en modo demo sin crear cuenta"
+            >
+              Modo demo — entrar sin cuenta
+            </a>
 
             <form onSubmit={handleSignUp}>
               <div className={styles["neu-field"]}>

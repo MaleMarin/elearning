@@ -52,6 +52,8 @@ export default function AdminLeccionEditPage() {
   const [competenciasCatalog, setCompetenciasCatalog] = useState<CompetenciaOption[]>([]);
   const [otherEditor, setOtherEditor] = useState<{ userName: string } | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [generandoSubs, setGenerandoSubs] = useState(false);
+  const [subtitulosResult, setSubtitulosResult] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/auth/me", { credentials: "include" })
@@ -280,6 +282,53 @@ export default function AdminLeccionEditPage() {
                 className="w-full px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-white text-[var(--ink)]"
                 placeholder="https://..."
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--ink)] mb-1">
+                Generar subtítulos (Whisper)
+              </label>
+              <p className="text-xs text-[var(--ink-muted)] mb-2">
+                Sube un archivo de video para generar subtítulos en español (SRT). Luego guarda la URL del SRT en tu lección si la subes a Storage.
+              </p>
+              <input
+                type="file"
+                accept="video/mp4,video/webm,video/mpeg"
+                id="video-subtitles-file"
+                className="sr-only"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setGenerandoSubs(true);
+                  setSubtitulosResult(null);
+                  try {
+                    const fd = new FormData();
+                    fd.append("video", file);
+                    const res = await fetch("/api/video/subtitulos", { method: "POST", body: fd, credentials: "include" });
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok && data.subtitulos) setSubtitulosResult(data.subtitulos);
+                    else setSubtitulosResult(`Error: ${(data as { error?: string }).error ?? "Error generando subtítulos"}`);
+                  } catch (err) {
+                    setSubtitulosResult(err instanceof Error ? err.message : "Error");
+                  } finally {
+                    setGenerandoSubs(false);
+                    e.target.value = "";
+                  }
+                }}
+              />
+              <label
+                htmlFor="video-subtitles-file"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-white text-sm font-medium text-[var(--ink)] cursor-pointer hover:bg-[var(--surface-soft)]"
+              >
+                {generandoSubs ? "Generando…" : "Seleccionar video y generar SRT"}
+              </label>
+              {subtitulosResult && (
+                <textarea
+                  readOnly
+                  rows={8}
+                  className="mt-2 w-full px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-[var(--surface-soft)] text-sm font-mono text-[var(--ink)]"
+                  value={subtitulosResult}
+                />
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-[var(--ink)] mb-1">

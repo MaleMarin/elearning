@@ -107,7 +107,7 @@ export async function getUserSimulationResult(
   };
 }
 
-/** Promedio de score por simulación en la cohorte (anónimo). */
+/** Promedio de score por simulación en el grupo (anónimo). */
 export async function getCohortAverageScore(simulationId: string): Promise<number | null> {
   try {
     const snap = await db()

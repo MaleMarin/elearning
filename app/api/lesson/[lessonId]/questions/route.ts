@@ -62,7 +62,7 @@ export async function POST(
   try {
     const auth = await getAuthFromRequest(req);
     const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
-    if (!enrollment) return NextResponse.json({ error: "Sin cohorte activa" }, { status: 403 });
+    if (!enrollment) return NextResponse.json({ error: "Sin grupo activo" }, { status: 403 });
     const body = await req.json();
     const question = (body.question as string)?.trim();
     if (!question) return NextResponse.json({ error: "Falta question" }, { status: 400 });

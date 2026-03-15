@@ -19,7 +19,7 @@ export async function POST(
     if (!challengeId) return NextResponse.json({ error: "challengeId requerido" }, { status: 400 });
     if (!useFirebase()) return NextResponse.json({ error: "No disponible" }, { status: 501 });
     const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
-    if (!enrollment) return NextResponse.json({ error: "No perteneces a una cohorte" }, { status: 403 });
+    if (!enrollment) return NextResponse.json({ error: "No perteneces a un grupo" }, { status: 403 });
     const body = await req.json().catch(() => ({}));
     const nombre = typeof body.nombre === "string" ? body.nombre.trim() : "";
     if (!nombre) return NextResponse.json({ error: "Nombre del equipo requerido" }, { status: 400 });

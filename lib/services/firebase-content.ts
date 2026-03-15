@@ -1,5 +1,5 @@
 /**
- * Capa de contenido (cursos, módulos, lecciones, cohortes) sobre Firestore.
+ * Capa de contenido (cursos, módulos, lecciones, grupos) sobre Firestore.
  * Usar cuando useFirebase() === true.
  */
 
@@ -298,7 +298,7 @@ export async function getActiveEnrollmentForUser(uid: string): Promise<{ cohort_
   return { cohort_id: d.cohort_id as string };
 }
 
-/** Lista user_id de alumnos activos en una cohorte (para emparejamiento). */
+/** Lista user_id de alumnos activos en un grupo (para emparejamiento). */
 export async function listActiveEnrollmentUserIdsInCohort(cohortId: string): Promise<string[]> {
   const snap = await db()
     .collection("enrollments")
@@ -390,7 +390,7 @@ export async function canEditLesson(lessonId: string, userId: string, role: stri
 // --- Cohorts (create, get one) ---
 export async function getCohort(cohortId: string) {
   const doc = await db().collection("cohorts").doc(cohortId).get();
-  if (!doc.exists) throw new Error("Cohorte no encontrada");
+  if (!doc.exists) throw new Error("Grupo no encontrado");
   return { id: doc.id, ...doc.data() } as Record<string, unknown>;
 }
 
@@ -434,7 +434,7 @@ function computeCohortEstado(fechaInicio: Date, fechaFin: Date): CohortEstado {
   return "activa";
 }
 
-/** Crea una cohorte con el modelo BRECHA 4 (nombre, courseId, facilitadorId, fechas, estado, codigoInvitacion 6 chars, config). */
+/** Crea un grupo con el modelo BRECHA 4 (nombre, courseId, facilitadorId, fechas, estado, codigoInvitacion 6 chars, config). */
 export async function createCohortV2(payload: {
   nombre: string;
   courseId: string;
@@ -487,7 +487,7 @@ export async function createCohortV2(payload: {
   return { id: snap.id, ...snap.data() } as Record<string, unknown>;
 }
 
-/** Busca cohorte por código de invitación de 6 caracteres. */
+/** Busca grupo por código de invitación de 6 caracteres. */
 export async function getCohortByCodigoInvitacion(code: string): Promise<Record<string, unknown> | null> {
   const normalized = code.trim().toUpperCase();
   if (normalized.length !== 6) return null;
@@ -497,15 +497,15 @@ export async function getCohortByCodigoInvitacion(code: string): Promise<Record<
   return { id: d.id, ...d.data() } as Record<string, unknown>;
 }
 
-/** Canjea código de 6 caracteres (codigoInvitacion de la cohorte). Añade enrollment y actualiza cohort.alumnos. */
+/** Canjea código de 6 caracteres (codigoInvitacion del grupo). Añade enrollment y actualiza cohort.alumnos. */
 export async function redeemCohortCode(code: string, userId: string): Promise<{ cohortId: string }> {
   const cohort = await getCohortByCodigoInvitacion(code);
   if (!cohort) throw new Error("Código no válido");
   const config = (cohort.configuracion as CohortConfiguracion) ?? {};
-  if (!config.permitirAutoInscripcion) throw new Error("Esta cohorte no permite autoinscripción con código");
+  if (!config.permitirAutoInscripcion) throw new Error("Este grupo no permite autoinscripción con código");
   const maxAlumnos = config.maxAlumnos ?? 0;
   const alumnos = (cohort.alumnos as string[]) ?? [];
-  if (maxAlumnos > 0 && alumnos.length >= maxAlumnos) throw new Error("La cohorte ha alcanzado el límite de alumnos");
+  if (maxAlumnos > 0 && alumnos.length >= maxAlumnos) throw new Error("El grupo ha alcanzado el límite de alumnos");
   const cohortId = cohort.id as string;
   const already = await db().collection("enrollments").where("user_id", "==", userId).where("cohort_id", "==", cohortId).limit(1).get();
   if (!already.empty) return { cohortId };
@@ -555,7 +555,7 @@ export async function listCohortAlumnosWithProgress(cohortId: string): Promise<{
   return result;
 }
 
-/** Ranking de la cohorte por % avance (desc). */
+/** Ranking del grupo por % avance (desc). */
 export async function getCohortRanking(cohortId: string): Promise<{ userId: string; displayName: string | null; progressPct: number; rank: number }[]> {
   const list = await listCohortAlumnosWithProgress(cohortId);
   list.sort((a, b) => b.progressPct - a.progressPct);
@@ -638,7 +638,7 @@ export async function redeemInvitation(code: string, userId: string): Promise<{ 
     try {
       return await redeemCohortCode(trimmed, userId);
     } catch {
-      throw new Error("Código no válido o cohorte no permite inscripción");
+      throw new Error("Código no válido o el grupo no permite inscripción");
     }
   }
   const inv = await getInvitationByCode(code);
@@ -651,9 +651,9 @@ export async function redeemInvitation(code: string, userId: string): Promise<{ 
   if (expiresAt && new Date(expiresAt) < new Date()) throw new Error("El código ha caducado");
   const cohortId = inv.cohort_id as string;
   const cohortDoc = await db().collection("cohorts").doc(cohortId).get();
-  if (!cohortDoc.exists) throw new Error("La cohorte no existe");
+  if (!cohortDoc.exists) throw new Error("El grupo no existe");
   const cohortData = cohortDoc.data()!;
-  if (cohortData.is_active === false) throw new Error("La cohorte no está activa");
+  if (cohortData.is_active === false) throw new Error("El grupo no está activo");
 
   const enrollmentRef = db().collection("enrollments").doc();
   await enrollmentRef.set({

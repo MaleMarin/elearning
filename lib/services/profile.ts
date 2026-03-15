@@ -18,6 +18,9 @@ export interface AccessibilityPrefs {
   highContrast?: boolean;
 }
 
+/** Modo de contenido preferido en lecciones (leer texto, escuchar audio, ver video). */
+export type ContentMode = "leer" | "escuchar" | "ver";
+
 export interface UserProfile {
   fullName?: string | null;
   photoURL?: string | null;
@@ -28,6 +31,8 @@ export interface UserProfile {
   linkedIn?: string | null;
   preferredLanguage?: "es" | "en";
   reminderFrequency?: "daily" | "weekly" | "live_only" | "never";
+  /** Modo de contenido preferido: leer, escuchar o ver. */
+  contentMode?: ContentMode;
   totalMinutesOnPlatform?: number;
   lastActivityDate?: string | null;
   streakDays?: number;
@@ -93,6 +98,7 @@ export async function getProfile(uid: string): Promise<UserProfile | null> {
     accessibilityFontSize: (d.accessibilityFontSize as AccessibilityFontSize) ?? "normal",
     accessibilityReduceMotion: (d.accessibilityReduceMotion as boolean) ?? false,
     accessibilityHighContrast: (d.accessibilityHighContrast as boolean) ?? false,
+    contentMode: (d.contentMode as UserProfile["contentMode"]) ?? "leer",
   };
 }
 
@@ -127,6 +133,7 @@ export async function updateProfile(
     accessibilityFontSize: (d?.accessibilityFontSize as AccessibilityFontSize) ?? "normal",
     accessibilityReduceMotion: (d?.accessibilityReduceMotion as boolean) ?? false,
     accessibilityHighContrast: (d?.accessibilityHighContrast as boolean) ?? false,
+    contentMode: (d?.contentMode as UserProfile["contentMode"]) ?? "leer",
   };
 }
 

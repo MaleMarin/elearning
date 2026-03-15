@@ -18,6 +18,12 @@ import {
   parseDeviceFromUserAgent,
 } from "@/lib/services/access-audit";
 import { logAudit } from "@/lib/services/audit-logs";
+import { logAudit as logGlobalAudit } from "@/lib/services/audit-log";
+import {
+  checkLoginAttempts,
+  recordFailedAttempt,
+  clearLoginAttempts,
+} from "@/lib/auth/login-attempts";
 
 export const dynamic = "force-dynamic";
 
@@ -48,10 +54,25 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let emailFromBody: string | undefined;
   try {
     const body = await req.json().catch(() => ({}));
     const idToken = (body.idToken ?? body.token) as string;
     const hasIdToken = idToken && typeof idToken === "string";
+    emailFromBody = (body.email as string)?.trim?.();
+
+    // Bloqueo por 5 intentos fallidos (solo si tenemos email)
+    if (emailFromBody) {
+      const { blocked, remainingMinutes } = await checkLoginAttempts(emailFromBody);
+      if (blocked) {
+        return NextResponse.json(
+          {
+            error: `Cuenta bloqueada por demasiados intentos. Intenta de nuevo en ${remainingMinutes ?? 15} minutos.`,
+          },
+          { status: 429 }
+        );
+      }
+    }
 
     // Modo demo: cuando está activo o cuando en desarrollo se envía email/password sin idToken
     const isDemoRequest = getDemoMode() || (!hasIdToken && body.email != null && process.env.NODE_ENV === "development");
@@ -112,10 +133,27 @@ export async function POST(req: NextRequest) {
         sessionId,
       });
       logAudit(decoded.uid, "login", { userAgent: req.headers.get("user-agent") ?? undefined }).catch(() => {});
+      logGlobalAudit({
+        userId: decoded.uid,
+        action: "login",
+        userAgent: req.headers.get("user-agent") ?? undefined,
+      }).catch(() => {});
+    }
+    if (emailFromBody || decoded.email) {
+      await clearLoginAttempts(emailFromBody ?? decoded.email ?? "").catch(() => {});
     }
     return res;
   } catch (e) {
     console.error("[auth/login]", e);
+    if (emailFromBody) {
+      const { blocked } = await recordFailedAttempt(emailFromBody).catch(() => ({ blocked: false }));
+      if (blocked) {
+        return NextResponse.json(
+          { error: "Demasiados intentos fallidos. Cuenta bloqueada por 15 minutos." },
+          { status: 429 }
+        );
+      }
+    }
     return NextResponse.json(
       { error: "Token inválido o expirado" },
       { status: 401 }

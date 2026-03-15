@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes shimmer {
+  0%  { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
 /* ==========================================================================
    NEUMORFISMO GLOBAL — POLÍTICA DIGITAL
    Fondo base #f0f2f5 (frío, moderno). Sombras ajustadas para contraste.
@@ -137,7 +147,12 @@ main {
   box-shadow: 8px 8px 18px rgba(174, 183, 194, 0.65), -8px -8px 18px rgba(255, 255, 255, 0.92) !important;
 }
 
-/* Modo oscuro */
+/* Modo oscuro (toggle desde la app: html.dark) */
+html.dark,
+html.dark body {
+  background: #1a1f2e !important;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --neu-bg: #1a1f2e;
@@ -246,20 +261,50 @@ html {
 .text-contrast { color: var(--ink); }
 .text-muted { color: var(--muted); }
 
-/* WCAG 2.1 AA: focus visible (azul eléctrico) */
-:focus-visible {
-  outline: 2px solid var(--azul-mid);
+/* WCAG 2.1 AA: focus visible (teclado) — azul #1428d4 */
+*:focus-visible {
+  outline: 3px solid #1428d4;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* Respetar preferencia de movimiento reducido */
+/* Remover outline solo en mouse, mantener en teclado */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Mejorar contraste en textos pequeños (1.4.3 AA) */
+.text-accessible {
+  color: #4a5580;
+  font-weight: 500;
+}
+
+/* Screen reader only — visible para lectores, oculto visualmente */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Respetar preferencia de movimiento reducido (2.3.3) */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .sec-dot,
+  [style*="animation: pulse"] {
+    animation: none !important;
   }
 }
 
@@ -421,4 +466,55 @@ select:focus {
 }
 [data-tooltip]:hover::after {
   opacity: 1;
+}
+
+/* ── Mobile responsive (dashboard /inicio) ─────────────────────────────────── */
+@media (max-width: 767px) {
+  .sidebar-left                    { display: none !important; }
+  .panel-right                     { display: none !important; }
+  .panel-right.open                {
+    display: flex !important;
+    flex-direction: column !important;
+    position: fixed !important;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(280px, 85vw);
+    z-index: 35;
+    border-radius: 0;
+    margin: 0;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.12);
+  }
+  .bottom-nav                      { display: flex !important; }
+  .main-content                    { padding: 14px 12px 80px !important; }
+  .lessons-notifs-grid             { grid-template-columns: 1fr !important; }
+  .checkin-grid                    { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+  .topbar-date-desktop             { display: none !important; }
+  .topbar-date-mobile              { display: block !important; }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .panel-right                     { display: none !important; }
+  .panel-right.open                {
+    display: flex !important;
+    flex-direction: column !important;
+    position: fixed !important;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(320px, 90vw);
+    z-index: 35;
+    border-radius: 0;
+    margin: 0;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.12);
+  }
+  .panel-right-btn                 { display: flex !important; }
+  .bottom-nav                      { display: none !important; }
+  .topbar-date-desktop             { display: block !important; }
+  .topbar-date-mobile              { display: none !important; }
+}
+@media (min-width: 1024px) {
+  .bottom-nav                      { display: none !important; }
+  .panel-right-btn                 { display: none !important; }
+  .topbar-date-mobile              { display: none !important; }
+  .topbar-date-desktop             { display: block !important; }
 }

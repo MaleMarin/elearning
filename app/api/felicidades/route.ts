@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
       horas: 40,
       calificacion: "9.2",
       leccionesTotal: 12,
-      badges: [
+      logros: [
         { icon: "🏆", name: "Programa completo", desc: "100% completado" },
         { icon: "🔥", name: "Racha 7 días", desc: "7 días seguidos" },
         { icon: "🎓", name: "Certificado", desc: "Sobresaliente" },
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
       carta: "Quiero aprender herramientas concretas para modernizar los procesos de mi área.",
       cartaFecha: "10 de enero de 2025",
       idCert: "PD-2026-1234-MX",
-      cohorte: "2025-I",
+      grupo: "2025-I",
       verifyUrl: `${getAppUrl()}/verificar/PD-2026-1234-MX`,
     });
   }
@@ -63,24 +63,24 @@ export async function GET(req: NextRequest) {
   const verifyUrl = firstCert ? `${getAppUrl()}/verificar/${firstCert.idCert}` : null;
 
   const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
-  let cohorte = "—";
+  let grupo = "—";
   if (enrollment) {
     try {
       const cohort = await firebaseContent.getCohort(enrollment.cohort_id);
-      cohorte = (cohort.name as string) ?? enrollment.cohort_id;
+      grupo = (cohort.name as string) ?? enrollment.cohort_id;
     } catch {
-      cohorte = enrollment.cohort_id;
+      grupo = enrollment.cohort_id;
     }
   }
 
   const badgesSnap = await db.collection("users").doc(auth.uid).collection("badges").get();
   const earnedIds = badgesSnap.docs.map((d) => d.id as string);
-  const badges = earnedIds
+  const logros = earnedIds
     .map((id) => BADGE_MAP[id])
     .filter(Boolean);
-  if (badges.length === 0) {
-    badges.push({ icon: "🏆", name: "Programa completo", desc: "100% completado" });
-    if (firstCert) badges.push({ icon: "🎓", name: "Certificado", desc: "Sobresaliente" });
+  if (logros.length === 0) {
+    logros.push({ icon: "🏆", name: "Programa completo", desc: "100% completado" });
+    if (firstCert) logros.push({ icon: "🎓", name: "Certificado", desc: "Sobresaliente" });
   }
 
   let leccionesTotal = 12;
@@ -114,11 +114,11 @@ export async function GET(req: NextRequest) {
     horas,
     calificacion,
     leccionesTotal,
-    badges,
+    logros,
     cartaEncrypted: cartaEncrypted ?? undefined,
     cartaFecha: cartaFecha ?? undefined,
     idCert: idCert ?? "PD-2026-0000-MX",
-    cohorte,
+    grupo,
     verifyUrl: verifyUrl ?? `${getAppUrl()}/certificado`,
   });
 }

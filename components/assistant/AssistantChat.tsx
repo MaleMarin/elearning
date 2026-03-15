@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useChat } from "@ai-sdk/react";
-import { Mic, Loader2 } from "lucide-react";
+import { Mic, Loader2, Paperclip } from "lucide-react";
 import { DefaultChatTransport } from "ai";
 import type { AssistantMode } from "@/lib/types/database";
 import type { LessonContext } from "@/lib/types/database";
@@ -94,6 +94,9 @@ function DemoChat({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [modelUsed, setModelUsed] = useState<string | null>(null);
+  const [uploadedDocuments, setUploadedDocuments] = useState<string[]>([]);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -131,6 +134,7 @@ function DemoChat({
           cohortId: cohortId ?? undefined,
           courseId: courseId ?? undefined,
           provider,
+          uploadedDocuments: uploadedDocuments.length > 0 ? uploadedDocuments : undefined,
         }),
       });
       const model = res.headers.get("X-Model-Used");
@@ -149,10 +153,33 @@ function DemoChat({
         },
       ]);
       onAssistantMessage?.(assistantContent);
+      setUploadedDocuments([]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al enviar");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    setUploadingFile(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/documents/extract", { method: "POST", credentials: "include", body: formData });
+      const data = await res.json();
+      if (res.ok && data.text) {
+        setUploadedDocuments((prev) => [...prev, data.text]);
+      } else {
+        setError(data.error ?? "Error al procesar el archivo");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al subir");
+    } finally {
+      setUploadingFile(false);
     }
   };
 
@@ -235,19 +262,38 @@ function DemoChat({
             </button>
           </div>
         )}
-        <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Escribe tu mensaje..."
-            className="flex-1 px-4 py-3 rounded-lg border border-gray-300 text-[var(--text)] text-base min-h-[48px] focus:outline focus:ring-2 focus:ring-[var(--accent)]"
-            disabled={loading}
-            aria-label="Mensaje"
-          />
-          <button type="submit" disabled={loading || !input.trim()} className="btn-primary disabled:opacity-50">
-            {loading ? "…" : "Enviar"}
-          </button>
+        <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex flex-col gap-2">
+          {uploadedDocuments.length > 0 && (
+            <p className="text-xs text-[var(--acento-dark)] flex items-center gap-1">
+              <Paperclip className="w-3.5 h-3.5" />
+              {uploadedDocuments.length} documento(s) listo(s) para resumir o preguntar (estilo NotebookLM).
+            </p>
+          )}
+          <div className="flex gap-2">
+            <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept=".pdf,.pptx,.txt,audio/*,.webm,.mp3,.m4a,.wav" className="hidden" aria-hidden />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={loading || uploadingFile}
+              title="Subir documento (PDF, PPTX, TXT) o audio para resumir o preguntar"
+              aria-label="Subir documento o audio"
+              className="flex items-center justify-center w-12 h-12 rounded-full border-2 border-gray-300 text-[var(--ink-muted)] hover:border-[var(--accent)] hover:text-[var(--accent)] shrink-0 disabled:opacity-50"
+            >
+              {uploadingFile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
+            </button>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="¿Cómo te ayudo?"
+              className="flex-1 px-4 py-3 rounded-lg border border-gray-300 text-[var(--text)] text-base min-h-[48px] focus:outline focus:ring-2 focus:ring-[var(--accent)]"
+              disabled={loading}
+              aria-label="Mensaje"
+            />
+            <button type="submit" disabled={loading || !input.trim()} className="btn-primary disabled:opacity-50">
+              {loading ? "…" : "Enviar"}
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -275,6 +321,7 @@ function StreamChat({
   const lastReportedIdRef = useRef<string | null>(null);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [modelUsed, setModelUsed] = useState<string | null>(null);
+  const [uploadedDocuments, setUploadedDocuments] = useState<string[]>([]);
   const fetchWithHeaders = useCallback(async (url: RequestInfo | URL, init?: RequestInit) => {
     const res = await fetch(url, init);
     const tid = res.headers.get("X-Thread-Id");
@@ -293,8 +340,9 @@ function StreamChat({
       threadId: threadId ?? undefined,
       cohortId: cohortId ?? undefined,
       courseId: courseId ?? undefined,
+      uploadedDocuments: uploadedDocuments.length > 0 ? uploadedDocuments : undefined,
     }),
-    [provider, mode, apiContext, threadId, cohortId, courseId]
+    [provider, mode, apiContext, threadId, cohortId, courseId, uploadedDocuments]
   );
 
   const { messages, sendMessage: rawSendMessage, status, error } = useChat({
@@ -347,7 +395,8 @@ function StreamChat({
                     key={text}
                     type="button"
                     onClick={() => sendMessage({ text })}
-                    className="px-3 py-2 rounded-xl border border-[var(--line)] bg-white text-sm text-[var(--ink)] hover:bg-[var(--cream)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
+                    className="px-3 py-2 rounded-xl bg-[var(--neu-bg)] text-sm text-[var(--azul)] hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acento)] transition-all"
+                    style={{ boxShadow: "var(--neu-shadow-out-sm)" }}
                   >
                     {text}
                   </button>
@@ -364,9 +413,14 @@ function StreamChat({
             }`}
           >
             <div
-              className={`max-w-[85%] rounded-xl px-4 py-3 ${
-                m.role === "user" ? "bg-[var(--accent)] text-white" : "card-white"
+              className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+                m.role === "user"
+                  ? "bg-[var(--acento)] text-[var(--azul-dark)] font-medium"
+                  : "bg-[var(--neu-bg)] text-[var(--azul)]"
               }`}
+              style={{
+                boxShadow: m.role === "user" ? "var(--neu-shadow-out-sm)" : "var(--neu-shadow-out-sm)",
+              }}
             >
               {(() => {
                 const text = getMessageText(m);
@@ -409,7 +463,15 @@ function StreamChat({
           </button>
         </div>
       )}
-      <ChatInput onSend={sendMessage} loading={loading} />
+      <ChatInput
+        onSend={(opts) => {
+          sendMessage(opts);
+          setUploadedDocuments([]);
+        }}
+        loading={loading}
+        uploadedDocuments={uploadedDocuments}
+        onAddUploadedDocument={(text) => setUploadedDocuments((prev) => [...prev, text])}
+      />
     </div>
   );
 }
@@ -423,17 +485,42 @@ function canUseMediaRecorder(): boolean {
 function ChatInput({
   onSend,
   loading,
+  uploadedDocuments = [],
+  onAddUploadedDocument,
 }: {
-  onSend: (opts: { text: string }) => Promise<void>;
+  onSend: (opts: { text: string }) => void | Promise<void>;
   loading: boolean;
+  uploadedDocuments?: string[];
+  onAddUploadedDocument?: (text: string) => void;
 }) {
   const [input, setInput] = useState("");
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const chunksRef = useRef<Blob[]>([]);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const supportsVoice = canUseMediaRecorder();
+
+  const handleFileSelect = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file || !onAddUploadedDocument) return;
+      e.target.value = "";
+      setUploadingFile(true);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/documents/extract", { method: "POST", credentials: "include", body: formData });
+        const data = await res.json();
+        if (res.ok && data.text) onAddUploadedDocument(data.text);
+      } finally {
+        setUploadingFile(false);
+      }
+    },
+    [onAddUploadedDocument]
+  );
 
   const stopStream = useCallback(() => {
     if (streamRef.current) {
@@ -496,14 +583,35 @@ function ChatInput({
   };
 
   return (
-    <div className="p-4 border-t border-cream-dark bg-white">
+    <div className="p-4 bg-[var(--neu-bg)]" style={{ boxShadow: "var(--neu-shadow-in-sm)" }}>
+      {uploadedDocuments.length > 0 && (
+        <p className="text-xs text-[var(--acento-dark)] flex items-center gap-1 mb-2">
+          <Paperclip className="w-3.5 h-3.5" />
+          {uploadedDocuments.length} documento(s) listo(s) para resumir o preguntar (estilo NotebookLM).
+        </p>
+      )}
       <form onSubmit={handleSubmit} className="flex gap-2 items-center">
+        <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept=".pdf,.pptx,.txt,audio/*,.webm,.mp3,.m4a,.wav" className="hidden" aria-hidden />
+        {onAddUploadedDocument && (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading || uploadingFile}
+            title="Subir documento o audio para resumir o preguntar"
+            aria-label="Subir documento o audio"
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-[var(--neu-bg)] text-[var(--azul)] hover:opacity-90 shrink-0 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acento)] transition-all"
+            style={{ boxShadow: "var(--neu-shadow-out-sm)" }}
+          >
+            {uploadingFile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
+          </button>
+        )}
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Escribe tu mensaje..."
-          className="flex-1 px-4 py-3 rounded-lg border border-gray-300 text-[var(--text)] text-base min-h-[48px] focus:outline focus:ring-2 focus:ring-[var(--accent)]"
+          placeholder="¿Cómo te ayudo?"
+          className="flex-1 px-4 py-3 rounded-xl bg-[var(--neu-bg)] text-[var(--azul)] text-base min-h-[48px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acento)] disabled:opacity-70"
+          style={{ boxShadow: "var(--neu-shadow-in)" }}
           disabled={loading}
           aria-label="Mensaje"
         />
@@ -512,9 +620,10 @@ function ChatInput({
             type="button"
             onClick={toggleVoice}
             disabled={loading}
-            className={`flex items-center justify-center w-12 h-12 rounded-full border-2 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:opacity-50 ${
-              recording ? "bg-[var(--acento)] border-[var(--acento)] text-white animate-pulse" : "border-gray-300 text-[var(--ink-muted)] hover:border-[var(--acento)] hover:text-[var(--acento)]"
+            className={`flex items-center justify-center w-12 h-12 rounded-full shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acento)] disabled:opacity-50 transition-all ${
+              recording ? "bg-[var(--acento)] text-[var(--azul-dark)] animate-pulse" : "bg-[var(--neu-bg)] text-[var(--azul)]"
             }`}
+            style={{ boxShadow: recording ? "var(--neu-shadow-in)" : "var(--neu-shadow-out-sm)" }}
             aria-label={recording ? "Detener grabación" : "Grabar voz"}
             title={recording ? "Clic para transcribir" : "Grabar mensaje por voz"}
           >
@@ -524,7 +633,8 @@ function ChatInput({
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="btn-primary disabled:opacity-50"
+          className="px-4 py-3 rounded-xl font-semibold text-[var(--azul)] bg-[var(--neu-bg)] disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acento)] transition-all min-h-[48px]"
+          style={{ boxShadow: "var(--neu-shadow-out-sm)" }}
         >
           {loading ? "…" : "Enviar"}
         </button>

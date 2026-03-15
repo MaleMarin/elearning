@@ -12,12 +12,12 @@ function toIso(v: unknown): string | null {
   return d?.toDate?.()?.toISOString?.() ?? null;
 }
 
-/** GET: datos de "Tu cohorte" para la vista del alumno (nombre, fechas, compañeros, mi ranking, próx. fecha límite). */
+/** GET: datos de "Tu grupo" para la vista del alumno (nombre, fechas, compañeros, mi ranking, próx. fecha límite). */
 export async function GET(req: NextRequest) {
   if (getDemoMode()) {
     return NextResponse.json({
       cohortId: "demo-cohort-id",
-      nombre: "Cohorte 2025-I demo",
+      nombre: "Grupo 2025-I demo",
       fechaInicio: new Date().toISOString(),
       fechaFin: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
       totalAlumnos: 12,
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     if (!enrollment) return NextResponse.json({ cohortId: null });
     const cohortId = enrollment.cohort_id;
     const cohort = await firebaseContent.getCohort(cohortId);
-    const nombre = (cohort.nombre as string) ?? (cohort.name as string) ?? "Cohorte";
+    const nombre = (cohort.nombre as string) ?? (cohort.name as string) ?? "Grupo";
     const fechaInicio = toIso(cohort.fechaInicio);
     const fechaFin = toIso(cohort.fechaFin);
     const alumnos = (cohort.alumnos as string[]) ?? [];

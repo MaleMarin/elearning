@@ -22,7 +22,7 @@ Responde en español, en prosa breve (1-2 párrafos).`;
 }
 
 export function buildDigestSystemPrompt(): string {
-  return `Eres un asistente que escribe resúmenes semanales para una cohorte de un curso en línea.
+  return `Eres un asistente que escribe resúmenes semanales para un grupo de un curso en línea.
 Dado: temas de la semana, posts destacados, dudas comunes y próximos hitos, escribe un digest amigable en español (2-4 párrafos).
 Incluye: lo más comentado, dudas frecuentes, y un recordatorio de próximos hitos. Tono cercano pero profesional.`;
 }

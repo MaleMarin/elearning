@@ -24,6 +24,7 @@ export default function AdminReglasPage() {
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     trigger: "course_completed" as EnrollmentRuleTrigger,
@@ -174,12 +175,17 @@ export default function AdminReglasPage() {
 
         <PageSection
           title="Reglas de inscripción automática"
-          subtitle="Al completar un curso, inscribir al alumno en otro curso o cohorte."
+          subtitle="Al completar un curso, inscribir al alumno en otro curso o grupo."
         >
           {error && (
             <div className="mb-6">
               <Alert message={error} variant="error" />
               <SecondaryButton onClick={() => setError(null)} className="mt-2">Cerrar</SecondaryButton>
+            </div>
+          )}
+          {successMessage && (
+            <div className="mb-6 p-4 rounded-xl bg-[var(--success-soft)] border border-[var(--success)]/30 text-[var(--success)] text-sm font-medium">
+              {successMessage}
             </div>
           )}
 
@@ -190,6 +196,38 @@ export default function AdminReglasPage() {
                 Reglas
               </h3>
               <div className="flex items-center gap-2">
+                <SecondaryButton
+                  onClick={async () => {
+                    setLoading(true);
+                    try {
+                      const res = await fetch("/api/admin/reglas/ejecutar", {
+                        method: "POST",
+                        credentials: "include",
+                      });
+                      const data = await res.json().catch(() => ({}));
+                      if (res.ok && data.ejecutadas != null) {
+                        setError(null);
+                        setSuccessMessage(`Ejecutadas ${data.ejecutadas} reglas.`);
+                        setTimeout(() => setSuccessMessage(""), 4000);
+                      } else {
+                        setError((data as { error?: string }).error ?? "Error al ejecutar");
+                      }
+                    } catch (e) {
+                      setError(e instanceof Error ? e.message : "Error al ejecutar");
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                  className="inline-flex items-center gap-2"
+                >
+                  {loading ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" aria-hidden />
+                  ) : (
+                    <ListChecks className="w-4 h-4" aria-hidden />
+                  )}
+                  Ejecutar reglas ahora
+                </SecondaryButton>
                 <SecondaryButton onClick={loadRules} disabled={loading} className="inline-flex items-center gap-2">
                   <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
                   Actualizar
@@ -253,7 +291,7 @@ export default function AdminReglasPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[var(--ink-muted)] mb-1">Asignar a cohorte (opcional)</label>
+                    <label className="block text-sm font-medium text-[var(--ink-muted)] mb-1">Asignar a grupo (opcional)</label>
                     <select
                       value={form.assignCohortId}
                       onChange={(e) => setForm((f) => ({ ...f, assignCohortId: e.target.value }))}
@@ -313,7 +351,7 @@ export default function AdminReglasPage() {
                           <>Al completar <strong>{courseTitle(r.conditions.completedCourseId)}</strong> → inscribir en <strong>{courseTitle(r.action.enrollInCourseId)}</strong></>
                         )}
                         {r.action.assignCohortId && (
-                          <> → cohorte <strong>{cohortName(r.action.assignCohortId)}</strong></>
+                          <> → grupo <strong>{cohortName(r.action.assignCohortId)}</strong></>
                         )}
                       </p>
                     </div>

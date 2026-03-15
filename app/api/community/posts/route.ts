@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/community/posts?cohortId=uuid
- * Posts de la cohorte (solo si el usuario es miembro). Oculta los que tienen ≥3 reportes.
+ * Posts del grupo (solo si el usuario es miembro). Oculta los que tienen ≥3 reportes.
  */
 export async function GET(request: NextRequest) {
   if (getDemoMode()) return NextResponse.json({ posts: demoApiData.posts, cohortId: demoApiData.cohortId });
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     .eq("user_id", user.id)
     .limit(1);
   cohortId = members?.[0]?.cohort_id ?? null;
-  if (!cohortId) return NextResponse.json({ error: "Sin cohorte asignada" }, { status: 403 });
+  if (!cohortId) return NextResponse.json({ error: "Sin grupo asignado" }, { status: 403 });
 
   const body = await request.json().catch(() => ({}));
   const title = (body.title as string)?.trim() ?? "";

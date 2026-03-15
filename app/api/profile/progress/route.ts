@@ -16,7 +16,7 @@ export interface ProgressResponse {
   certificatePercent: number | null;
   certificateAvailable: boolean;
   totalPoints: number;
-  badges: { id: BadgeId; earned: boolean; earnedAt?: string }[];
+  logros: { id: BadgeId; earned: boolean; earnedAt?: string }[];
 }
 
 function demoProgress(): ProgressResponse {
@@ -28,7 +28,7 @@ function demoProgress(): ProgressResponse {
     certificatePercent: 16,
     certificateAvailable: false,
     totalPoints: 25,
-    badges: [
+    logros: [
       { id: "first_lesson", earned: true, earnedAt: new Date().toISOString() },
       { id: "streak_3", earned: false },
       { id: "module_complete", earned: false },
@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
       earnedAtMap.set("certificate", now);
     }
 
-    const badges: ProgressResponse["badges"] = profileService.getAllBadgeIds().map((id) => ({
+    const logros: ProgressResponse["logros"] = profileService.getAllBadgeIds().map((id) => ({
       id,
       earned: earnedSet.has(id),
       earnedAt: earnedAtMap.get(id),
@@ -134,7 +134,7 @@ export async function GET(req: NextRequest) {
       certificatePercent: lessonsTotal > 0 ? percent : null,
       certificateAvailable,
       totalPoints,
-      badges,
+      logros,
     });
   } catch {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });

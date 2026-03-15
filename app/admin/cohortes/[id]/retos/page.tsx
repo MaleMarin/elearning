@@ -73,10 +73,10 @@ export default function AdminCohortRetosPage() {
     <div className="max-w-3xl mx-auto py-8 px-4">
       <Link href="/admin/cohortes" className="inline-flex items-center gap-2 text-sm text-[var(--ink-muted)] mb-6">
         <ChevronLeft className="w-4 h-4" />
-        Volver a cohortes
+        Volver a grupos
       </Link>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="heading-section">Retos de la cohorte</h1>
+        <h1 className="heading-section">Retos del grupo</h1>
         <PrimaryButton href={`/admin/cohortes/${id}/retos/nuevo`}>
           <Plus className="w-4 h-4" />
           Nuevo reto
@@ -87,7 +87,7 @@ export default function AdminCohortRetosPage() {
       ) : challenges.length === 0 ? (
         <EmptyState
           title="Sin retos"
-          description="Crea el primer reto colaborativo para esta cohorte."
+          description="Crea el primer reto colaborativo para este grupo."
           ctaLabel="Crear reto"
           ctaHref={`/admin/cohortes/${id}/retos/nuevo`}
         />

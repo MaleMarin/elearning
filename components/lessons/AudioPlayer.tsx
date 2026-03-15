@@ -13,9 +13,11 @@ interface AudioPlayerProps {
   storageId: string;
   /** Título opcional para aria-label. */
   title?: string;
+  /** Si true, inicia la reproducción al montar (preferencia "escuchar"). */
+  autoplay?: boolean;
 }
 
-export function AudioPlayer({ text, storageId, title }: AudioPlayerProps) {
+export function AudioPlayer({ text, storageId, title, autoplay = false }: AudioPlayerProps) {
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -124,6 +126,14 @@ export function AudioPlayer({ text, storageId, title }: AudioPlayerProps) {
     const audio = audioRef.current;
     if (audio) audio.playbackRate = speed;
   }, [speed]);
+
+  const autoplayTriggered = useRef(false);
+  useEffect(() => {
+    if (!autoplay || !text.trim() || autoplayTriggered.current) return;
+    autoplayTriggered.current = true;
+    const t = setTimeout(() => loadAndPlay(), 500);
+    return () => clearTimeout(t);
+  }, [autoplay, text, loadAndPlay]);
 
   useEffect(() => {
     return () => {

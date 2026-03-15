@@ -5,19 +5,58 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getFirebaseAuth } from "@/lib/firebase/client";
 import { getDemoMode } from "@/lib/env";
+import { getMfaResolverFromError } from "@/lib/auth/mfa";
+import { MFAChallenge } from "@/components/auth/MFAChallenge";
+import TwoFactorSetup from "@/components/admin/TwoFactorSetup";
+import type { MultiFactorResolver } from "firebase/auth";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null);
+  const [needsMfaVerify, setNeedsMfaVerify] = useState(false);
   const router = useRouter();
   const isDemo = getDemoMode();
+
+  const finishLogin = async (idToken: string) => {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken }),
+      credentials: "include",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error((data as { error?: string }).error ?? "Error al crear sesión");
+    const meRes = await fetch("/api/auth/me", { credentials: "include" });
+    const meData = await meRes.json().catch(() => ({}));
+    if (meData.mfaEnabled === true) {
+      setNeedsMfaVerify(true);
+      return;
+    }
+    router.push("/admin");
+    router.refresh();
+  };
+
+  const handleMfaSuccess = async (userCredential: import("firebase/auth").UserCredential) => {
+    setLoading(true);
+    setError("");
+    try {
+      const idToken = await userCredential.user.getIdToken();
+      await finishLogin(idToken);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al completar el acceso");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setMfaResolver(null);
     try {
       if (isDemo) {
         const res = await fetch("/api/auth/login", {
@@ -46,17 +85,25 @@ export default function AdminLoginPage() {
       const { signInWithEmailAndPassword } = await import("firebase/auth");
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCred.user.getIdToken();
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-        credentials: "include",
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as { error?: string }).error ?? "Error al crear sesión");
-      router.push("/admin");
-      router.refresh();
+      await finishLogin(idToken);
     } catch (err) {
+      const code = (err as { code?: string })?.code;
+      if (code === "auth/multi-factor-auth-required") {
+        const requireMfaRes = await fetch(`/api/auth/require-mfa?email=${encodeURIComponent(email)}`);
+        const { requireMfa } = await requireMfaRes.json().catch(() => ({ requireMfa: false }));
+        if (!requireMfa) {
+          setError("Se requiere verificación en dos pasos. Solo cuentas de administrador pueden continuar aquí.");
+          return;
+        }
+        const resolver = await getMfaResolverFromError(err);
+        if (resolver) {
+          setError("");
+          setMfaResolver(resolver);
+        } else {
+          setError("Se requiere verificación en dos pasos. Intenta de nuevo.");
+        }
+        return;
+      }
       const msg = err instanceof Error ? err.message : "Error al iniciar sesión";
       if (msg.includes("Invalid") || msg.includes("invalid") || msg.includes("incorrect")) {
         setError("Correo o contraseña incorrectos.");
@@ -67,6 +114,71 @@ export default function AdminLoginPage() {
       setLoading(false);
     }
   };
+
+  if (needsMfaVerify) {
+    return (
+      <>
+        <style>{adminLoginStyles}</style>
+        <div className="admin-login-page">
+          <div className="admin-login-box">
+            <div className="admin-login-form">
+              <div className="admin-login-logo">
+                <div className="admin-login-logo-mark">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+                    <circle cx="10" cy="10" r="8" stroke="#1428d4" strokeWidth="1.2" />
+                    <path d="M10 4l1.6 4.9H16l-4.2 3.1 1.6 4.9L10 13.9l-4.4 3 1.6-4.9L3 9l5.4-.1z" fill="#1428d4" fillOpacity="0.7" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="admin-login-logo-name">Política Digital</span>
+                  <span className="admin-login-logo-sub">Admin · Verificación 2FA</span>
+                </div>
+              </div>
+              <TwoFactorSetup onComplete={() => { router.push("/admin"); router.refresh(); }} />
+              <p className="admin-login-back">
+                <Link href="/login" className="admin-login-back-link">← Volver al login</Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (mfaResolver) {
+    return (
+      <>
+        <style>{adminLoginStyles}</style>
+        <div className="admin-login-page">
+          <div className="admin-login-box">
+            <div className="admin-login-form">
+              <div className="admin-login-logo">
+                <div className="admin-login-logo-mark">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+                    <circle cx="10" cy="10" r="8" stroke="#1428d4" strokeWidth="1.2" />
+                    <path d="M10 4l1.6 4.9H16l-4.2 3.1 1.6 4.9L10 13.9l-4.4 3 1.6-4.9L3 9l5.4-.1z" fill="#1428d4" fillOpacity="0.7" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="admin-login-logo-name">Política Digital</span>
+                  <span className="admin-login-logo-sub">Admin · Verificación en dos pasos</span>
+                </div>
+              </div>
+              <div className="admin-login-eyebrow">Código de tu app</div>
+              <div className="admin-login-title">Introduce el código de 6 dígitos</div>
+              {error && <p className="admin-login-error" role="alert">{error}</p>}
+              <MFAChallenge resolver={mfaResolver} onSuccess={handleMfaSuccess} onError={setError} />
+              <p className="admin-login-back">
+                <button type="button" className="admin-login-back-link" onClick={() => setMfaResolver(null)} style={{ background: "none", border: "none", cursor: "pointer", font: "inherit" }}>
+                  ← Volver a correo y contraseña
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

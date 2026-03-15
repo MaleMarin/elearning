@@ -13,11 +13,11 @@ export default function FelicidadesPage() {
     horas: number;
     calificacion: string;
     leccionesTotal: number;
-    badges: { icon: string; name: string; desc: string }[];
+    logros: { icon: string; name: string; desc: string }[];
     carta?: string;
     cartaFecha?: string;
     idCert: string;
-    cohorte: string;
+    grupo: string;
     verifyUrl: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,11 +68,11 @@ export default function FelicidadesPage() {
       horas={data.horas}
       calificacion={data.calificacion}
       leccionesTotal={data.leccionesTotal}
-      badges={data.badges}
+      logros={data.logros}
       carta={data.carta}
       cartaFecha={data.cartaFecha}
       idCert={data.idCert}
-      cohorte={data.cohorte}
+      grupo={data.grupo}
       verifyUrl={data.verifyUrl}
     />
   );
