@@ -10,7 +10,8 @@ import {
   Badge,
 } from "@/components/ui";
 import { Alert } from "@/components/ui/Alert";
-import { ChevronLeft, Plus, Pencil, FileText } from "lucide-react";
+import { ChevronLeft, Plus, Pencil, FileText, Sparkles, BookOpen } from "lucide-react";
+import { ResourceManager } from "@/components/admin/ResourceManager";
 
 type Module = {
   id: string;
@@ -18,6 +19,9 @@ type Module = {
   description: string | null;
   order_index: number;
   status: string;
+  requiresCompletion?: string[];
+  objectives?: string[];
+  reward_label?: string | null;
 };
 type Lesson = {
   id: string;
@@ -41,6 +45,9 @@ export default function AdminModuloEditPage() {
   const [lessonOpen, setLessonOpen] = useState(false);
   const [lessonTitle, setLessonTitle] = useState("");
   const [lessonSubmitting, setLessonSubmitting] = useState(false);
+  const [requiresCompletion, setRequiresCompletion] = useState("");
+  const [editObjectives, setEditObjectives] = useState("");
+  const [editRewardLabel, setEditRewardLabel] = useState("");
 
   useEffect(() => {
     if (!moduleId) return;
@@ -54,6 +61,9 @@ export default function AdminModuloEditPage() {
           setEditTitle(modRes.module.title);
           setEditDescription(modRes.module.description ?? "");
           setEditStatus(modRes.module.status);
+          setRequiresCompletion(Array.isArray(modRes.module.requiresCompletion) ? modRes.module.requiresCompletion.join(", ") : "");
+          setEditObjectives(Array.isArray(modRes.module.objectives) ? modRes.module.objectives.join("\n") : "");
+          setEditRewardLabel(modRes.module.reward_label ?? modRes.module.rewardLabel ?? "");
         }
         setLessons(lessonsRes.lessons ?? []);
       })
@@ -73,6 +83,9 @@ export default function AdminModuloEditPage() {
           title: editTitle.trim(),
           description: editDescription.trim() || null,
           status: editStatus,
+          requiresCompletion: requiresCompletion.split(",").map((s) => s.trim()).filter(Boolean),
+          objectives: editObjectives.split("\n").map((s) => s.trim()).filter(Boolean),
+          reward_label: editRewardLabel.trim() || null,
         }),
       });
       const data = await res.json();
@@ -124,13 +137,20 @@ export default function AdminModuloEditPage() {
   return (
     <div className="min-h-screen bg-[#F3F2EF]">
       <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6">
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center justify-between gap-4 mb-8">
           <Link
             href={`/admin/cursos/${courseId}`}
             className="inline-flex items-center gap-2 text-[var(--ink-muted)] hover:text-[var(--ink)] no-underline text-sm font-medium"
           >
             <ChevronLeft className="w-4 h-4" />
             Curso
+          </Link>
+          <Link
+            href={`/admin/cursos/${courseId}/modulos/${moduleId}/contenido`}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-[var(--line)] text-[var(--ink)] text-sm font-medium hover:bg-[var(--cream)]"
+          >
+            <BookOpen className="w-4 h-4" />
+            Contenido del módulo
           </Link>
         </div>
 
@@ -149,11 +169,31 @@ export default function AdminModuloEditPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[var(--ink)] mb-1">Descripción</label>
+              <label className="block text-sm font-medium text-[var(--ink)] mb-1">Descripción (resumen en landing)</label>
               <textarea
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
                 rows={2}
+                className="w-full px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-white text-[var(--ink)]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--ink)] mb-1">Objetivos (uno por línea, landing por módulo)</label>
+              <textarea
+                value={editObjectives}
+                onChange={(e) => setEditObjectives(e.target.value)}
+                rows={4}
+                placeholder="Comprender el concepto de…&#10;Identificar casos de aplicación…"
+                className="w-full px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-white text-[var(--ink)]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--ink)] mb-1">Recompensa / insignia al completar</label>
+              <input
+                type="text"
+                value={editRewardLabel}
+                onChange={(e) => setEditRewardLabel(e.target.value)}
+                placeholder="Ej: Insignia Fundamentos COBIT"
                 className="w-full px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-white text-[var(--ink)]"
               />
             </div>
@@ -168,6 +208,17 @@ export default function AdminModuloEditPage() {
                 <option value="published">Publicado</option>
               </select>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--ink)] mb-1">Requisitos (IDs de módulos a completar antes)</label>
+              <input
+                type="text"
+                value={requiresCompletion}
+                onChange={(e) => setRequiresCompletion(e.target.value)}
+                placeholder="idModulo1, idModulo2"
+                className="w-full px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-white text-[var(--ink)] font-mono text-sm"
+              />
+              <p className="text-xs text-[var(--text-muted)] mt-1">El alumno debe completar todas las lecciones de esos módulos para desbloquear este.</p>
+            </div>
             <PrimaryButton type="submit" disabled={saving}>Guardar módulo</PrimaryButton>
           </form>
         </SurfaceCard>
@@ -178,14 +229,20 @@ export default function AdminModuloEditPage() {
               <FileText className="w-5 h-5 text-[var(--primary)]" />
               Lecciones
             </h2>
-            {!lessonOpen ? (
-              <PrimaryButton onClick={() => setLessonOpen(true)}>
-                <Plus className="w-4 h-4" />
-                Añadir lección
-              </PrimaryButton>
-            ) : (
-              <SecondaryButton onClick={() => setLessonOpen(false)}>Cerrar</SecondaryButton>
-            )}
+            <div className="flex flex-wrap items-center gap-2">
+              <SecondaryButton href={`/admin/cursos/${courseId}/lecciones/generar`}>
+                <Sparkles className="w-4 h-4" />
+                Generar desde archivo
+              </SecondaryButton>
+              {!lessonOpen ? (
+                <PrimaryButton onClick={() => setLessonOpen(true)}>
+                  <Plus className="w-4 h-4" />
+                  Añadir lección
+                </PrimaryButton>
+              ) : (
+                <SecondaryButton onClick={() => setLessonOpen(false)}>Cerrar</SecondaryButton>
+              )}
+            </div>
           </div>
           {lessonOpen && (
             <form onSubmit={handleAddLesson} className="mb-6 p-4 rounded-xl bg-[var(--bg)] space-y-3">
@@ -225,6 +282,10 @@ export default function AdminModuloEditPage() {
                 ))}
             </ul>
           )}
+        </SurfaceCard>
+
+        <SurfaceCard padding="lg" clickable={false} className="mt-8">
+          <ResourceManager moduleId={moduleId} onError={setError} />
         </SurfaceCard>
       </div>
     </div>

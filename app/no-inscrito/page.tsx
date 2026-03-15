@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { SurfaceCard } from "@/components/ui/SurfaceCard";
-import { PrimaryButton } from "@/components/ui/Buttons";
+import { PrimaryButton, SecondaryButton } from "@/components/ui/Buttons";
 import { Alert } from "@/components/ui/Alert";
-import { HelpCircle, LogOut, KeyRound, Mail } from "lucide-react";
+import { HelpCircle, LogOut, KeyRound, Mail, Sparkles } from "lucide-react";
+
+const isDemoMode = typeof process !== "undefined" && process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 export default function NoInscritoPage() {
   const [code, setCode] = useState("");
@@ -17,16 +17,39 @@ export default function NoInscritoPage() {
   const [requestSent, setRequestSent] = useState(false);
   const [requestLoading, setRequestLoading] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const [showEscape, setShowEscape] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    createClient()
-      .auth.getUser()
-      .then(({ data }) => setSignedIn(!!data.user));
+    let cancelled = false;
+    const fallbackTimeout = window.setTimeout(() => {
+      if (!cancelled) setSignedIn(false);
+    }, 3000);
+    const escapeTimeout = window.setTimeout(() => {
+      if (!cancelled) setShowEscape(true);
+    }, 2000);
+
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((r) => {
+        if (!cancelled) setSignedIn(r.ok);
+      })
+      .catch(() => {
+        if (!cancelled) setSignedIn(false);
+      })
+      .finally(() => {
+        window.clearTimeout(fallbackTimeout);
+        window.clearTimeout(escapeTimeout);
+      });
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(fallbackTimeout);
+      window.clearTimeout(escapeTimeout);
+    };
   }, []);
 
   const handleSignOut = async () => {
-    await createClient().auth.signOut();
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     router.push("/login");
     router.refresh();
   };
@@ -82,12 +105,10 @@ export default function NoInscritoPage() {
     }
   };
 
-  const pageBg = { backgroundColor: "#F3F2EF" };
-
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={pageBg}>
-        <SurfaceCard padding="lg" className="max-w-md text-center">
+      <div className="min-h-screen flex items-center justify-center p-6 bg-[var(--bg)]">
+        <SurfaceCard padding="lg" clickable={false} className="max-w-md text-center">
           <p className="text-lg text-[var(--success)] font-medium">
             Acceso activado. Redirigiendo a tu panel…
           </p>
@@ -98,36 +119,63 @@ export default function NoInscritoPage() {
 
   if (signedIn === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={pageBg}>
-        <p className="text-[var(--ink-muted)]">Cargando…</p>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6 bg-[var(--bg)]">
+        <p className="text-[var(--muted)]">Cargando…</p>
+        {showEscape && (
+          <div className="flex flex-col items-center gap-2 text-center">
+            <p className="text-sm text-[var(--ink-muted)]">¿Sigue sin cargar?</p>
+            <PrimaryButton onClick={() => router.replace("/login")}>
+              Ir a iniciar sesión
+            </PrimaryButton>
+            {isDemoMode && (
+              <SecondaryButton onClick={() => router.replace("/inicio")}>
+                Ir a Inicio (modo demo)
+              </SecondaryButton>
+            )}
+          </div>
+        )}
       </div>
     );
   }
 
   if (!signedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={pageBg}>
-        <SurfaceCard padding="lg" className="max-w-md text-center">
+      <div className="min-h-screen flex items-center justify-center p-6 bg-[var(--bg)]">
+        <SurfaceCard padding="lg" clickable={false} className="max-w-md text-center">
           <h1 className="text-xl font-bold text-[var(--ink)] mb-2">
             Acceso con inscripción
           </h1>
-          <p className="text-[var(--ink-muted)] mb-6">
+          <p className="text-[var(--muted)] mb-6">
             Inicia sesión para canjear un código o solicitar acceso a un programa.
           </p>
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center min-h-[44px] px-6 rounded-full font-medium bg-[var(--primary)] text-white no-underline hover:bg-[var(--primary-hover)]"
-          >
+          <PrimaryButton href="/login">
             Ir a iniciar sesión
-          </Link>
+          </PrimaryButton>
         </SurfaceCard>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6" style={pageBg}>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[var(--bg)]">
       <div className="w-full max-w-lg space-y-6">
+        {isDemoMode && (
+          <SurfaceCard padding="lg" clickable={false} className="border-2 border-[var(--acento)] bg-[rgba(0,229,160,0.06)]">
+            <div className="flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-[var(--acento)] shrink-0 mt-0.5" />
+              <div>
+                <h2 className="text-base font-semibold text-[var(--ink)] mb-1">Modo demo</h2>
+                <p className="text-sm text-[var(--ink-muted)] mb-3">
+                  En este entorno no se envían correos. Escribe <strong>DEMO</strong> en el código de invitación y pulsa «Activar acceso», o usa el botón para ir directo al inicio.
+                </p>
+                <PrimaryButton onClick={() => router.replace("/inicio")}>
+                  Ir a Inicio sin código
+                </PrimaryButton>
+              </div>
+            </div>
+          </SurfaceCard>
+        )}
+
         <div className="text-center">
           <h1 className="text-2xl font-bold text-[var(--ink)] tracking-tight mb-2">
             Tu cuenta está lista
@@ -137,12 +185,12 @@ export default function NoInscritoPage() {
           </p>
         </div>
 
-        <SurfaceCard padding="lg">
+        <SurfaceCard padding="lg" clickable={false}>
           <h2 className="text-base font-semibold text-[var(--ink)] mb-2 flex items-center gap-2">
             <KeyRound className="w-4 h-4 text-[var(--primary)]" />
             Código de invitación
           </h2>
-          <p className="text-[var(--ink-muted)] text-sm mb-4">
+          <p className="text-[var(--muted)] text-sm mb-4">
             Si te enviaron un código, introdúcelo a continuación.
           </p>
           <form onSubmit={handleRedeem} className="flex flex-wrap gap-3">
@@ -151,7 +199,7 @@ export default function NoInscritoPage() {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="Ej. ABCD-1234"
-              className="flex-1 min-w-[140px] px-4 py-3 rounded-xl border border-[var(--line-subtle)] bg-white text-[var(--ink)] placeholder:text-[var(--ink-muted)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
+              className="flex-1 min-w-[140px] px-4 py-3 rounded-xl bg-[var(--surface)] text-[var(--ink)] border border-[var(--line)] input-premium"
               aria-label="Código de invitación"
               autoComplete="off"
               disabled={loading}
@@ -162,12 +210,12 @@ export default function NoInscritoPage() {
           </form>
         </SurfaceCard>
 
-        <SurfaceCard padding="lg">
+        <SurfaceCard padding="lg" clickable={false}>
           <h2 className="text-base font-semibold text-[var(--ink)] mb-2 flex items-center gap-2">
             <Mail className="w-4 h-4 text-[var(--primary)]" />
             Solicitar acceso
           </h2>
-          <p className="text-[var(--ink-muted)] text-sm mb-4">
+          <p className="text-[var(--muted)] text-sm mb-4">
             Si no tienes código, envía una solicitud y te contactaremos.
           </p>
           {requestSent ? (
@@ -175,14 +223,13 @@ export default function NoInscritoPage() {
               Solicitud enviada. Revisaremos tu acceso y te avisaremos.
             </p>
           ) : (
-            <button
+            <SecondaryButton
               type="button"
               onClick={handleRequestAccess}
               disabled={requestLoading}
-              className="text-[var(--primary)] font-medium hover:underline disabled:opacity-50 min-h-[44px]"
             >
               {requestLoading ? "Enviando…" : "Solicitar acceso"}
-            </button>
+            </SecondaryButton>
           )}
         </SurfaceCard>
 
@@ -191,21 +238,14 @@ export default function NoInscritoPage() {
         )}
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-          <Link
-            href="/soporte"
-            className="inline-flex items-center gap-2 text-[var(--ink)] hover:text-[var(--primary)] no-underline text-sm font-medium min-h-[44px] items-center"
-          >
+          <SecondaryButton href="/soporte" className="inline-flex items-center gap-2">
             <HelpCircle className="w-4 h-4" />
             Contactar soporte
-          </Link>
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="inline-flex items-center gap-2 text-[var(--ink-muted)] hover:text-[var(--ink)] bg-transparent border border-[var(--line-subtle)] rounded-full px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] min-h-[44px]"
-          >
+          </SecondaryButton>
+          <SecondaryButton type="button" onClick={handleSignOut} className="inline-flex items-center gap-2">
             <LogOut className="w-4 h-4" />
             Cerrar sesión
-          </button>
+          </SecondaryButton>
         </div>
       </div>
     </div>

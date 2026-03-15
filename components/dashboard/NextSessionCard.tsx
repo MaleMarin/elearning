@@ -2,7 +2,7 @@
 
 import { Video, Calendar, Clock } from "lucide-react";
 import { SurfaceCard } from "@/components/ui/SurfaceCard";
-import { SecondaryButton } from "@/components/ui/Buttons";
+import { SecondaryButton, AccentButton } from "@/components/ui/Buttons";
 
 export interface SessionData {
   id: string;
@@ -43,14 +43,9 @@ export function NextSessionCard({ session }: NextSessionCardProps) {
             </span>
           </div>
           {session.meeting_url ? (
-            <a
-              href={session.meeting_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 min-h-[44px] px-6 rounded-full font-medium bg-[var(--coral)] text-white no-underline hover:bg-[var(--coral-hover)] transition-colors w-full sm:w-auto"
-            >
+            <AccentButton href={session.meeting_url} className="w-full sm:w-auto">
               Entrar a Zoom
-            </a>
+            </AccentButton>
           ) : (
             <SecondaryButton href="/sesiones-en-vivo">Ver sesiones</SecondaryButton>
           )}

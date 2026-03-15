@@ -39,10 +39,10 @@ export default function SesionesPage() {
       <div className="max-w-3xl">
         <h1 className="text-2xl font-bold text-[var(--text)] mb-6">Sesiones en vivo</h1>
         <EmptyState
-          title="No hay sesiones programadas"
-          description="Cuando tu cohorte tenga sesiones en vivo aparecerán aquí con el enlace para unirte."
-          ctaLabel="Volver al inicio"
-          ctaHref="/"
+          title="Sin sesiones programadas"
+          description="Te avisaremos por WhatsApp y email cuando el facilitador programe una sesión."
+          ctaLabel="Activar recordatorios"
+          ctaHref="/perfil#notificaciones"
           icon="📅"
         />
       </div>

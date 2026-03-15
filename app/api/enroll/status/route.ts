@@ -1,53 +1,47 @@
-import { NextResponse } from "next/server";
-import { getDemoMode } from "@/lib/env";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getDemoMode, useFirebase } from "@/lib/env";
+import { PRECISAR_SESSION_COOKIE, isDemoCookieValue } from "@/lib/auth/session-cookie";
+import { getAuthFromRequest } from "@/lib/firebase/auth-request";
+import * as firebaseContent from "@/lib/services/firebase-content";
 
 export const dynamic = "force-dynamic";
+
+function demoEnrolledResponse() {
+  return NextResponse.json({ enrolled: true, cohortId: "demo-cohort-id", cohortName: "Cohorte demo" });
+}
 
 /**
  * GET /api/enroll/status
  * Devuelve { enrolled: boolean, cohortId?: string } para el usuario autenticado.
- * enrolled = admin O tiene al menos un enrollment con status 'active'.
- * cohortId = id de la cohorte más reciente (created_at desc) si hay enrollment activo.
  */
-export async function GET() {
-  if (getDemoMode()) {
-    return NextResponse.json({ enrolled: true, cohortId: "demo-cohort-id" });
-  }
+export async function GET(req: NextRequest) {
+  if (getDemoMode()) return demoEnrolledResponse();
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
+  const cookieValue = req.cookies.get(PRECISAR_SESSION_COOKIE)?.value;
+  if (cookieValue && isDemoCookieValue(cookieValue)) return demoEnrolledResponse();
+
+  if (!useFirebase()) {
     return NextResponse.json({ enrolled: false }, { status: 200 });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role === "admin") {
-    return NextResponse.json({ enrolled: true });
+  try {
+    const auth = await getAuthFromRequest(req);
+    if (auth.role === "admin") {
+      return NextResponse.json({ enrolled: true });
+    }
+    const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
+    if (enrollment) {
+      let cohortName: string | null = null;
+      try {
+        const cohort = await firebaseContent.getCohort(enrollment.cohort_id);
+        cohortName = (cohort.nombre as string) ?? (cohort.name as string) ?? null;
+      } catch {
+        // ignore
+      }
+      return NextResponse.json({ enrolled: true, cohortId: enrollment.cohort_id, cohortName });
+    }
+    return NextResponse.json({ enrolled: false }, { status: 200 });
+  } catch {
+    return NextResponse.json({ enrolled: false }, { status: 200 });
   }
-
-  const { data: enrollments } = await supabase
-    .from("enrollments")
-    .select("id, cohort_id, created_at")
-    .eq("user_id", user.id)
-    .eq("status", "active")
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  if (enrollments && enrollments.length > 0) {
-    const latest = enrollments[0];
-    return NextResponse.json({
-      enrolled: true,
-      cohortId: latest.cohort_id ?? undefined,
-    });
-  }
-
-  return NextResponse.json({ enrolled: false }, { status: 200 });
 }

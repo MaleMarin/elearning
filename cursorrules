@@ -1,0 +1,52 @@
+# Política Digital — Reglas para Cursor
+# Este archivo se lee automáticamente antes de cada respuesta.
+
+## Identidad del proyecto
+Plataforma de e-learning para servidores públicos mexicanos.
+Stack: Next.js App Router + Firebase + Tailwind + TypeScript.
+Modo demo activo con NEXT_PUBLIC_DEMO_MODE=true.
+
+## Antes de hacer CUALQUIER cosa
+1. Leer docs/DESIGN_SYSTEM.md para colores, sombras y tipografía.
+2. Leer docs/PROJECT_STRUCTURE.md para saber dónde va cada archivo.
+3. Verificar que el archivo no existe ya antes de crearlo.
+
+## Estructura de rutas
+- Alumno: app/inicio, app/curso, app/tareas, app/perfil, etc.
+- Admin: app/admin/[seccion]
+- Layout: app/layout.tsx usa ConditionalLayout — NO existe app/(app)/layout.tsx
+- API: app/api/[dominio]/[accion]/route.ts (solo servidor)
+- Servicios: lib/services/ (solo servidor, nunca en cliente)
+- Firebase Admin: lib/firebase/admin.ts — NUNCA importar en componentes cliente
+
+## Sistema de diseño — reglas críticas
+- Fondo SIEMPRE: #f0f2f5 (NO blanco, NO #e8ecf0)
+- Azul primario: #1428d4 (NO #1e3a8a)
+- Acento verde menta: #00e5a0 (NO dorado)
+- Fuente: Plus Jakarta Sans (NO serif, NO cursiva en dashboard)
+- Cards flotantes: box-shadow 8px 8px 18px rgba(174,183,194,0.65), -8px -8px 18px rgba(255,255,255,0.92)
+- Cards hundidas: inset 4px 4px 10px rgba(174,183,194,0.55), inset -4px -4px 10px rgba(255,255,255,0.85)
+- NUNCA border en cards neumórficas
+- NUNCA background: white en el dashboard
+
+## Reglas de comportamiento
+- Implementar UN ítem a la vez
+- Confirmar con ✅ HECHO: [nombre] después de cada ítem
+- Esperar confirmación antes de continuar
+- Máximo 3 intentos por error — si falla, documentar y pasar al siguiente
+- NUNCA modificar el mismo archivo más de 3 veces por el mismo problema
+- NUNCA correr npm run build automáticamente — preguntar primero
+- NUNCA crear duplicados de archivos existentes
+- NUNCA mover archivos sin actualizar todos los imports
+
+## Credenciales demo
+- Alumno: /login → cualquier correo y contraseña
+- Admin: /admin/login → admin@demo.com / demo123
+
+## Lo que NO hacer
+- No agregar funcionalidades no pedidas
+- No cambiar archivos que no fueron mencionados
+- No usar emojis en la UI (usar SVG o texto)
+- No usar font-style: italic en el dashboard
+- No importar firebase-admin en componentes cliente
+- No crear archivos en app/(app)/ — las rutas van en app/

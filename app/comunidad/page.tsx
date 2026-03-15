@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useAssistant } from "@/contexts/AssistantContext";
 import { EmptyState } from "@/components/ui/EmptyState";
 
@@ -23,6 +24,9 @@ export default function ComunidadPage() {
   const [unansweredLoading, setUnansweredLoading] = useState(false);
   const [digestResult, setDigestResult] = useState<string | null>(null);
   const [unansweredResult, setUnansweredResult] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"general" | "mi-cohorte">("mi-cohorte");
+  const [reportingId, setReportingId] = useState<string | null>(null);
+  const [reportResult, setReportResult] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/community/posts")
@@ -100,20 +104,28 @@ export default function ComunidadPage() {
       <div className="max-w-3xl">
         <h1 className="text-2xl font-bold text-[var(--text)] mb-6">Comunidad</h1>
         <EmptyState
-          title={noCohort ? "Aún no formas parte de una cohorte" : "Sé la primera persona en publicar"}
+          title={noCohort ? "Aún no formas parte de un grupo" : "Sé el primero en publicar"}
           description={
             noCohort
-              ? "Cuando te asignen a un programa podrás ver y escribir en la comunidad."
-              : "Abre el asistente en la pestaña Comunidad para preguntar, compartir o debatir con tus compañeros."
+              ? "Cuando te asignen a un programa, podrás ver y escribir en la comunidad. Si crees que deberías tener acceso, contacta a soporte."
+              : "Las mejores comunidades empiezan con una sola persona que dice hola."
           }
-          ctaLabel="Abrir asistente comunidad"
-          onCtaClick={() => openDrawer({ mode: "community", cohortId, courseId: null })}
+          ctaLabel={noCohort ? "Ir a soporte" : "Crear publicación"}
+          ctaHref={noCohort ? "/soporte" : undefined}
+          onCtaClick={noCohort ? undefined : () => openDrawer({ mode: "community", cohortId, courseId: null })}
           icon="💬"
         />
         {!noCohort && (
-          <p className="mt-4 text-center text-[var(--text-muted)] text-base">
-            Ideas: &quot;Pregunta sobre el contenido&quot;, &quot;Compartir un recurso&quot;, &quot;Duda sobre la entrega&quot;
-          </p>
+          <>
+            <p className="mt-4 text-center text-[var(--text-muted)] text-base">
+              Ideas: &quot;Pregunta sobre el contenido&quot;, &quot;Compartir un recurso&quot;, &quot;Duda sobre la entrega&quot;
+            </p>
+            <p className="mt-2 text-center text-base">
+              <Link href="/comunidad/show-and-tell" className="text-[var(--primary)] font-medium hover:underline">
+                Ir a Show & Tell
+              </Link>
+            </p>
+          </>
         )}
       </div>
     );
@@ -123,7 +135,50 @@ export default function ComunidadPage() {
     <div className="max-w-3xl">
       <h1 className="text-2xl font-bold text-[var(--text)] mb-4">Comunidad</h1>
 
+      {cohortId && (
+        <div className="flex border-b border-[var(--line)] mb-6" role="tablist" aria-label="Secciones de comunidad">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "mi-cohorte"}
+            onClick={() => setActiveTab("mi-cohorte")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              activeTab === "mi-cohorte"
+                ? "border-[var(--primary)] text-[var(--primary)]"
+                : "border-transparent text-[var(--text-muted)] hover:text-[var(--text)]"
+            }`}
+          >
+            Mi cohorte
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "general"}
+            onClick={() => setActiveTab("general")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              activeTab === "general"
+                ? "border-[var(--primary)] text-[var(--primary)]"
+                : "border-transparent text-[var(--text-muted)] hover:text-[var(--text)]"
+            }`}
+          >
+            General
+          </button>
+        </div>
+      )}
+
+      {activeTab === "mi-cohorte" && cohortId && (
+        <p className="text-sm text-[var(--text-muted)] mb-4">
+          Foro privado de tu cohorte. Solo los miembros pueden ver y participar. El facilitador puede fijar anuncios y abrir hilos por módulo.
+        </p>
+      )}
+
       <div className="flex flex-wrap gap-4 mb-6">
+        <Link href="/comunidad/show-and-tell" className="btn-primary min-h-[44px] inline-flex items-center">
+          Show & Tell
+        </Link>
+        <Link href="/comunidad/proponer-leccion" className="btn-primary min-h-[44px] inline-flex items-center">
+          Proponer una lección
+        </Link>
         <button
           type="button"
           onClick={() => openDrawer({ mode: "community", cohortId, courseId: null })}
@@ -180,6 +235,11 @@ export default function ComunidadPage() {
 
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-[var(--text)]">Posts</h2>
+        {reportResult && (
+          <p className="text-sm text-[var(--primary)] bg-[var(--primary-soft)] px-3 py-2 rounded-lg">
+            {reportResult}
+          </p>
+        )}
         {posts.map((p) => (
           <article key={p.id} className="card-white p-4">
             {p.pinned && (
@@ -187,9 +247,38 @@ export default function ComunidadPage() {
             )}
             <h3 className="font-semibold text-[var(--text)]">{p.title}</h3>
             <p className="text-[var(--text-muted)] text-base mt-1">{p.body}</p>
-            <p className="text-sm text-[var(--text-muted)] mt-2">
-              {new Date(p.created_at).toLocaleDateString("es")}
-            </p>
+            <div className="flex items-center justify-between mt-2 flex-wrap gap-2">
+              <p className="text-sm text-[var(--text-muted)]">
+                {new Date(p.created_at).toLocaleDateString("es")}
+              </p>
+              <button
+                type="button"
+                disabled={reportingId === p.id}
+                onClick={() => {
+                  setReportingId(p.id);
+                  setReportResult(null);
+                  fetch(`/api/community/posts/${p.id}/report`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ reason: "Reporte de la comunidad" }),
+                  })
+                    .then((r) => r.json())
+                    .then((d) => {
+                      if (d.error) setReportResult(d.error);
+                      else if (d.hidden) {
+                        setReportResult("El post ha sido ocultado por acumular 3 reportes.");
+                        setPosts((prev) => prev.filter((x) => x.id !== p.id));
+                      } else setReportResult(`Reporte registrado (${d.reportCount ?? 0}/3).`);
+                    })
+                    .catch(() => setReportResult("Error al reportar"))
+                    .finally(() => setReportingId(null));
+                }}
+                className="text-xs text-[var(--ink-muted)] hover:text-[var(--coral)] hover:underline disabled:opacity-50"
+              >
+                {reportingId === p.id ? "Enviando…" : "Reportar"}
+              </button>
+            </div>
           </article>
         ))}
       </section>

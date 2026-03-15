@@ -26,12 +26,13 @@ export function Alert({ title, message, variant = "error", className = "" }: Ale
     <div
       role="alert"
       className={`
-        px-4 py-3 rounded-xl border text-sm
+        px-4 py-3 rounded-[20px] border text-sm
+        shadow-[var(--shadow-card-inset)]
         ${variantStyles[variant]} ${className}
       `}
     >
       {title && <p className="font-semibold mb-1">{title}</p>}
-      <p className="text-[var(--muted)]">{message}</p>
+      <p className="text-[var(--ink)]">{message}</p>
     </div>
   );
 }

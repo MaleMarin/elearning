@@ -42,8 +42,8 @@ export default function TareasPage() {
       <div className="max-w-3xl">
         <h1 className="text-2xl font-bold text-[var(--text)] mb-6">Tareas</h1>
         <EmptyState
-          title="No tienes tareas pendientes"
-          description="Cuando te asignen tareas con fechas límite aparecerán aquí."
+          title="Aún no tienes tareas asignadas"
+          description="Cuando te asignen tareas con fecha límite, aparecerán aquí. Mientras tanto, puedes seguir avanzando en el curso."
           ctaLabel="Ver curso"
           ctaHref="/curso"
           icon="✅"

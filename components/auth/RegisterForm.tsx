@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { getFirebaseAuth } from "@/lib/firebase/client";
+import { getDemoMode } from "@/lib/env";
 
 export function RegisterForm() {
   const [email, setEmail] = useState("");
@@ -11,77 +12,144 @@ export function RegisterForm() {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const router = useRouter();
+  const [isDemo, setIsDemo] = useState(false);
+
+  useEffect(() => {
+    const demo = getDemoMode();
+    setIsDemo(demo);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const supabase = createClient();
-    const { error: err } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName || undefined } },
-    });
-    setLoading(false);
-    if (err) {
-      setError(err.message);
+
+    if (isDemo) {
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: email?.trim() || "demo@precisar.local",
+            password: password || "",
+          }),
+          credentials: "include",
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          setError((data as { error?: string }).error ?? "No pudimos crear la sesión. Intenta de nuevo.");
+          return;
+        }
+        window.location.href = "/inicio";
+        return;
+      } catch {
+        setError("No pudimos crear la cuenta. Intenta de nuevo.");
+      } finally {
+        setLoading(false);
+      }
       return;
     }
-    router.push("/no-inscrito");
-    router.refresh();
+
+    const auth = getFirebaseAuth();
+    if (!auth) {
+      setError("El registro no está disponible en este momento. Si el problema continúa, contacta a soporte.");
+      setLoading(false);
+      return;
+    }
+
+    const { createUserWithEmailAndPassword } = await import("firebase/auth");
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      const idToken = await userCred.user.getIdToken();
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Error al crear sesión");
+      window.location.href = "/onboarding/diagnostic";
+      return;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("email-already-in-use")) {
+        setError("Ese correo ya está registrado. Prueba a iniciar sesión o usa otro correo.");
+      } else if (msg.includes("weak-password") || msg.includes("password")) {
+        setError("La contraseña es demasiado corta. Usa al menos 6 caracteres.");
+      } else {
+        setError("No pudimos crear la cuenta. Intenta de nuevo o contacta a soporte.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <label className="block">
-        <span className="text-[#1F2430] text-sm font-medium">Nombre (opcional)</span>
+    <form onSubmit={handleSubmit} className="space-y-0" noValidate={isDemo}>
+      {isDemo && (
+        <p className="neu-reg-subtitle" style={{ marginBottom: 16, background: "rgba(0,229,160,0.08)", padding: "8px 12px", borderRadius: 10 }}>
+          Modo demo: usa cualquier correo y contraseña.
+        </p>
+      )}
+      <div className="neu-reg-field">
+        <label className="neu-reg-label" htmlFor="reg-name">Nombre (opcional)</label>
         <input
+          id="reg-name"
+          className="neu-reg-input"
           type="text"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           autoComplete="name"
           placeholder="Tu nombre"
-          className="mt-1.5 block w-full px-4 py-3 rounded-xl border border-[var(--line-subtle)] bg-white text-[#1F2430] min-h-[48px] placeholder:text-[var(--ink-muted)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+          aria-invalid={!!error}
         />
-      </label>
-      <label className="block">
-        <span className="text-[#1F2430] text-sm font-medium">Correo</span>
+      </div>
+      <div className="neu-reg-field">
+        <label className="neu-reg-label" htmlFor="reg-email">Correo</label>
         <input
+          id="reg-email"
+          className="neu-reg-input"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
+          required={!isDemo}
           autoComplete="email"
-          className="mt-1.5 block w-full px-4 py-3 rounded-xl border border-[var(--line-subtle)] bg-white text-[#1F2430] min-h-[48px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+          placeholder={isDemo ? "Cualquier correo (demo)" : "nombre@institución.gob.mx"}
+          aria-invalid={!!error}
         />
-      </label>
-      <label className="block">
-        <span className="text-[#1F2430] text-sm font-medium">Contraseña</span>
+      </div>
+      <div className="neu-reg-field">
+        <label className="neu-reg-label" htmlFor="reg-password">Contraseña</label>
         <input
+          id="reg-password"
+          className="neu-reg-input"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
+          required={!isDemo}
+          minLength={isDemo ? undefined : 6}
           autoComplete="new-password"
-          className="mt-1.5 block w-full px-4 py-3 rounded-xl border border-[var(--line-subtle)] bg-white text-[#1F2430] min-h-[48px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+          placeholder={isDemo ? "Cualquier contraseña (demo)" : "Mínimo 6 caracteres"}
+          aria-invalid={!!error}
         />
-        <p className="mt-1 text-[var(--ink-muted)] text-xs">Mínimo 6 caracteres</p>
-      </label>
+        {!isDemo && <p style={{ marginTop: 6, fontSize: 11, color: "#9ca3af" }}>Mínimo 6 caracteres</p>}
+      </div>
       {error && (
-        <p className="text-[var(--error)] text-sm" role="alert">
-          {error}
-        </p>
+        <p className="neu-reg-subtitle" style={{ color: "#b91c1c", marginBottom: 12 }} role="alert">{error}</p>
       )}
-      <button type="submit" disabled={loading} className="btn-primary w-full">
-        {loading ? "Creando cuenta…" : "Crear cuenta"}
+      <button type="submit" className="neu-reg-btn" disabled={loading}>
+        {loading ? (
+          <>
+            <div className="neu-reg-spinner" aria-hidden />
+            Creando cuenta…
+          </>
+        ) : (
+          "Crear cuenta"
+        )}
       </button>
-      <p className="text-[var(--ink-muted)] text-sm text-center">
+      <p className="neu-reg-subtitle" style={{ marginTop: 16, marginBottom: 0, textAlign: "center" }}>
         ¿Ya tienes cuenta?{" "}
-        <Link href="/login" className="text-[var(--primary)] no-underline hover:underline">
-          Iniciar sesión
-        </Link>
+        <Link href="/login" style={{ color: "#1428d4", textDecoration: "none" }}>Iniciar sesión</Link>
       </p>
     </form>
   );

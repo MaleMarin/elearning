@@ -1,4 +1,4 @@
-export type AssistantMode = "tutor" | "support" | "community";
+export type AssistantMode = "tutor" | "support" | "community" | "roleplay";
 
 export interface AssistantThread {
   id: string;

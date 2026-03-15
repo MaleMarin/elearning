@@ -7,9 +7,11 @@ export interface SidebarProfileCardProps {
   /** Si null, se muestra "Iniciar sesión". */
   user: { email?: string | null } | null;
   onSignOut?: () => void;
+  /** Si false, no se muestra el botón Cerrar sesión dentro de la card (para mostrarlo aparte en el sidebar). */
+  showSignOutButton?: boolean;
 }
 
-export function SidebarProfileCard({ user, onSignOut }: SidebarProfileCardProps) {
+export function SidebarProfileCard({ user, onSignOut, showSignOutButton = true }: SidebarProfileCardProps) {
   if (user) {
     const displayName = user.email?.split("@")[0] ?? "Usuario";
     return (
@@ -18,7 +20,7 @@ export function SidebarProfileCard({ user, onSignOut }: SidebarProfileCardProps)
         role="region"
         aria-label="Perfil"
       >
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-3">
           <div
             className="w-10 h-10 rounded-full bg-[var(--primary)]/15 flex items-center justify-center shrink-0"
             aria-hidden
@@ -34,11 +36,11 @@ export function SidebarProfileCard({ user, onSignOut }: SidebarProfileCardProps)
             </p>
           </div>
         </div>
-        {onSignOut && (
+        {showSignOutButton && onSignOut && (
           <button
             type="button"
             onClick={onSignOut}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm text-[var(--ink-muted)] hover:bg-[var(--cream)]/80 hover:text-[var(--ink)] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm text-[var(--ink-muted)] hover:bg-[var(--cream)]/80 hover:text-[var(--ink)] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] mt-3"
           >
             Cerrar sesión
           </button>

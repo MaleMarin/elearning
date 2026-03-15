@@ -1,8 +1,11 @@
-import { NextResponse } from "next/server";
-import { getDemoMode } from "@/lib/env";
+import { NextRequest, NextResponse } from "next/server";
+import { getDemoMode, useFirebase } from "@/lib/env";
+import { getAuthFromRequest } from "@/lib/firebase/auth-request";
+import * as firebaseContent from "@/lib/services/firebase-content";
+import * as firebaseProgress from "@/lib/services/firebase-progress";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { demoApiData } from "@/lib/supabase/demo-mock";
-import { DEMO_MODULES, DEMO_NEXT_LESSON } from "@/lib/supabase/demo-mock";
+import { DEMO_MODULES, DEMO_NEXT_LESSON, DEMO_COURSE_ID } from "@/lib/supabase/demo-mock";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +40,7 @@ export interface DashboardModule {
 
 export interface DashboardResponse {
   cohortId: string | null;
+  courseId: string | null;
   userName: string;
   nextSession: DashboardSession | null;
   nextTask: DashboardTask | null;
@@ -63,6 +67,7 @@ function demoDashboard(userName: string): DashboardResponse {
     : null;
   return {
     cohortId: demoApiData.cohortId,
+    courseId: DEMO_COURSE_ID,
     userName,
     nextSession: session
       ? {
@@ -90,9 +95,58 @@ function demoDashboard(userName: string): DashboardResponse {
   };
 }
 
-export async function GET(): Promise<NextResponse<DashboardResponse | { error: string }>> {
+export async function GET(req: NextRequest): Promise<NextResponse<DashboardResponse | { error: string }>> {
   if (getDemoMode()) {
     return NextResponse.json(demoDashboard("Estudiante"));
+  }
+
+  if (useFirebase()) {
+    try {
+      const auth = await getAuthFromRequest(req);
+      const enrollment = await firebaseContent.getActiveEnrollmentForUser(auth.uid);
+      const cohortId = enrollment?.cohort_id ?? null;
+      const courseId = await firebaseContent.getPrimaryCourseForCohort(cohortId ?? "");
+      if (!cohortId || !courseId) {
+        return NextResponse.json({
+          cohortId,
+          courseId: courseId ?? null,
+          userName: auth.email?.split("@")[0] ?? "Estudiante",
+          nextSession: null,
+          nextTask: null,
+          lastPost: null,
+          progress: { lessonsDone: 0, lessonsTotal: 0 },
+          modules: [],
+          showDemoModules: false,
+          nextLessonHref: null,
+          nextLessonTitle: null,
+          nextLessonSummary: null,
+        });
+      }
+      const modules = await firebaseContent.getPublishedModules(courseId);
+      const moduleIds = modules.map((m) => m.id);
+      const lessons = await firebaseContent.getPublishedLessons(moduleIds);
+      const lessonsTotal = lessons.length;
+      const { completedLessonIds } = await firebaseProgress.getProgress(auth.uid, courseId);
+      const publishedIds = new Set(lessons.map((l) => l.id));
+      const lessonsDone = completedLessonIds.filter((id) => publishedIds.has(id)).length;
+      const firstLesson = lessons[0];
+      return NextResponse.json({
+        cohortId,
+        courseId,
+        userName: auth.email?.split("@")[0] ?? "Estudiante",
+        nextSession: null,
+        nextTask: null,
+        lastPost: null,
+        progress: { lessonsDone, lessonsTotal },
+        modules: modules.map((m) => ({ id: m.id, title: m.title, order_index: m.order_index, course_id: courseId })),
+        showDemoModules: false,
+        nextLessonHref: firstLesson ? `/curso/lecciones/${firstLesson.id}` : "/curso",
+        nextLessonTitle: firstLesson?.title ?? null,
+        nextLessonSummary: firstLesson?.summary ?? null,
+      });
+    } catch {
+      return NextResponse.json({ error: "No autorizado" } as { error: string }, { status: 401 });
+    }
   }
 
   const supabase = await createServerSupabaseClient();
@@ -126,6 +180,7 @@ export async function GET(): Promise<NextResponse<DashboardResponse | { error: s
   if (!cohortId) {
     return NextResponse.json({
       cohortId: null,
+      courseId: null,
       userName,
       nextSession: null,
       nextTask: null,
@@ -264,8 +319,10 @@ export async function GET(): Promise<NextResponse<DashboardResponse | { error: s
     }
   }
 
+  const courseId = firstCourseId;
   return NextResponse.json({
     cohortId,
+    courseId,
     userName,
     nextSession,
     nextTask,

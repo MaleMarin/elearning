@@ -1,0 +1,19 @@
+{
+  "name": "Política Digital — E-learning",
+  "short_name": "Política Digital",
+  "description": "Plataforma de e-learning de Política Digital",
+  "start_url": "/inicio",
+  "display": "standalone",
+  "background_color": "#F8FAFC",
+  "theme_color": "#021097",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ]
+}

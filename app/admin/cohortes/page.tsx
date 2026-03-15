@@ -11,20 +11,32 @@ import {
   EmptyState,
 } from "@/components/ui";
 import { Alert } from "@/components/ui/Alert";
-import { Copy, Plus, KeyRound, ChevronLeft } from "lucide-react";
+import { Copy, Plus, KeyRound, ChevronLeft, Users, Trophy, Bell, Download } from "lucide-react";
 
 type Cohort = {
   id: string;
   name: string;
+  nombre?: string;
   description: string | null;
   starts_at: string | null;
   ends_at: string | null;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
   timezone: string;
   capacity: number;
   is_active: boolean;
+  courseId?: string | null;
+  facilitadorId?: string | null;
+  estado?: string | null;
+  alumnos?: string[];
+  codigoInvitacion?: string | null;
+  configuracion?: { permitirAutoInscripcion?: boolean; maxAlumnos?: number; esPrivada?: boolean } | null;
   created_at: string;
   updated_at: string;
 };
+
+type CourseOption = { id: string; title: string };
+type MentorOption = { userId: string; fullName: string };
 
 type Invitation = {
   id: string;
@@ -50,6 +62,21 @@ export default function AdminCohortesPage() {
   const [createCapacity, setCreateCapacity] = useState("");
   const [createIsActive, setCreateIsActive] = useState(true);
   const [createSubmitting, setCreateSubmitting] = useState(false);
+  const [createWithCourse, setCreateWithCourse] = useState(true);
+  const [createCourseId, setCreateCourseId] = useState("");
+  const [createFacilitadorId, setCreateFacilitadorId] = useState("");
+  const [createFechaInicio, setCreateFechaInicio] = useState("");
+  const [createFechaFin, setCreateFechaFin] = useState("");
+  const [createMaxAlumnos, setCreateMaxAlumnos] = useState("0");
+  const [createPermitirAuto, setCreatePermitirAuto] = useState(false);
+  const [courses, setCourses] = useState<CourseOption[]>([]);
+  const [mentors, setMentors] = useState<MentorOption[]>([]);
+  const [progressByCohort, setProgressByCohort] = useState<Record<string, { userId: string; displayName: string | null; progressPct: number }[]>>({});
+  const [rankingByCohort, setRankingByCohort] = useState<Record<string, { userId: string; displayName: string | null; progressPct: number; rank: number }[]>>({});
+  const [notifyCohortId, setNotifyCohortId] = useState<string | null>(null);
+  const [notifyTitle, setNotifyTitle] = useState("");
+  const [notifyBody, setNotifyBody] = useState("");
+  const [notifySubmitting, setNotifySubmitting] = useState(false);
 
   const [generateCohortId, setGenerateCohortId] = useState<string | null>(null);
   const [generateMaxUses, setGenerateMaxUses] = useState("1");
@@ -96,21 +123,63 @@ export default function AdminCohortesPage() {
     });
   }, [cohorts, fetchInvitations]);
 
+  useEffect(() => {
+    fetch("/api/admin/courses", { credentials: "include" })
+      .then((r) => r.ok ? r.json() : { courses: [] })
+      .then((data) => setCourses((data.courses ?? []).map((c: { id: string; title: string }) => ({ id: c.id, title: c.title }))))
+      .catch(() => {});
+  }, []);
+  useEffect(() => {
+    fetch("/api/mentors")
+      .then((r) => r.ok ? r.json() : { mentors: [] })
+      .then((data) => setMentors(data.mentors ?? []))
+      .catch(() => {});
+  }, []);
+
+  const fetchProgress = useCallback((cohortId: string) => {
+    fetch(`/api/admin/cohorts/${cohortId}/progress`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (d?.progress) setProgressByCohort((prev) => ({ ...prev, [cohortId]: d.progress }));
+      })
+      .catch(() => {});
+  }, []);
+  const fetchRanking = useCallback((cohortId: string) => {
+    fetch(`/api/admin/cohorts/${cohortId}/ranking`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (d?.ranking) setRankingByCohort((prev) => ({ ...prev, [cohortId]: d.ranking }));
+      })
+      .catch(() => {});
+  }, []);
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setCreateSubmitting(true);
     try {
+      const body = createWithCourse && createCourseId && createFacilitadorId && createFechaInicio && createFechaFin
+        ? {
+            nombre: createName.trim(),
+            courseId: createCourseId,
+            facilitadorId: createFacilitadorId,
+            fechaInicio: createFechaInicio,
+            fechaFin: createFechaFin,
+            maxAlumnos: createMaxAlumnos === "" ? 0 : parseInt(createMaxAlumnos, 10),
+            permitirAutoInscripcion: createPermitirAuto,
+            esPrivada: true,
+          }
+        : {
+            name: createName.trim(),
+            startsAt: createStartsAt || null,
+            endsAt: createEndsAt || null,
+            capacity: createCapacity === "" ? 0 : parseInt(createCapacity, 10),
+            isActive: createIsActive,
+          };
       const res = await fetch("/api/admin/cohorts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: createName.trim(),
-          startsAt: createStartsAt || null,
-          endsAt: createEndsAt || null,
-          capacity: createCapacity === "" ? 0 : parseInt(createCapacity, 10),
-          isActive: createIsActive,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al crear");
@@ -120,11 +189,40 @@ export default function AdminCohortesPage() {
       setCreateEndsAt("");
       setCreateCapacity("");
       setCreateIsActive(true);
+      setCreateCourseId("");
+      setCreateFacilitadorId("");
+      setCreateFechaInicio("");
+      setCreateFechaFin("");
+      setCreateMaxAlumnos("0");
+      setCreatePermitirAuto(false);
       setCreateOpen(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al crear cohorte");
     } finally {
       setCreateSubmitting(false);
+    }
+  };
+
+  const handleNotify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!notifyCohortId) return;
+    setNotifySubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/cohorts/${notifyCohortId}/notify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: notifyTitle, body: notifyBody }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Error al enviar");
+      setNotifyCohortId(null);
+      setNotifyTitle("");
+      setNotifyBody("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error al enviar notificación");
+    } finally {
+      setNotifySubmitting(false);
     }
   };
 
@@ -193,9 +291,45 @@ export default function AdminCohortesPage() {
           </Link>
         </div>
 
-        <PageSection title="Cohortes e invitaciones" subtitle="Crea cohortes y genera códigos para inscribir estudiantes.">
+        <PageSection title="Cohortes e invitaciones" subtitle="Crea cohortes, asigna curso y facilitador, y gestiona progreso y notificaciones.">
           {error && (
             <Alert message={error} variant="error" className="mb-4" />
+          )}
+
+          {notifyCohortId && (
+            <SurfaceCard padding="lg" clickable={false} className="mb-6 border-2 border-[var(--primary)]">
+              <h4 className="text-lg font-semibold text-[var(--ink)] mb-3">Enviar notificación a la cohorte</h4>
+              <form onSubmit={handleNotify} className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-[var(--ink)] mb-1">Asunto</label>
+                  <input
+                    type="text"
+                    value={notifyTitle}
+                    onChange={(e) => setNotifyTitle(e.target.value)}
+                    className="w-full px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]"
+                    placeholder="Título del mensaje"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[var(--ink)] mb-1">Mensaje</label>
+                  <textarea
+                    value={notifyBody}
+                    onChange={(e) => setNotifyBody(e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]"
+                    placeholder="Texto para todos los alumnos de la cohorte"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <PrimaryButton type="submit" disabled={notifySubmitting}>
+                    {notifySubmitting ? "Enviando…" : "Enviar a toda la cohorte"}
+                  </PrimaryButton>
+                  <SecondaryButton type="button" onClick={() => { setNotifyCohortId(null); setNotifyTitle(""); setNotifyBody(""); }}>
+                    Cancelar
+                  </SecondaryButton>
+                </div>
+              </form>
+            </SurfaceCard>
           )}
 
           <SurfaceCard padding="lg" clickable={false} className="mb-8">
@@ -214,66 +348,123 @@ export default function AdminCohortesPage() {
             </div>
             {createOpen && (
               <form onSubmit={handleCreate} className="mt-6 space-y-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={createWithCourse}
+                    onChange={(e) => setCreateWithCourse(e.target.checked)}
+                    className="rounded border-[var(--line)]"
+                  />
+                  <span className="text-sm text-[var(--ink)]">Cohorte con curso y facilitador (fechas y código 6 caracteres)</span>
+                </label>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--ink)] mb-1">
-                    Nombre *
-                  </label>
+                  <label className="block text-sm font-medium text-[var(--ink)] mb-1">Nombre *</label>
                   <input
                     type="text"
                     value={createName}
                     onChange={(e) => setCreateName(e.target.value)}
                     required
-                    className="w-full px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-white text-[var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
-                    placeholder="Ej. Cohorte Marzo 2026"
+                    className="w-full px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] input-premium"
+                    placeholder="Ej. Cohorte 2025-I SHCP"
                   />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--ink)] mb-1">
-                      Inicio (fecha)
+                {createWithCourse && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--ink)] mb-1">Curso *</label>
+                      <select
+                        value={createCourseId}
+                        onChange={(e) => setCreateCourseId(e.target.value)}
+                        required={createWithCourse}
+                        className="w-full px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]"
+                      >
+                        <option value="">Seleccionar curso</option>
+                        {courses.map((c) => (
+                          <option key={c.id} value={c.id}>{c.title}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--ink)] mb-1">Facilitador *</label>
+                      <select
+                        value={createFacilitadorId}
+                        onChange={(e) => setCreateFacilitadorId(e.target.value)}
+                        required={createWithCourse}
+                        className="w-full px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]"
+                      >
+                        <option value="">Seleccionar facilitador</option>
+                        {mentors.map((m) => (
+                          <option key={m.userId} value={m.userId}>{m.fullName}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--ink)] mb-1">Fecha inicio *</label>
+                        <input
+                          type="date"
+                          value={createFechaInicio}
+                          onChange={(e) => setCreateFechaInicio(e.target.value)}
+                          required={createWithCourse}
+                          className="w-full px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] input-premium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--ink)] mb-1">Fecha fin *</label>
+                        <input
+                          type="date"
+                          value={createFechaFin}
+                          onChange={(e) => setCreateFechaFin(e.target.value)}
+                          required={createWithCourse}
+                          className="w-full px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] input-premium"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--ink)] mb-1">Límite de alumnos (0 = sin límite)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        value={createMaxAlumnos}
+                        onChange={(e) => setCreateMaxAlumnos(e.target.value)}
+                        className="w-24 px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] input-premium"
+                      />
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={createPermitirAuto}
+                        onChange={(e) => setCreatePermitirAuto(e.target.checked)}
+                        className="rounded border-[var(--line)]"
+                      />
+                      <span className="text-sm text-[var(--ink)]">Permitir autoinscripción con código de 6 caracteres</span>
                     </label>
-                    <input
-                      type="date"
-                      value={createStartsAt}
-                      onChange={(e) => setCreateStartsAt(e.target.value)}
-                      className="w-full px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-white text-[var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--ink)] mb-1">
-                      Fin (fecha)
-                    </label>
-                    <input
-                      type="date"
-                      value={createEndsAt}
-                      onChange={(e) => setCreateEndsAt(e.target.value)}
-                      className="w-full px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-white text-[var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--ink)] mb-1">
-                      Capacidad (0 = sin límite)
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      value={createCapacity}
-                      onChange={(e) => setCreateCapacity(e.target.value)}
-                      className="w-24 px-4 py-2 rounded-xl border border-[var(--line-subtle)] bg-white text-[var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
-                    />
-                  </div>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={createIsActive}
-                      onChange={(e) => setCreateIsActive(e.target.checked)}
-                      className="rounded border-[var(--line)]"
-                    />
-                    <span className="text-sm text-[var(--ink)]">Activa</span>
-                  </label>
-                </div>
+                  </>
+                )}
+                {!createWithCourse && (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--ink)] mb-1">Inicio (fecha)</label>
+                        <input type="date" value={createStartsAt} onChange={(e) => setCreateStartsAt(e.target.value)} className="w-full px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] input-premium" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--ink)] mb-1">Fin (fecha)</label>
+                        <input type="date" value={createEndsAt} onChange={(e) => setCreateEndsAt(e.target.value)} className="w-full px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] input-premium" />
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--ink)] mb-1">Capacidad (0 = sin límite)</label>
+                        <input type="number" min={0} value={createCapacity} onChange={(e) => setCreateCapacity(e.target.value)} className="w-24 px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] input-premium" />
+                      </div>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" checked={createIsActive} onChange={(e) => setCreateIsActive(e.target.checked)} className="rounded border-[var(--line)]" />
+                        <span className="text-sm text-[var(--ink)]">Activa</span>
+                      </label>
+                    </div>
+                  </>
+                )}
                 <PrimaryButton type="submit" disabled={createSubmitting || !createName.trim()}>
                   {createSubmitting ? "Creando…" : "Crear cohorte"}
                 </PrimaryButton>
@@ -294,44 +485,130 @@ export default function AdminCohortesPage() {
                 <SurfaceCard key={cohort.id} padding="lg" clickable={false}>
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-[var(--ink)]">{cohort.name}</h3>
+                      <h3 className="text-lg font-semibold text-[var(--ink)]">{cohort.nombre ?? cohort.name}</h3>
                       {cohort.description && (
                         <p className="text-sm text-[var(--ink-muted)] mt-1">{cohort.description}</p>
                       )}
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {cohort.starts_at && (
+                      <div className="flex flex-wrap gap-2 mt-2 items-center">
+                        {cohort.estado && (
+                          <Badge variant={cohort.estado === "activa" ? "completado" : cohort.estado === "finalizada" ? "pendiente" : "en-curso"}>
+                            {cohort.estado}
+                          </Badge>
+                        )}
+                        {(cohort.fechaInicio || cohort.starts_at) && (
                           <span className="text-xs text-[var(--ink-muted)]">
-                            Inicio: {new Date(cohort.starts_at).toLocaleDateString()}
+                            Inicio: {new Date((cohort.fechaInicio ?? cohort.starts_at) as string).toLocaleDateString()}
                           </span>
                         )}
-                        {cohort.ends_at && (
+                        {(cohort.fechaFin || cohort.ends_at) && (
                           <span className="text-xs text-[var(--ink-muted)]">
-                            Fin: {new Date(cohort.ends_at).toLocaleDateString()}
+                            Fin: {new Date((cohort.fechaFin ?? cohort.ends_at) as string).toLocaleDateString()}
                           </span>
                         )}
-                        {cohort.capacity > 0 && (
+                        {(cohort.capacity > 0 || (cohort.configuracion?.maxAlumnos ?? 0) > 0) && (
                           <span className="text-xs text-[var(--ink-muted)]">
-                            Capacidad: {cohort.capacity}
+                            Límite: {cohort.configuracion?.maxAlumnos ?? cohort.capacity}
                           </span>
                         )}
-                        {!cohort.is_active && (
+                        {cohort.alumnos && <span className="text-xs text-[var(--ink-muted)]">Alumnos: {cohort.alumnos.length}</span>}
+                        {!cohort.is_active && !cohort.estado && (
                           <Badge variant="pendiente">Inactiva</Badge>
                         )}
                       </div>
                     </div>
+                    {cohort.codigoInvitacion && (
+                      <div className="flex items-center gap-2 p-2 rounded-xl bg-[var(--surface-soft)] border border-[var(--line-subtle)]">
+                        <span className="text-xs text-[var(--muted)]">Código 6 chars</span>
+                        <span className="font-mono font-semibold text-[var(--ink)]">{cohort.codigoInvitacion}</span>
+                        <SecondaryButton type="button" onClick={() => copyCode(cohort.codigoInvitacion!)} className="min-h-0 py-1 px-2 text-sm">
+                          <Copy className="w-4 h-4" /> {copiedCode === cohort.codigoInvitacion ? "Copiado" : "Copiar"}
+                        </SecondaryButton>
+                      </div>
+                    )}
                   </div>
+
+                  {(cohort.courseId || cohort.codigoInvitacion) && (
+                    <div className="mt-6 pt-6 border-t border-[var(--line)]">
+                      <h4 className="text-base font-semibold text-[var(--ink)] mb-3 flex items-center gap-2">
+                        <Users className="w-4 h-4 text-[var(--primary)]" />
+                        Progreso del grupo
+                      </h4>
+                      <SecondaryButton type="button" onClick={() => { fetchProgress(cohort.id); fetchRanking(cohort.id); }} className="mb-3">
+                        Cargar progreso y ranking
+                      </SecondaryButton>
+                      {progressByCohort[cohort.id] && (
+                        <div className="overflow-x-auto rounded-xl border border-[var(--line-subtle)] mb-4">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-[var(--line-subtle)] bg-[var(--bg)]">
+                                <th className="text-left py-2 px-3 font-semibold text-[var(--ink)]">Alumno</th>
+                                <th className="text-right py-2 px-3 font-semibold text-[var(--ink)]">Avance</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {progressByCohort[cohort.id].map((r) => (
+                                <tr key={r.userId} className="border-b border-[var(--line-subtle)] last:border-b-0">
+                                  <td className="py-2 px-3 text-[var(--ink)]">{r.displayName || r.userId}</td>
+                                  <td className="py-2 px-3 text-right font-medium">{r.progressPct}%</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                      {rankingByCohort[cohort.id] && (
+                        <div className="mb-4">
+                          <h5 className="text-sm font-semibold text-[var(--ink)] mb-2 flex items-center gap-1">
+                            <Trophy className="w-4 h-4" /> Ranking
+                          </h5>
+                          <ol className="list-decimal list-inside text-sm text-[var(--ink)] space-y-1">
+                            {rankingByCohort[cohort.id].slice(0, 10).map((r) => (
+                              <li key={r.userId}>{r.displayName || r.userId} — {r.progressPct}%</li>
+                            ))}
+                          </ol>
+                        </div>
+                      )}
+                      <div className="flex flex-wrap gap-2">
+                        <SecondaryButton href={`/admin/cohortes/${cohort.id}/retos`}>
+                          <Trophy className="w-4 h-4" /> Retos
+                        </SecondaryButton>
+                        <SecondaryButton type="button" onClick={() => { setNotifyCohortId(cohort.id); setNotifyTitle(""); setNotifyBody(""); }}>
+                          <Bell className="w-4 h-4" /> Enviar notificación
+                        </SecondaryButton>
+                        <SecondaryButton
+                          type="button"
+                          onClick={() => {
+                            fetch(`/api/admin/cohorts/${cohort.id}/export`, { credentials: "include" })
+                              .then((r) => r.blob())
+                              .then((blob) => {
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement("a");
+                                a.href = url;
+                                a.download = `cohorte-${cohort.id}-progreso.csv`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                              })
+                              .catch(() => setError("Error al exportar"));
+                          }}
+                        >
+                          <Download className="w-4 h-4" /> Exportar CSV
+                        </SecondaryButton>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="mt-6 pt-6 border-t border-[var(--line)]">
                     <h4 className="text-base font-semibold text-[var(--ink)] mb-3 flex items-center gap-2">
                       <KeyRound className="w-4 h-4 text-[var(--primary)]" />
-                      Códigos de invitación
+                      Códigos de invitación (legacy)
                     </h4>
 
                     {generateCohortId === cohort.id ? (
-                      <form onSubmit={handleGenerateCode} className="mb-4 p-4 rounded-xl bg-[var(--bg)] space-y-3">
+                      <SurfaceCard variant="soft" padding="sm" clickable={false} className="mb-4">
+                        <form onSubmit={handleGenerateCode} className="space-y-3">
                         <div className="flex flex-wrap gap-3 items-end">
                           <div>
-                            <label className="block text-xs font-medium text-[var(--ink-muted)] mb-1">
+                            <label className="block text-xs font-medium text-[var(--muted)] mb-1">
                               Usos máximos
                             </label>
                             <input
@@ -339,18 +616,18 @@ export default function AdminCohortesPage() {
                               min={1}
                               value={generateMaxUses}
                               onChange={(e) => setGenerateMaxUses(e.target.value)}
-                              className="w-20 px-3 py-2 rounded-lg border border-[var(--line-subtle)] bg-white text-[var(--ink)]"
+                              className="w-20 px-3 py-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] input-premium"
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-[var(--ink-muted)] mb-1">
+                            <label className="block text-xs font-medium text-[var(--muted)] mb-1">
                               Caduca (opcional)
                             </label>
                             <input
                               type="datetime-local"
                               value={generateExpiresAt}
                               onChange={(e) => setGenerateExpiresAt(e.target.value)}
-                              className="px-3 py-2 rounded-lg border border-[var(--line-subtle)] bg-white text-[var(--ink)]"
+                              className="px-3 py-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] input-premium"
                             />
                           </div>
                           <label className="flex items-center gap-2 cursor-pointer pb-2">
@@ -369,7 +646,8 @@ export default function AdminCohortesPage() {
                             Cerrar
                           </SecondaryButton>
                         </div>
-                      </form>
+                        </form>
+                      </SurfaceCard>
                     ) : (
                       <SecondaryButton
                         onClick={() => {
@@ -384,16 +662,16 @@ export default function AdminCohortesPage() {
                     )}
 
                     {lastGeneratedCode && generateCohortId === cohort.id && (
-                      <div className="mb-4 p-3 rounded-xl bg-[var(--success)]/10 border border-[var(--success)]/30 flex items-center justify-between gap-2">
+                      <div className="mb-4 p-3 rounded-[20px] bg-[var(--surface-soft)] border border-[var(--line)] flex items-center justify-between gap-2 shadow-[var(--shadow-card-inset)]">
                         <span className="font-mono font-semibold text-[var(--ink)]">{lastGeneratedCode}</span>
-                        <button
+                        <SecondaryButton
                           type="button"
                           onClick={() => copyCode(lastGeneratedCode)}
-                          className="inline-flex items-center gap-1 text-sm font-medium text-[var(--primary)] hover:underline"
+                          className="text-sm inline-flex items-center gap-1"
                         >
                           <Copy className="w-4 h-4" />
                           Copiar
-                        </button>
+                        </SecondaryButton>
                       </div>
                     )}
 
@@ -442,15 +720,15 @@ export default function AdminCohortesPage() {
                                   )}
                                 </td>
                                 <td className="py-2 px-4 text-right">
-                                  <button
+                                  <SecondaryButton
                                     type="button"
                                     onClick={() => copyCode(inv.code)}
-                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[var(--primary)] hover:bg-[var(--primary-soft)] font-medium"
+                                    className="text-sm min-h-0 py-1.5 px-2"
                                     title="Copiar código"
                                   >
                                     <Copy className="w-4 h-4" />
                                     {copiedCode === inv.code ? "Copiado" : "Copiar"}
-                                  </button>
+                                  </SecondaryButton>
                                 </td>
                               </tr>
                             ))}

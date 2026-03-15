@@ -33,7 +33,7 @@ export function Toast({ message, variant = "default", onDismiss, className = "" 
         <button
           type="button"
           onClick={onDismiss}
-          className="shrink-0 p-1 rounded-lg hover:bg-black/5 text-[var(--muted)] focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
+          className="shrink-0 p-1 rounded-lg hover:bg-[var(--overlay-light)] text-[var(--muted)] focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
           aria-label="Cerrar"
         >
           ×

@@ -1,13 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getDemoMode } from "@/lib/env";
+import { getDemoMode, useFirebase } from "@/lib/env";
 import { getSupabaseConfig, getSiteUrl } from "@/lib/config";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const next = searchParams.get("next") ?? "/";
   if (getDemoMode()) return NextResponse.redirect(new URL(next, getSiteUrl()));
+  if (useFirebase()) return NextResponse.redirect(new URL(next, getSiteUrl()));
 
   const code = searchParams.get("code");
   const cookieStore = await cookies();

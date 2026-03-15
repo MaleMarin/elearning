@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Home, ArrowLeft } from "lucide-react";
 
 export default function NotFound() {
@@ -15,21 +14,28 @@ export default function NotFound() {
           La ruta a la que intentas acceder no existe o fue movida. Puedes volver al inicio y seguir desde ahí.
         </p>
         <div className="flex flex-wrap gap-3 justify-center">
-          <Link
+          <a
             href="/inicio"
-            className="btn-primary inline-flex items-center gap-2 no-underline"
+            className="btn-primary inline-flex items-center gap-2 no-underline cursor-pointer"
+            style={{ pointerEvents: "auto" }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              window.location.replace("/inicio");
+            }}
           >
             <Home className="w-5 h-5" />
             Ir al inicio
-          </Link>
-          <button
-            type="button"
-            onClick={() => typeof window !== "undefined" && window.history.back()}
-            className="btn-ghost inline-flex items-center gap-2"
+          </a>
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); if (typeof window !== "undefined") window.history.back(); }}
+            className="btn-ghost inline-flex items-center gap-2 cursor-pointer"
+            style={{ pointerEvents: "auto" }}
           >
             <ArrowLeft className="w-5 h-5" />
             Volver atrás
-          </button>
+          </a>
         </div>
       </div>
     </div>

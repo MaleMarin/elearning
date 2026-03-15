@@ -9,10 +9,11 @@ import {
   PageSection,
   PrimaryButton,
   SecondaryButton,
-  Badge,
   EmptyState,
+  Alert,
 } from "@/components/ui";
-import { Plus, ChevronLeft, BookOpen, RefreshCw, Pencil } from "lucide-react";
+import { CourseGrid, type CourseGridItem } from "@/components/admin/CourseGrid";
+import { Plus, ChevronLeft, BookOpen, RefreshCw, Sparkles } from "lucide-react";
 
 type Course = {
   id: string;
@@ -30,6 +31,7 @@ export default function AdminCursosPage() {
   const [createTitle, setCreateTitle] = useState("");
   const [createSubmitting, setCreateSubmitting] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [duplicateLoadingId, setDuplicateLoadingId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -160,8 +162,24 @@ export default function AdminCursosPage() {
     }
   };
 
+  const handleDuplicate = async (c: CourseGridItem) => {
+    if (duplicateLoadingId) return;
+    setDuplicateLoadingId(c.id);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/courses/${c.id}/duplicate`, { method: "POST", credentials: "include" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as { error?: string }).error ?? "Error al duplicar");
+      await loadCourses();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error al duplicar");
+    } finally {
+      setDuplicateLoadingId(null);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#F3F2EF]">
+    <div className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6">
         <div className="flex items-center gap-4 mb-8">
           <Link
@@ -178,26 +196,32 @@ export default function AdminCursosPage() {
           subtitle="Crea y edita cursos, módulos y lecciones. Asigna cursos a cohortes."
         >
           {error !== null && (
-            <SurfaceCard padding="lg" clickable={false} className="mb-6 border border-red-200 bg-red-50/50">
-              <h3 className="font-semibold text-[var(--ink)] mb-1">No se pudieron cargar los cursos</h3>
-              <p className="text-sm text-[var(--ink-muted)] mb-4">
-                {IS_DEV ? error : error.length > 80 ? `${error.slice(0, 80)}…` : error}
-              </p>
-              <SecondaryButton onClick={loadCourses} className="inline-flex items-center gap-2">
+            <div className="mb-6">
+              <Alert
+                message={IS_DEV ? error : error.length > 80 ? `${error.slice(0, 80)}…` : error}
+                variant="error"
+              />
+              <SecondaryButton onClick={loadCourses} className="mt-3 inline-flex items-center gap-2">
                 <RefreshCw className="w-4 h-4" />
                 Reintentar
               </SecondaryButton>
-            </SurfaceCard>
+            </div>
           )}
 
           <SurfaceCard padding="lg" clickable={false} className="mb-8">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <h3 className="text-lg font-semibold text-[var(--ink)]">Crear curso</h3>
               {!createOpen ? (
-                <PrimaryButton onClick={() => setCreateOpen(true)}>
-                  <Plus className="w-4 h-4" />
-                  Crear curso
-                </PrimaryButton>
+                <>
+                  <SecondaryButton href="/admin/cursos/generar">
+                    <Sparkles className="w-4 h-4" />
+                    Generar con IA
+                  </SecondaryButton>
+                  <PrimaryButton onClick={() => setCreateOpen(true)}>
+                    <Plus className="w-4 h-4" />
+                    Crear curso
+                  </PrimaryButton>
+                </>
               ) : (
                 <SecondaryButton onClick={() => setCreateOpen(false)}>Cancelar</SecondaryButton>
               )}
@@ -212,7 +236,7 @@ export default function AdminCursosPage() {
                     onChange={(e) => setCreateTitle(e.target.value)}
                     required
                     placeholder="Nombre del curso"
-                    className="w-full px-4 py-2 rounded-xl bg-white text-[var(--ink)] input-premium focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 focus:ring-offset-[var(--bg)]"
+                    className="w-full px-4 py-2 rounded-xl bg-[var(--surface)] text-[var(--ink)] border border-[var(--line)] input-premium"
                   />
                 </div>
                 <PrimaryButton type="submit" disabled={createSubmitting || !createTitle.trim()}>
@@ -235,37 +259,13 @@ export default function AdminCursosPage() {
               onCtaClick={() => setCreateOpen(true)}
             />
           ) : (
-            <SurfaceCard padding="none" clickable={false}>
-              <ul className="divide-y divide-[var(--line-subtle)]">
-                {courses.map((c) => (
-                  <li key={c.id} className="flex items-center gap-4 py-4 px-4 sm:px-5">
-                    <BookOpen className="w-5 h-5 text-[var(--primary)] shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-[var(--ink)] truncate">{c.title}</p>
-                      <Badge
-                        variant={c.status === "published" ? "completado" : "pendiente"}
-                        className="mt-1"
-                      >
-                        {c.status === "published" ? "Publicado" : "Borrador"}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <SecondaryButton
-                        onClick={() => handleTogglePublish(c)}
-                        disabled={togglingId === c.id}
-                        className="text-sm"
-                      >
-                        {c.status === "published" ? "Despublicar" : "Publicar"}
-                      </SecondaryButton>
-                      <SecondaryButton href={`/admin/cursos/${c.id}`} className="text-sm">
-                        <Pencil className="w-4 h-4" />
-                        Editar
-                      </SecondaryButton>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </SurfaceCard>
+            <CourseGrid
+              courses={courses as CourseGridItem[]}
+              togglingId={togglingId}
+              duplicateLoadingId={duplicateLoadingId}
+              onTogglePublish={handleTogglePublish}
+              onDuplicate={handleDuplicate}
+            />
           )}
         </PageSection>
       </div>

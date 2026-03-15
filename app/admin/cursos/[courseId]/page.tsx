@@ -11,7 +11,10 @@ import {
   EmptyState,
 } from "@/components/ui";
 import { Alert } from "@/components/ui/Alert";
-import { ChevronLeft, Plus, Pencil, ListOrdered, Users } from "lucide-react";
+import { TranslationManager } from "@/components/admin/TranslationManager";
+import { StaleContentAlert } from "@/components/admin/StaleContentAlert";
+import { CoAuthorManager } from "@/components/admin/CoAuthorManager";
+import { ChevronLeft, Plus, Pencil, ListOrdered, Users, Sliders } from "lucide-react";
 
 type Course = {
   id: string;
@@ -46,6 +49,8 @@ export default function AdminCursoEditPage() {
   const [moduleSubmitting, setModuleSubmitting] = useState(false);
   const [assignCohortId, setAssignCohortId] = useState("");
   const [assignSubmitting, setAssignSubmitting] = useState(false);
+  const [coAuthors, setCoAuthors] = useState<string[]>([]);
+  const [coAuthorDetails, setCoAuthorDetails] = useState<{ id: string; full_name: string; email: string | null }[]>([]);
 
   useEffect(() => {
     if (!courseId) return;
@@ -61,7 +66,9 @@ export default function AdminCursoEditPage() {
           setEditTitle(courseRes.course.title);
           setEditDescription(courseRes.course.description ?? "");
           setEditStatus(courseRes.course.status);
+          setCoAuthors(Array.isArray(courseRes.course.coAuthors) ? courseRes.course.coAuthors : []);
         }
+        if (Array.isArray(courseRes.coAuthorDetails)) setCoAuthorDetails(courseRes.coAuthorDetails);
         setModules(modulesRes.modules ?? []);
         setCohortCourses(cohortsRes.cohortCourses ?? []);
         setCohorts(Array.isArray(allCohorts) ? allCohorts : []);
@@ -87,6 +94,7 @@ export default function AdminCursoEditPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al guardar");
       setCourse(data.course);
+      if (Array.isArray(data.course?.coAuthors)) setCoAuthors(data.course.coAuthors);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al guardar");
     } finally {
@@ -221,6 +229,48 @@ export default function AdminCursoEditPage() {
             <PrimaryButton type="submit" disabled={saving}>Guardar curso</PrimaryButton>
           </form>
         </SurfaceCard>
+
+        <div className="mb-8">
+          <SurfaceCard padding="md" clickable={false} className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-[var(--ink)] flex items-center gap-2">
+                <Sliders className="w-5 h-5 text-[var(--primary)]" />
+                Funcionalidades
+              </h2>
+              <p className="text-sm text-[var(--ink-muted)] mt-1">
+                Activa o desactiva qué verán los alumnos en este curso (laboratorio, gamificación, etc.).
+              </p>
+            </div>
+            <SecondaryButton href={`/admin/cursos/${courseId}/funcionalidades`}>
+              Configurar
+            </SecondaryButton>
+          </SurfaceCard>
+        </div>
+
+        <div className="mb-8">
+          <CoAuthorManager
+            courseId={courseId}
+            coAuthors={coAuthors}
+            coAuthorDetails={coAuthorDetails}
+            canManage={true}
+            onUpdate={async (next) => {
+              const res = await fetch(`/api/admin/courses/${courseId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ coAuthors: next }),
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error ?? "Error");
+              setCoAuthors((data.course?.coAuthors as string[]) ?? next);
+              const res2 = await fetch(`/api/admin/courses/${courseId}`);
+              const data2 = await res2.json();
+              if (Array.isArray(data2.coAuthorDetails)) setCoAuthorDetails(data2.coAuthorDetails);
+            }}
+          />
+        </div>
+
+        <TranslationManager courseId={courseId} />
+        <StaleContentAlert courseId={courseId} />
 
         <SurfaceCard padding="lg" clickable={false} className="mb-8">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">

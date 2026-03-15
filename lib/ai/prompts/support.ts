@@ -12,8 +12,8 @@ export const SUPPORT_FAQ = [
     a: "Entra en tu perfil (icono de usuario) y edita los campos. Guarda los cambios.",
   },
   {
-    q: "No puedo acceder a un curso o cohorte",
-    a: "Comprueba que estés inscrito en esa cohorte. Si crees que es un error, abre un ticket de soporte y lo revisamos.",
+    q: "No puedo acceder a un curso o grupo",
+    a: "Comprueba que estés inscrito en ese grupo. Si crees que es un error, abre un ticket de soporte y lo revisamos.",
   },
   {
     q: "Problemas con el reproductor de video o el contenido",

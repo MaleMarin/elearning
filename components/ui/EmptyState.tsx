@@ -46,9 +46,9 @@ export function EmptyState({
       {ctaLabel && (
         <>
           {ctaHref ? (
-            <PrimaryButton href={ctaHref}>{ctaLabel}</PrimaryButton>
+            <PrimaryButton href={ctaHref} className="min-h-[48px]">{ctaLabel}</PrimaryButton>
           ) : onCtaClick ? (
-            <PrimaryButton onClick={onCtaClick}>{ctaLabel}</PrimaryButton>
+            <PrimaryButton onClick={onCtaClick} className="min-h-[48px]">{ctaLabel}</PrimaryButton>
           ) : null}
         </>
       )}

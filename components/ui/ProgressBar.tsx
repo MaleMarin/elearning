@@ -23,7 +23,8 @@ export function ProgressBar({ value, max = 100, className = "", "aria-label": ar
         className="h-full rounded-full transition-[width] duration-400 ease-out"
         style={{
           width: `${pct}%`,
-          background: "linear-gradient(90deg, var(--primary) 0%, var(--amber) 100%)",
+          background: "linear-gradient(90deg, var(--azul) 0%, var(--acento) 100%)",
+          boxShadow: "0 0 8px rgba(0, 229, 160, 0.4)",
         }}
       />
     </div>

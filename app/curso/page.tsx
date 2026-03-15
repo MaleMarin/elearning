@@ -2,38 +2,51 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
   SurfaceCard,
   PrimaryButton,
-  SecondaryButton,
   EmptyState,
   ListRow,
+  PageSection,
 } from "@/components/ui";
 import type { CursoApiResponse } from "@/app/api/curso/route";
-import { BookOpen, ChevronRight } from "lucide-react";
+import type { ProgramaApiResponse } from "@/app/api/curso/programa/route";
+import { ModuleCard } from "@/components/curso/ModuleCard";
+import { ModuleProgramView } from "@/components/modules";
+import { getDemoMode } from "@/lib/env";
+import { ChevronRight, List, LayoutList } from "lucide-react";
 
 function Skeleton() {
   return (
-    <div className="max-w-2xl space-y-4">
-      <div className="h-8 w-48 rounded-lg bg-[var(--line-subtle)] animate-pulse" />
-      <div className="rounded-xl border border-[var(--line-subtle)] bg-[var(--surface)] p-5 space-y-3">
-        <div className="h-5 rounded bg-[var(--line-subtle)] animate-pulse w-3/4" />
-        <div className="h-4 rounded bg-[var(--line-subtle)] animate-pulse w-full" />
-        <div className="h-4 rounded bg-[var(--line-subtle)] animate-pulse w-1/2" />
-      </div>
-      <div className="rounded-xl border border-[var(--line-subtle)] bg-[var(--surface)] p-4 space-y-2">
-        <div className="h-4 rounded bg-[var(--line-subtle)] animate-pulse w-1/3" />
-        <div className="h-12 rounded-lg bg-[var(--line-subtle)] animate-pulse" />
-        <div className="h-12 rounded-lg bg-[var(--line-subtle)] animate-pulse" />
-      </div>
+    <div className="max-w-2xl space-y-4" aria-busy="true">
+      <div className="h-8 w-48 rounded-xl bg-[var(--surface-soft)] animate-pulse" />
+      <SurfaceCard padding="md" clickable={false}>
+        <div className="space-y-3">
+          <div className="h-5 rounded bg-[var(--surface-soft)] animate-pulse w-3/4" />
+          <div className="h-4 rounded bg-[var(--surface-soft)] animate-pulse w-full" />
+          <div className="h-4 rounded bg-[var(--surface-soft)] animate-pulse w-1/2" />
+        </div>
+      </SurfaceCard>
+      <SurfaceCard padding="md" clickable={false}>
+        <div className="space-y-2">
+          <div className="h-4 rounded bg-[var(--surface-soft)] animate-pulse w-1/3" />
+          <div className="h-12 rounded-xl bg-[var(--surface-soft)] animate-pulse" />
+          <div className="h-12 rounded-xl bg-[var(--surface-soft)] animate-pulse" />
+        </div>
+      </SurfaceCard>
     </div>
   );
 }
 
+type CursoView = "modulos" | "programa";
+
 export default function CursoPage() {
   const router = useRouter();
   const [data, setData] = useState<CursoApiResponse | null>(null);
+  const [programaData, setProgramaData] = useState<ProgramaApiResponse | null>(null);
+  const [programaLoading, setProgramaLoading] = useState(false);
+  const [view, setView] = useState<CursoView>("modulos");
+  const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,6 +59,43 @@ export default function CursoPage() {
       .catch(() => setData(null))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!data?.course?.id) return;
+    fetch(`/api/progress?courseId=${encodeURIComponent(data.course.id)}`)
+      .then((r) => r.json())
+      .then((d: { completedLessonIds?: string[] }) => {
+        if (d && Array.isArray(d.completedLessonIds)) setCompletedLessonIds(d.completedLessonIds);
+      })
+      .catch(() => {});
+  }, [data?.course?.id]);
+
+  useEffect(() => {
+    if (view !== "programa") return;
+    setProgramaLoading(true);
+    fetch("/api/curso/programa", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d: ProgramaApiResponse & { error?: string }) => {
+        if (d && !("error" in d)) setProgramaData(d);
+        else setProgramaData(null);
+      })
+      .catch(() => setProgramaData(null))
+      .finally(() => setProgramaLoading(false));
+  }, [view]);
+
+  useEffect(() => {
+    if (getDemoMode() || !data?.course?.id) return;
+    fetch("/api/audit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        action: "course_view",
+        resourceId: data.course.id,
+        resourceName: data.course.title ?? "",
+      }),
+    }).catch(() => {});
+  }, [data?.course?.id, data?.course?.title]);
 
   if (loading) {
     return (
@@ -87,7 +137,7 @@ export default function CursoPage() {
     );
   }
 
-  const hasContent = data.modules.length > 0 && data.lessons.length > 0;
+  const hasContent = data.modules.some((m) => m.lessonCount > 0);
   if (!hasContent) {
     return (
       <div className="max-w-2xl w-full">
@@ -102,65 +152,143 @@ export default function CursoPage() {
     );
   }
 
-  const lessonsByModule = data.lessons.reduce<Record<string, typeof data.lessons>>((acc, l) => {
-    if (!acc[l.module_id]) acc[l.module_id] = [];
-    acc[l.module_id].push(l);
-    return acc;
-  }, {});
-
-  const firstHref = data.firstLessonId ? `/curso/lecciones/${data.firstLessonId}` : "/curso";
+  const moduleAccess = data.moduleAccess ?? {};
+  const moduleLockReasons = data.moduleLockReasons ?? {};
+  const firstUnlockedModule = data.modules.find((m) => m.lessonCount > 0 && moduleAccess[m.id] !== "locked");
+  const firstLessonIdUnlocked = firstUnlockedModule?.lessons[0]?.id ?? data.firstLessonId;
+  const firstHref = firstLessonIdUnlocked ? `/curso/lecciones/${firstLessonIdUnlocked}` : "/curso";
+  const lessonById = new Map(data.lessons.map((l) => [l.id, l]));
+  const useModuleCards = Object.keys(moduleAccess).length > 0;
 
   return (
-    <div className="max-w-2xl w-full space-y-6">
-      <SurfaceCard padding="lg" clickable={false} className="flex flex-col gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-[var(--ink)]">{data.course.title}</h1>
-          {data.course.description && (
-            <p className="text-[var(--ink-muted)] text-sm mt-1">{data.course.description}</p>
-          )}
-        </div>
-        <PrimaryButton href={firstHref} className="inline-flex items-center gap-2 w-fit">
-          {data.firstLessonId ? "Continuar" : "Comenzar"}
-          <ChevronRight className="w-4 h-4" />
+    <div className="max-w-2xl w-full space-y-8">
+      <PageSection
+        id="curso-header"
+        title={data.course.title}
+        subtitle={data.course.description ?? undefined}
+      >
+        <PrimaryButton
+          href={firstHref}
+          className="inline-flex items-center gap-2 w-fit min-h-[48px]"
+          aria-label={firstLessonIdUnlocked ? "Continuar al contenido" : "Comenzar"}
+        >
+          {firstLessonIdUnlocked ? "Continuar" : "Comenzar"}
+          <ChevronRight className="w-4 h-4" aria-hidden />
         </PrimaryButton>
-      </SurfaceCard>
+      </PageSection>
 
-      <section aria-labelledby="modulos-heading">
-        <h2 id="modulos-heading" className="text-base font-semibold text-[var(--ink)] mb-3">
+      <div
+        className="rounded-[16px] p-1 bg-[var(--neu-bg)] border-none flex gap-1 w-fit"
+        style={{ boxShadow: "var(--neu-shadow-in-sm)" }}
+        role="tablist"
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "modulos"}
+          onClick={() => setView("modulos")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            view === "modulos" ? "bg-[var(--surface)] text-[var(--azul)]" : "text-[var(--ink)] hover:bg-[var(--surface-soft)]"
+          }`}
+          style={view === "modulos" ? { boxShadow: "var(--neu-shadow-out-sm)" } : undefined}
+        >
+          <List className="w-4 h-4" aria-hidden />
           Módulos y lecciones
-        </h2>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "programa"}
+          onClick={() => setView("programa")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            view === "programa" ? "bg-[var(--surface)] text-[var(--azul)]" : "text-[var(--ink)] hover:bg-[var(--surface-soft)]"
+          }`}
+          style={view === "programa" ? { boxShadow: "var(--neu-shadow-out-sm)" } : undefined}
+        >
+          <LayoutList className="w-4 h-4" aria-hidden />
+          Programa completo
+        </button>
+      </div>
+
+      {view === "modulos" && (
+      <PageSection id="modulos" title="Módulos y lecciones">
         <div className="space-y-4">
-          {data.modules.map((mod) => {
-            const modLessons = lessonsByModule[mod.id] ?? [];
-            if (modLessons.length === 0) return null;
+          {data.modules.map((mod, modIndex) => {
+            if (mod.lessonCount === 0) return null;
+            if (useModuleCards) {
+              return (
+                <ModuleCard
+                  key={mod.id}
+                  module={mod}
+                  accessStatus={moduleAccess[mod.id] ?? "available"}
+                  courseId={data.course!.id}
+                  firstLessonId={mod.lessons[0]?.id ?? null}
+                  lockReason={moduleLockReasons[mod.id]}
+                />
+              );
+            }
+            const moduleLabel = `Módulo ${modIndex + 1}: ${mod.title}`;
             return (
               <SurfaceCard key={mod.id} padding="md" clickable={false}>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <h3 className="font-semibold text-[var(--ink)]">{mod.title}</h3>
+                  <h3 className="font-semibold text-[var(--ink)]">{moduleLabel}</h3>
                   <span className="text-xs text-[var(--ink-muted)]">
-                    {modLessons.length} {modLessons.length === 1 ? "lección" : "lecciones"}
+                    {(() => {
+                      const done = mod.lessons.filter((l) => completedLessonIds.includes(l.id)).length;
+                      return `${done}/${mod.lessonCount} completadas`;
+                    })()}
                   </span>
                 </div>
-                <ul className="space-y-1">
-                  {modLessons.map((l) => (
-                    <li key={l.id}>
-                      <ListRow
-                        href={`/curso/lecciones/${l.id}`}
-                        title={l.title}
-                        subtitle={
-                          l.estimated_minutes != null
-                            ? `${l.estimated_minutes} min`
-                            : undefined
-                        }
-                      />
-                    </li>
-                  ))}
+                <ul className="space-y-2" role="list">
+                  {mod.lessons.map((l) => {
+                    const meta = lessonById.get(l.id);
+                    const durationLabel = meta?.estimated_minutes != null && meta.estimated_minutes > 0
+                      ? `~${meta.estimated_minutes} min`
+                      : null;
+                    const isCommunity = (l as { source_community?: boolean }).source_community ?? meta?.source_community;
+                    const subtitleParts = [durationLabel, isCommunity ? "Comunidad" : null].filter(Boolean);
+                    return (
+                      <li key={l.id}>
+                        <ListRow
+                          href={`/curso/lecciones/${l.id}`}
+                          title={l.title}
+                          subtitle={subtitleParts.length > 0 ? subtitleParts.join(" · ") : undefined}
+                          badge={
+                            completedLessonIds.includes(l.id)
+                              ? { variant: "completado", label: "Completado" }
+                              : { variant: "pendiente", label: "Pendiente" }
+                          }
+                          className="min-h-[48px] rounded-xl"
+                        />
+                      </li>
+                    );
+                  })}
                 </ul>
               </SurfaceCard>
             );
           })}
         </div>
-      </section>
+      </PageSection>
+      )}
+
+      {view === "programa" && (
+        <div className="max-w-2xl">
+          {programaLoading ? (
+            <div className="space-y-3 animate-pulse">
+              <div className="h-6 w-40 rounded bg-[var(--surface-soft)]" />
+              <div className="h-24 rounded-[16px] bg-[var(--surface-soft)]" />
+              <div className="h-24 rounded-[16px] bg-[var(--surface-soft)]" />
+            </div>
+          ) : programaData?.modules && programaData.modules.length > 0 ? (
+            <ModuleProgramView
+              modules={programaData.modules}
+              onModuleClick={(id) => router.push(`/curso/modulos/${id}`)}
+            />
+          ) : (
+            <p className="text-sm text-[var(--texto-sub)]">No hay módulos en el programa.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

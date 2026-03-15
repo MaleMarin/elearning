@@ -45,7 +45,7 @@ export function ListRow({ href, left, title, subtitle, badge, children, classNam
     return (
       <Link
         href={href}
-        className={`flex items-center gap-4 rounded-xl border border-[var(--line-subtle)] bg-[var(--surface)] shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_2px_8px_rgba(31,36,48,0.05)] ${padding} no-underline transition-all duration-200 hover:bg-[var(--surface-soft)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_6px_20px_rgba(31,36,48,0.07)] hover:-translate-y-px group ${className}`}
+        className={`flex items-center gap-4 rounded-xl border border-[var(--line-subtle)] bg-[var(--surface)] shadow-[var(--shadow-list-row)] ${padding} no-underline transition-all duration-200 hover:bg-[var(--surface-soft)] hover:shadow-[var(--shadow-list-row-hover)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] group ${className}`}
       >
         {content}
       </Link>
@@ -53,7 +53,7 @@ export function ListRow({ href, left, title, subtitle, badge, children, classNam
   }
 
   return (
-    <div className={`flex items-center gap-4 rounded-xl border border-[var(--line-subtle)] bg-[var(--surface)] shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_2px_8px_rgba(31,36,48,0.05)] ${padding} ${className}`}>
+    <div className={`flex items-center gap-4 rounded-xl border border-[var(--line-subtle)] bg-[var(--surface)] shadow-[var(--shadow-list-row)] ${padding} ${className}`}>
       {content}
     </div>
   );

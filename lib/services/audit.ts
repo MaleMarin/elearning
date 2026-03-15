@@ -1,3 +1,5 @@
+import { useFirebase } from "@/lib/env";
+import { getFirebaseAdminFirestore } from "@/lib/firebase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export interface AuditPayload {
@@ -12,7 +14,6 @@ export interface AuditPayload {
 
 /**
  * Registra una acción de admin/mentor en audit_logs.
- * Llamar desde API routes después de verificar rol.
  */
 export async function auditLog(params: {
   userId: string;
@@ -24,6 +25,20 @@ export async function auditLog(params: {
   ip?: string;
 }): Promise<void> {
   try {
+    if (useFirebase()) {
+      const db = getFirebaseAdminFirestore();
+      await db.collection("audit_logs").add({
+        user_id: params.userId,
+        role: params.role,
+        action: params.action,
+        resource_type: params.resourceType ?? null,
+        resource_id: params.resourceId ?? null,
+        payload: params.payload ?? {},
+        ip: params.ip ?? null,
+        created_at: new Date(),
+      });
+      return;
+    }
     const supabase = await createServerSupabaseClient();
     await supabase.from("audit_logs").insert({
       user_id: params.userId,

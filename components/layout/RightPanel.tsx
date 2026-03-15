@@ -58,9 +58,9 @@ export function RightPanel() {
             <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80" aria-hidden>
               <defs>
                 <linearGradient id="progress-ring-gradient-rp" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#9ECB45" />
-                  <stop offset="60%" stopColor="#7569DE" />
-                  <stop offset="100%" stopColor="#FFA046" />
+                  <stop offset="0%" stopColor="#00e5a0" />
+                  <stop offset="50%" stopColor="#00b87d" />
+                  <stop offset="100%" stopColor="#1428d4" />
                 </linearGradient>
               </defs>
               <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(31,36,48,0.08)" strokeWidth="6" />

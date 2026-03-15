@@ -3,79 +3,181 @@
 @tailwind utilities;
 
 /* ==========================================================================
-   SISTEMA VISUAL BASE — PLATAFORMA E-LEARNING PRECISAR
-   No inventar colores, sombras, fondos ni estilos fuera de este sistema.
+   NEUMORFISMO GLOBAL — POLÍTICA DIGITAL
+   Fondo base #f0f2f5 (frío, moderno). Sombras ajustadas para contraste.
    ========================================================================== */
 
-/* ---------- 1. COLORES BASE OFICIALES ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap');
+
 :root {
-  /* Fondo global */
-  --bg: #F3F2EF;
-  /* Superficie */
-  --surface: #FFFFFF;
-  --surface-soft: #FAFAF8;
-  /* Texto */
-  --ink: #1F2430;
-  --muted: #6B7280;
-  /* Línea / borde */
-  --line: rgba(31, 36, 48, 0.08);
-  --line-subtle: rgba(31, 36, 48, 0.08);
+  /* Fondo base neumórfico — frío, moderno */
+  --neu-bg: #f0f2f5;
+  --neu-bg-dark: #1a1f2e;
 
-  /* Marca / acento */
-  --primary: #7569DE;
-  --primary-soft: #EEEAFD;
-  --primary-hover: #6355d4;
-  --coral: #FE6845;
-  --coral-soft: #FFF0EB;
-  --coral-hover: #e55a3a;
-  --amber: #FFA046;
-  --amber-soft: #FFF4E6;
-  --success: #9ECB45;
-  --success-soft: #F3F9E7;
+  /* Sombras neumórficas (más fuerte) */
+  --neu-shadow-out: 8px 8px 18px rgba(174,183,194,0.65), -8px -8px 18px rgba(255,255,255,0.92);
+  --neu-shadow-out-sm: 4px 4px 10px rgba(174,183,194,0.6), -4px -4px 10px rgba(255,255,255,0.9);
+  --neu-shadow-in: inset 4px 4px 10px rgba(174,183,194,0.55), inset -4px -4px 10px rgba(255,255,255,0.85);
 
-  /* Sidebar: versión apenas distinta del fondo general */
-  --sidebar-bg: #EFEEE9;
-  --sidebar-border: var(--line);
+  --neu-shadow-in-sm:
+    inset 2px 2px 6px rgba(174, 183, 194, 0.5),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.82);
 
-  /* Neutro suave (estado pendiente, fondos discretos) */
-  --neutral-soft: #F5F4F2;
+  /* Azul eléctrico (moras) — primario */
+  --azul:       #1428d4;
+  --azul-mid:   #2b4fff;
+  --azul-bright: #2b4fff;
+  --azul-dark:  #0a0f8a;
 
-  /* Aliases para compatibilidad con código existente */
-  --cream: var(--bg);
-  --cream-dark: var(--neutral-soft);
-  --canvas: var(--bg);
-  --canvas-sidebar: var(--sidebar-bg);
-  --canvas-sidebar-border: var(--line);
-  --ink-muted: var(--muted);
-  --text: var(--ink);
-  --text-muted: var(--muted);
-  --card: var(--surface);
-  --font-sans: "Avenir Light", "Avenir Next", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --error: #c53030;
+  /* Verde menta — acento */
+  --acento:       #00e5a0;
+  --acento-dark:  #00b87d;
+  --acento-glow:  rgba(0, 229, 160, 0.35);
 
-  /* Sombras del sistema (paper premium — más volumen y relieve) */
-  --shadow-card: 0 14px 38px rgba(31, 36, 48, 0.08);
-  --shadow-card-hover: 0 20px 52px rgba(31, 36, 48, 0.10);
-  --shadow-card-inset: inset 0 1px 0 rgba(255, 255, 255, 0.70);
-  --elevation-0: none;
-  --elevation-1: var(--shadow-card-inset), var(--shadow-card);
-  --elevation-2: var(--shadow-card-inset), var(--shadow-card-hover);
-  --shadow-sidebar: 0 2px 8px rgba(31, 36, 48, 0.04);
-  --shadow-input-focus: inset 0 1px 2px rgba(31, 36, 48, 0.04);
+  --texto:      #1428d4;
+  --texto-sub:  #6b7280;
+  --texto-hint: #9ca3af;
+
+  /* Glow para elementos activos */
+  --neu-glow:
+    6px 6px 14px rgba(174, 183, 194, 0.6),
+    -6px -6px 14px rgba(255, 255, 255, 0.92),
+    0 0 20px rgba(20, 40, 212, 0.12);
+  --neu-glow-acento:
+    6px 6px 14px rgba(174, 183, 194, 0.6),
+    -6px -6px 14px rgba(255, 255, 255, 0.92),
+    0 0 16px rgba(0, 229, 160, 0.25);
+
+  /* Radios */
+  --r-sm:  10px;
+  --r-md:  16px;
+  --r-lg:  20px;
+  --r-xl:  24px;
+  --r-pill: 50px;
+
+  /* Tipografía */
+  --font: 'Plus Jakarta Sans', sans-serif;
+
+  /* Compatibilidad con UI existente (alias a neumorfismo) */
+  --primary:       var(--azul);
+  --primary-hover: var(--azul-mid);
+  --primary-soft:  rgba(20, 40, 212, 0.08);
+  --accent:        var(--acento);
+  --accent-soft:   rgba(0, 229, 160, 0.12);
+  --success:       #00b87d;
+  --success-soft:  rgba(0, 229, 160, 0.12);
+  --bg:            var(--neu-bg);
+  --surface:       var(--neu-bg);
+  --surface-soft:  var(--neu-bg);
+  --ink:           var(--texto);
+  --muted:         var(--texto-sub);
+  --line:          rgba(20, 40, 212, 0.1);
+  --line-subtle:   rgba(20, 40, 212, 0.06);
+  --coral:         #DC2626;
+  --coral-soft:    #FEF2F2;
+  --coral-hover:   #B91C1C;
+  --amber:         #F59E0B;
+  --amber-soft:    #FFFBEB;
+  --sidebar-bg:    var(--neu-bg);
+  --sidebar-border: transparent;
+  --neutral-soft:  var(--neu-bg);
+  --overlay:       rgba(20, 40, 212, 0.35);
+  --overlay-light: rgba(20, 40, 212, 0.05);
+  --cream:         var(--neu-bg);
+  --cream-dark:    var(--neu-bg);
+  --canvas:        var(--neu-bg);
+  --canvas-sidebar: var(--neu-bg);
+  --canvas-sidebar-border: transparent;
+  --ink-muted:     var(--texto-sub);
+  --text:          var(--texto);
+  --text-muted:    var(--texto-sub);
+  --card:          var(--neu-bg);
+  --font-sans:     var(--font);
+  --error:         #b91c1c;
+
+  /* Sombras (neumórficas o compat) */
+  --shadow-card:     var(--neu-shadow-out);
+  --shadow-card-hover: 10px 10px 20px rgba(174, 183, 194, 0.65), -10px -10px 20px rgba(255, 255, 255, 0.92);
+  --shadow-card-inset: var(--neu-shadow-in-sm);
+  --inset-highlight: none;
+  --elevation-0:    none;
+  --elevation-1:    var(--neu-shadow-out);
+  --elevation-2:    var(--shadow-card-hover);
+  --shadow-sidebar: var(--neu-shadow-out);
+  --shadow-input-focus: var(--neu-shadow-in), 0 0 0 2px rgba(43, 79, 255, 0.25);
+  --shadow-list-row: var(--neu-shadow-out-sm);
+  --shadow-list-row-hover: var(--neu-glow);
+  --focus-ring: 0 0 0 3px rgba(43, 79, 255, 0.4);
+  --focus-ring-offset: 2px;
 }
 
-/* ---------- 2. BASE & BODY ---------- */
+/* ---------- Fondo global — #f0f2f5 para que las sombras neumórficas se vean ---------- */
+html,
+body,
+#__next,
+#main-content,
+.main-content,
+main {
+  background: #f0f2f5 !important;
+  font-family: var(--font) !important;
+}
+
+/* Eliminar bordes de cards; el neumorfismo los reemplaza por sombras */
+.card,
+[class*="card"],
+[class*="Card"] {
+  border: none !important;
+  background: var(--neu-bg) !important;
+}
+
+/* Dashboard /inicio: neumorfismo más fuerte en cards */
+.inicio-dashboard .rounded-card,
+.inicio-dashboard .rounded-card-lg,
+.inicio-dashboard section.rounded-2xl {
+  box-shadow: 8px 8px 18px rgba(174, 183, 194, 0.65), -8px -8px 18px rgba(255, 255, 255, 0.92) !important;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --neu-bg: #1a1f2e;
+    --neu-shadow-out:
+      8px 8px 16px rgba(0, 0, 0, 0.5),
+      -8px -8px 16px rgba(255, 255, 255, 0.03);
+    --neu-shadow-in:
+      inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+      inset -4px -4px 8px rgba(255, 255, 255, 0.03);
+    --texto: #e2e8f0;
+    --texto-sub: #94a3b8;
+    --ink: #e2e8f0;
+    --muted: #94a3b8;
+    --bg: #1a1f2e;
+    --surface: #1a1f2e;
+    --surface-soft: #1a1f2e;
+  }
+}
+
+/* Móvil — sombras más suaves */
+@media (max-width: 640px) {
+  :root {
+    --neu-shadow-out:
+      4px 4px 8px rgba(174, 183, 194, 0.5),
+      -4px -4px 8px rgba(255, 255, 255, 0.9);
+    --neu-shadow-in:
+      inset 2px 2px 6px rgba(174, 183, 194, 0.45),
+      inset -2px -2px 6px rgba(255, 255, 255, 0.82);
+  }
+}
+
+/* ---------- Base & body ---------- */
 @layer base {
   body {
     font-size: 18px;
     font-weight: 300;
     color: var(--ink);
-    background: var(--bg);
-    font-family: var(--font-sans);
-  }
-  body {
+    background: var(--neu-bg) !important;
+    font-family: var(--font);
     min-height: 100vh;
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 35%, var(--bg) 100%);
   }
   a {
     color: inherit;
@@ -90,7 +192,7 @@ html {
   font-size: 18px;
 }
 
-/* ---------- 3. TIPOGRAFÍA ---------- */
+/* ---------- Tipografía ---------- */
 .heading-hero {
   font-size: clamp(2rem, 4vw, 2.5rem);
   font-weight: 700;
@@ -120,152 +222,203 @@ html {
   color: var(--primary-hover);
 }
 
-/* ---------- 4. CARDS (paper premium) ---------- */
+/* ---------- Utilidades (elevación, focus, lectura) ---------- */
 @layer components {
-  .card-premium {
-    background: var(--surface) !important;
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    box-shadow: var(--shadow-card-inset), var(--shadow-card) !important;
-    transition: box-shadow 0.25s ease, transform 0.2s ease;
-  }
-  .card-premium:hover {
-    box-shadow: var(--shadow-card-inset), var(--shadow-card-hover) !important;
-    transform: translateY(-1px);
-  }
-  .card-white {
-    background: var(--surface) !important;
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    box-shadow: var(--shadow-card-inset), var(--shadow-card) !important;
-  }
-  .card-lg {
-    border-radius: 24px;
-  }
-  /* Inputs con relieve: borde + sombra interior sutil en focus */
-  .input-premium {
-    border: 1px solid var(--line-subtle);
-    box-shadow: 0 1px 2px rgba(31, 36, 48, 0.04);
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
-  }
-  .input-premium:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: var(--shadow-input-focus), 0 0 0 3px rgba(117, 105, 222, 0.12);
+  .reading-width {
+    max-width: 65ch;
   }
 }
 
-/* ---------- 5. BOTONES ---------- */
-.btn-primary {
-  @apply px-6 py-3 text-lg font-medium rounded-full min-h-[44px] min-w-[44px] inline-flex items-center justify-center transition-all duration-200;
-  background: var(--primary);
-  color: white;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 2px 0 0 rgba(255, 255, 255, 0.2) inset, 0 6px 20px rgba(31, 36, 48, 0.12);
-}
-.btn-primary:hover {
-  background: var(--primary-hover);
-  box-shadow: 0 2px 0 0 rgba(255, 255, 255, 0.25) inset, 0 10px 28px rgba(31, 36, 48, 0.14);
-  transform: translateY(-1px);
-}
-.btn-primary:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(117, 105, 222, 0.35);
-}
-
-.btn-coral {
-  @apply px-5 py-2.5 text-base font-medium rounded-full min-h-[44px] inline-flex items-center justify-center transition-all duration-200;
-  background: var(--coral);
-  color: white;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 2px 0 0 rgba(255, 255, 255, 0.2) inset, 0 6px 20px rgba(31, 36, 48, 0.12);
-}
-.btn-coral:hover {
-  background: var(--coral-hover);
-  box-shadow: 0 2px 0 0 rgba(255, 255, 255, 0.25) inset, 0 10px 28px rgba(31, 36, 48, 0.14);
-  transform: translateY(-1px);
-}
-.btn-coral:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(254, 104, 69, 0.35);
-}
-
-.btn-ghost {
-  @apply px-4 py-2.5 text-base font-medium rounded-full min-h-[44px] inline-flex items-center justify-center transition-all duration-200;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6) inset, 0 2px 8px rgba(31, 36, 48, 0.06);
-}
-.btn-ghost:hover {
-  background: var(--surface-soft);
-  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.7) inset, 0 4px 12px rgba(31, 36, 48, 0.07);
-  transform: translateY(-1px);
-}
-.btn-ghost:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
-}
-
-/* ---------- 6. INPUTS ---------- */
-.input-base {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  min-height: 48px;
-  padding: 12px 16px;
-  color: var(--ink);
-  font-size: 18px;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
-}
-.input-base::placeholder {
-  color: var(--muted);
-}
-.input-base:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(117, 105, 222, 0.2);
-}
-
-/* ---------- 7. PROGRESS BAR ---------- */
-.progress-bar {
-  height: 8px;
-  border-radius: 9999px;
-  background: var(--line);
-  overflow: hidden;
-}
-.progress-bar-fill {
-  height: 100%;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--amber) 100%);
-  transition: width 0.4s ease;
-}
-
-/* ---------- 8. SIDEBAR ---------- */
-.sidebar-elevation {
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--sidebar-border);
-  box-shadow: var(--shadow-sidebar);
-}
-
-/* ---------- 9. PANEL DERECHO ---------- */
-.panel-elevation {
-  background: var(--bg);
-  border-left: 1px solid var(--line);
-  box-shadow: -2px 0 12px rgba(31, 36, 48, 0.04);
-}
-
-/* ---------- 10. ELEVACIÓN (utilidades) ---------- */
 .elevation-0 { box-shadow: var(--elevation-0); }
 .elevation-1 { box-shadow: var(--elevation-1); }
 .elevation-2 { box-shadow: var(--elevation-2); }
 .hover-elevation-1:hover { box-shadow: var(--elevation-1); }
 .hover-elevation-2:hover { box-shadow: var(--elevation-2); }
 
-/* ---------- 11. FOCUS & UTILIDADES ---------- */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
 .ring-focus:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--primary);
+  box-shadow: var(--focus-ring);
 }
 .text-contrast { color: var(--ink); }
 .text-muted { color: var(--muted); }
+
+/* WCAG 2.1 AA: focus visible (azul eléctrico) */
+:focus-visible {
+  outline: 2px solid var(--azul-mid);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Respetar preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Tamaño mínimo de texto (WCAG) */
+body {
+  font-size: 16px;
+}
+
+/* Preferencias de accesibilidad (Brecha 2) */
+html.a11y-font-large {
+  font-size: 20px;
+}
+html.a11y-reduce-motion *,
+html.a11y-reduce-motion *::before,
+html.a11y-reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+html.a11y-high-contrast {
+  --line: rgba(20, 40, 212, 0.25);
+  --line-subtle: rgba(20, 40, 212, 0.15);
+  --ink-muted: #334155;
+}
+html.a11y-high-contrast body {
+  color: var(--ink);
+}
+
+/* Verde menta — utilidades de acento */
+.accent-glow {
+  box-shadow: 0 0 12px var(--acento-glow);
+}
+.accent-text { color: var(--acento); }
+.accent-bg { background: var(--acento); }
+.accent-bg-soft { background: rgba(0, 229, 160, 0.12); }
+
+/* View Transitions */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.25s;
+  animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* ── BLOQUE F: Neumorfismo global (sidebar, nav activo, botones, inputs, cards, quiz) ── */
+.sidebar,
+[class*="sidebar"],
+[class*="Sidebar"] {
+  background: var(--neu-bg) !important;
+  border: none !important;
+  box-shadow: var(--neu-shadow-out) !important;
+}
+
+[class*="nav-item"][aria-current="page"],
+[class*="NavItem"][class*="active"],
+[class*="sidebar-item"][class*="active"] {
+  background: var(--neu-bg) !important;
+  box-shadow: var(--neu-shadow-in-sm) !important;
+  border: none !important;
+}
+
+/* Nav del sidebar oscuro: no aplicar neumorfismo claro */
+.aside-elevation nav a {
+  box-shadow: none !important;
+}
+
+button[class*="btn-primary"],
+button[class*="btnPrimary"],
+.btn-primary {
+  background: var(--neu-bg) !important;
+  color: var(--azul) !important;
+  border: none !important;
+  box-shadow: var(--neu-shadow-out-sm) !important;
+  transition: box-shadow 0.15s, transform 0.1s !important;
+}
+button[class*="btn-primary"]:hover,
+.btn-primary:hover {
+  box-shadow: var(--neu-shadow-out) !important;
+  transform: translateY(-1px) !important;
+}
+button[class*="btn-primary"]:active,
+.btn-primary:active {
+  box-shadow: var(--neu-shadow-in) !important;
+  transform: translateY(0) !important;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea,
+select {
+  background: var(--neu-bg) !important;
+  border: none !important;
+  box-shadow: var(--neu-shadow-in) !important;
+  color: var(--azul) !important;
+  font-family: var(--font) !important;
+  outline: none !important;
+  transition: box-shadow 0.2s !important;
+}
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: var(--neu-shadow-in), 0 0 0 2px rgba(0, 229, 160, 0.3) !important;
+}
+
+[class*="card"]:not(.certificate-card):not([class*="CertificadoDownloader"]),
+[class*="Card"]:not([class*="certificate"]),
+[class*="module-card"],
+[class*="ModuleCard"] {
+  background: var(--neu-bg) !important;
+  border: none !important;
+  box-shadow: var(--neu-shadow-out-sm) !important;
+}
+[class*="card"]:not(.certificate-card):hover,
+[class*="Card"]:not([class*="certificate"]):hover {
+  box-shadow: var(--neu-shadow-out) !important;
+}
+
+[class*="quiz-option"],
+[class*="QuizOption"] {
+  background: var(--neu-bg) !important;
+  border: none !important;
+  box-shadow: var(--neu-shadow-out-sm) !important;
+  transition: box-shadow 0.15s !important;
+}
+[class*="quiz-option"]:hover {
+  box-shadow: var(--neu-shadow-out) !important;
+}
+[class*="quiz-option"][class*="selected"],
+[class*="quiz-option"][aria-selected="true"] {
+  box-shadow: var(--neu-shadow-in) !important;
+  color: var(--azul) !important;
+  font-weight: 600 !important;
+}
+
+/* ── Ítem 60: Tooltips en sidebar (data-tooltip) ── */
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #0a1628;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 1000;
+  font-family: var(--font);
+}
+[data-tooltip]:hover::after {
+  opacity: 1;
+}

@@ -9,6 +9,8 @@ export interface SurfaceCardProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "md" | "lg";
   /** Si true (default), aplica hover lift + sombra. Usar false para cards no clickeables. */
   clickable?: boolean;
+  /** default = surface blanco; soft = surface-soft (fondos discretos). */
+  variant?: "default" | "soft";
   as?: "div" | "section" | "article";
 }
 
@@ -31,6 +33,7 @@ export const SurfaceCard = forwardRef<HTMLDivElement, SurfaceCardProps>(
       padding = "md",
       size = "md",
       clickable = true,
+      variant = "default",
       as: Component = "div",
       children,
       ...rest
@@ -41,12 +44,13 @@ export const SurfaceCard = forwardRef<HTMLDivElement, SurfaceCardProps>(
       <Component
         ref={ref}
         className={[
-          "border border-[var(--line)] bg-[var(--surface)]",
+          "border border-[var(--line)]",
+          variant === "soft" ? "bg-[var(--surface-soft)]" : "bg-[var(--surface)]",
           "shadow-[var(--shadow-card-inset),var(--shadow-card)]",
           radiusMap[size],
           paddingMap[padding],
           clickable &&
-            "transition-[box-shadow,transform] duration-200 ease-out hover:shadow-[var(--shadow-card-inset),var(--shadow-card-hover)] hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0",
+            "transition-[box-shadow,transform] duration-200 ease-out hover:shadow-[var(--shadow-card-inset),var(--shadow-card-hover)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0",
           !clickable && "shadow-[var(--shadow-card-inset),var(--shadow-card)]",
           className,
         ]

@@ -36,7 +36,7 @@ export function CommunityPreviewCard({ post }: CommunityPreviewCardProps) {
       ) : (
         <div className="py-2">
           <p className="text-[var(--ink-muted)] text-sm mb-4">
-            Sé la primera persona en publicar en tu cohorte.
+            Sé la primera persona en publicar en tu grupo.
           </p>
           <SecondaryButton href="/comunidad">Crear post</SecondaryButton>
         </div>

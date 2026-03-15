@@ -1,13 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getDemoMode, useFirebase } from "@/lib/env";
+import { getAuthFromRequest } from "@/lib/firebase/auth-request";
+import * as firebaseContent from "@/lib/services/firebase-content";
 import { ensureContentEditor, getModules, createModule } from "@/lib/services/content";
 import type { PublishStatus } from "@/lib/types/content";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (getDemoMode()) {
+    return NextResponse.json({ modules: [] });
+  }
+  if (useFirebase()) {
+    try {
+      const auth = await getAuthFromRequest(req);
+      const editableIds = await firebaseContent.getEditableCourseIds(auth.uid, auth.role);
+      const { id: courseId } = await params;
+      if (!editableIds.includes(courseId)) {
+        return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+      }
+      const modules = await firebaseContent.getModules(courseId);
+      return NextResponse.json({ modules });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Error";
+      return NextResponse.json({ error: msg }, { status: msg === "No autorizado" ? 401 : 500 });
+    }
+  }
   try {
     await ensureContentEditor();
     const { id: courseId } = await params;
@@ -24,6 +45,30 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (getDemoMode()) {
+    return NextResponse.json({ error: "Demo" }, { status: 400 });
+  }
+  if (useFirebase()) {
+    try {
+      const auth = await getAuthFromRequest(req);
+      const editableIds = await firebaseContent.getEditableCourseIds(auth.uid, auth.role);
+      const { id: courseId } = await params;
+      if (!editableIds.includes(courseId)) {
+        return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+      }
+      const body = await req.json().catch(() => ({}));
+      const title = (body.title as string)?.trim();
+      const orderIndex = Number(body.order_index) ?? 0;
+      const status = (body.status as PublishStatus) ?? "draft";
+      const description = typeof body.description === "string" ? body.description.trim() || null : null;
+      if (!title) return NextResponse.json({ error: "Falta title" }, { status: 400 });
+      const module_ = await firebaseContent.createModule(courseId, title, orderIndex, status, description);
+      return NextResponse.json({ module: module_ });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Error";
+      return NextResponse.json({ error: msg }, { status: msg === "No autorizado" ? 401 : 500 });
+    }
+  }
   try {
     await ensureContentEditor();
     const { id: courseId } = await params;

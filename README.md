@@ -27,17 +27,28 @@ Toda la configuración depende **solo de variables de entorno** (nada hardcodead
    - Cursos, sesiones, tareas y comunidad muestran datos de ejemplo.
    - No se realizan llamadas a Supabase.
 
-3. **Modo real (con Supabase)**  
+3. **Modo real (Firebase)**  
    Con `NEXT_PUBLIC_DEMO_MODE=false` en `.env.local`:
-   - Completa **NEXT_PUBLIC_SUPABASE_URL** y **NEXT_PUBLIC_SUPABASE_ANON_KEY** (y opcionalmente **SUPABASE_SERVICE_ROLE_KEY** para seed/APIs de servidor).
-   - Si faltan estas variables, el build o el arranque fallarán con un mensaje claro indicando qué falta.
+   - Completa las variables **NEXT_PUBLIC_FIREBASE_*** y **FIREBASE_SERVICE_ACCOUNT_JSON** (ver `.env.example`).
+   - **Login con Google y Microsoft:** en [Firebase Console](https://console.firebase.google.com) → tu proyecto → Authentication → Sign-in method, activa "Google" y "Microsoft". No se requieren variables extra en `.env`; Firebase usa la configuración del proyecto. Para Microsoft puedes usar el tenant "common" (cuentas personales y laborales).
+   - Si faltan las variables de Firebase, el build o el arranque pueden fallar con un mensaje indicando qué falta.
 
-4. **Reiniciar el servidor**  
-   Después de cambiar `.env.local`, reinicia el servidor de desarrollo:
+4. **Arrancar el servidor de desarrollo**  
+   El servidor usa siempre el **puerto 3000**:
    ```bash
    npm run dev
    ```
-   Las variables `NEXT_PUBLIC_*` se inyectan en el build; los cambios no se aplican en caliente.
+   Abre en el navegador:
+   - **Inicio:** http://localhost:3000/inicio  
+   - **Login:** http://localhost:3000/login  
+
+5. **Si el puerto 3000 está ocupado**  
+   Si al ejecutar `npm run dev` falla porque el puerto ya está en uso, en la consola aparecerá un mensaje con la solución. Opciones:
+   - **Rápido:** ejecuta `npm run dev:fresh` (libera el 3000 y arranca el servidor).
+   - **Manual (macOS/Linux):** `lsof -ti:3000 | xargs kill -9` y luego `npm run dev`.
+   - **Otro puerto:** `npm run dev:any` y Next usará el primer puerto libre (3001, 3002, etc.).
+
+   Después de cambiar `.env.local`, reinicia el servidor; las variables `NEXT_PUBLIC_*` se inyectan en el build y no se aplican en caliente.
 
 ---
 
@@ -105,6 +116,13 @@ El seed es **idempotente**: si ya existe el curso "Programa Demo – 4 semanas",
 
 ---
 
+## PWA y app nativa
+
+La plataforma incluye **PWA instalable** (configurada con `@ducanh2912/next-pwa`): los usuarios pueden instalar el sitio en su dispositivo desde el navegador y usarlo como app.  
+**App nativa iOS/Android** planificada para más adelante (p. ej. con Capacitor o React Native cuando haya 200+ usuarios activos). Por ahora la PWA cubre el uso en móvil.
+
+---
+
 ## Checklist de verificación (RLS, roles, no cross-cohort leaks)
 
 - [ ] **RLS**: Todas las tablas sensibles tienen RLS activado (profiles, cohorts, cohort_members, courses, modules, lessons, sessions, tasks, community_posts, support_tickets, etc.).
@@ -122,7 +140,9 @@ El seed es **idempotente**: si ya existe el curso "Programa Demo – 4 semanas",
 
 | Script            | Descripción                                              |
 |-------------------|----------------------------------------------------------|
-| `npm run dev`     | Desarrollo local                                         |
+| `npm run dev`     | Desarrollo local en **puerto 3000** (http://localhost:3000) |
+| `npm run dev:fresh` | Libera el puerto 3000 y arranca el servidor (útil si 3000 está ocupado) |
+| `npm run dev:any` | Desarrollo local en un puerto libre (por si 3000 está ocupado) |
 | `npm run build`   | Build de producción                                     |
 | `npm run start`   | Servir build                                             |
 | `npm run db:push` | Aplicar migraciones (Supabase CLI: `supabase db push`)  |

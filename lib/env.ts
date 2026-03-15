@@ -7,22 +7,26 @@
 const env = (key: string): string | undefined =>
   typeof process !== "undefined" ? process.env[key] : undefined;
 
-/** Modo demo: true = ver plataforma sin Supabase (login saltado, datos placeholder). */
+/** Modo demo: true = ver plataforma sin backend real (login saltado, datos placeholder). */
 export function getDemoMode(): boolean {
   const v = env("NEXT_PUBLIC_DEMO_MODE");
   if (v === "true" || v === "1") return true;
-  const hasSupabase =
-    (env("NEXT_PUBLIC_SUPABASE_URL") ?? "").trim() !== "" &&
-    (env("NEXT_PUBLIC_SUPABASE_ANON_KEY") ?? "").trim() !== "";
-  if (!hasSupabase && env("NODE_ENV") === "development") return true;
   if (v === "false" || v === "0") return false;
-  if (!hasSupabase) return true;
-  return false;
+  const hasFirebase =
+    (env("NEXT_PUBLIC_FIREBASE_API_KEY") ?? "").trim() !== "" &&
+    (env("NEXT_PUBLIC_FIREBASE_PROJECT_ID") ?? "").trim() !== "";
+  if (!hasFirebase && env("NODE_ENV") === "development") return true;
+  return !hasFirebase;
+}
+
+/** Backend real cuando DEMO_MODE=false: Firebase. */
+export function useFirebase(): boolean {
+  return !getDemoMode();
 }
 
 const CRITICAL_KEYS = [
-  "NEXT_PUBLIC_SUPABASE_URL",
-  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  "NEXT_PUBLIC_FIREBASE_API_KEY",
+  "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
 ] as const;
 
 /**
@@ -40,9 +44,21 @@ export function validateEnv(): void {
   if (missing.length === 0) return;
   if (env("NODE_ENV") === "development") return;
   throw new Error(
-    `Faltan variables de entorno requeridas (modo real): ${missing.join(", ")}. ` +
+    `Faltan variables de entorno requeridas (modo real Firebase): ${missing.join(", ")}. ` +
       "Copia .env.example a .env.local y complétalas, o usa NEXT_PUBLIC_DEMO_MODE=true para modo demo."
   );
+}
+
+/** UIDs o email del superadmin (solo esa cuenta puede acceder a /superadmin). Ej: SUPERADMIN_UIDS=uid1,uid2 o SUPERADMIN_EMAIL=tu@email.com */
+export function getSuperadminUids(): string[] {
+  const v = env("SUPERADMIN_UIDS");
+  if (v?.trim()) return v.split(",").map((s) => s.trim()).filter(Boolean);
+  return [];
+}
+
+export function getSuperadminEmail(): string | null {
+  const v = env("SUPERADMIN_EMAIL");
+  return v?.trim() || null;
 }
 
 /** URL de la app (solo lectura). Default seguro. */
