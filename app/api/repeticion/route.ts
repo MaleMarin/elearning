@@ -11,8 +11,12 @@ export async function GET(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
-  const reviews = await getDueReviews(user.uid);
-  return NextResponse.json({ reviews });
+  try {
+    const reviews = await getDueReviews(user.uid);
+    return NextResponse.json({ reviews });
+  } catch {
+    return NextResponse.json({ reviews: [] });
+  }
 }
 
 export async function POST(req: NextRequest) {

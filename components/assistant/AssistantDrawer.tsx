@@ -220,7 +220,7 @@ export function AssistantDrawer({
                   </span>
                 )}
               </h2>
-              {showProviderSelector && (
+              {isAdmin && showProviderSelector && (
                 <ProviderSelect
                   providers={providers}
                   value={provider}
@@ -264,7 +264,7 @@ export function AssistantDrawer({
                   lessonContext={activeTab === "tutor" ? lessonContext : null}
                   cohortId={cohortId}
                   courseId={courseId}
-                  provider={provider}
+                  provider={isAdmin ? provider : "anthropic"}
                   onClose={() => setOpen(false)}
                   quickSuggestions={
                     activeTab === "tutor"

@@ -15,8 +15,13 @@ export default function SpacedRepCard() {
 
   useEffect(() => {
     fetch("/api/repeticion", { credentials: "include" })
-      .then((r) => r.json())
-      .then((d) => setReviews(d.reviews || []));
+      .then((r) => {
+        const ct = r.headers.get("content-type");
+        if (!r.ok || !ct?.includes("application/json")) return { reviews: [] };
+        return r.text().then((text) => (text ? JSON.parse(text) : { reviews: [] }));
+      })
+      .then((d) => setReviews(d.reviews || []))
+      .catch(() => setReviews([]));
   }, []);
 
   const handleAnswer = async (remembered: boolean) => {
