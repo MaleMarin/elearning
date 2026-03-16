@@ -165,10 +165,8 @@ const NOTIFS: NotifItem[] = [
   { icon: '📝',  iconBg: 'rgba(229,57,53,0.1)',    title: 'Tarea pendiente',    sub: 'Vence el 18 Mar',            isNew: true },
 ]
 
-// Días del calendario Marzo 2026 con eventos
+// Días con evento en el calendario (ej. entrega, sesión)
 const CAL_EVENTS = [10, 15, 18, 22, 25]
-const CAL_FIRST_DAY = 6 // Marzo 2026 empieza en domingo (índice 6 con Lunes=0)
-const CAL_DAYS = 31
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 export default function DashboardAlumno() {
@@ -210,6 +208,22 @@ export default function DashboardAlumno() {
   }
 
   const [showRightPanel, setShowRightPanel] = useState(false)
+
+  const [today, setToday] = useState<Date>(() => new Date())
+  useEffect(() => {
+    setToday(new Date())
+    const id = setInterval(() => setToday(new Date()), 60_000)
+    return () => clearInterval(id)
+  }, [])
+
+  const dateDesktop = today.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).replace(/\./g, '').replace(/\b\w/g, (c) => c.toUpperCase())
+  const dateMobile = today.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' }).replace(/\./g, '').replace(/\b\w/g, (c) => c.toUpperCase())
+  const calYear = today.getFullYear()
+  const calMonth = today.getMonth()
+  const calFirstDay = new Date(calYear, calMonth, 1).getDay()
+  const calDaysInMonth = new Date(calYear, calMonth + 1, 0).getDate()
+  const calTodayDate = today.getDate()
+  const calMonthLabel = today.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' }).replace(/\b\w/g, (c) => c.toUpperCase())
 
   const [dashboardProgress, setDashboardProgress] = useState<{ lessonsDone: number; lessonsTotal: number } | null>(null)
   useEffect(() => {
@@ -367,10 +381,10 @@ export default function DashboardAlumno() {
             </button>
             {/* Fecha */}
             <span className="topbar-date-desktop" style={{ background: NM.bg, borderRadius: 10, padding: '6px 11px', boxShadow: NM.insetSm, fontSize: f(10), color: NM.muted2, fontFamily: "'Space Mono', monospace" }}>
-              Dom 15 Mar 2026
+              {dateDesktop}
             </span>
             <span className="topbar-date-mobile" style={{ background: NM.bg, borderRadius: 10, padding: '6px 11px', boxShadow: NM.insetSm, fontSize: f(10), color: NM.muted2, fontFamily: "'Space Mono', monospace" }}>
-              15 Mar
+              {dateMobile}
             </span>
             {/* Online */}
             <div className="flex items-center gap-1" style={{ fontSize: f(10), color: NM.muted, fontFamily: "'Space Mono', monospace" }} role="status" aria-label="Estado: en línea">
@@ -652,7 +666,7 @@ export default function DashboardAlumno() {
         {/* Calendario */}
         <div style={{ background: NM.bg, borderRadius: 12, padding: 10, marginBottom: 12, boxShadow: NM.elevated, maxWidth: 200 }}>
           <div className="flex justify-between items-center mb-1">
-            <span style={{ fontSize: f(11), fontWeight: 700, color: NM.text }}>Marzo 2026</span>
+            <span style={{ fontSize: f(11), fontWeight: 700, color: NM.text }}>{calMonthLabel}</span>
             <div className="flex gap-0.5">
               {['‹','›'].map((ch,i) => (
                 <button key={i} type="button" style={{ width: 18, height: 18, borderRadius: 4, border: 'none', cursor: 'pointer', background: NM.bg, color: NM.muted, fontSize: f(10), display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: NM.insetSm }}>{ch}</button>
@@ -665,19 +679,19 @@ export default function DashboardAlumno() {
             ))}
           </div>
           <div className="grid grid-cols-7" style={{ gap: 1 }}>
-            {Array.from({ length: CAL_FIRST_DAY }).map((_,i) => (
+            {Array.from({ length: calFirstDay }).map((_,i) => (
               <div key={`e-${i}`} style={{ aspectRatio: '1', minWidth: 0 }} />
             ))}
-            {Array.from({ length: CAL_DAYS }).map((_,i) => {
+            {Array.from({ length: calDaysInMonth }).map((_,i) => {
               const day = i + 1
-              const isToday = day === 15
+              const isToday = day === calTodayDate
               const hasEvent = CAL_EVENTS.includes(day) && !isToday
               return (
                 <div
                   key={day}
                   role="button"
                   tabIndex={0}
-                  aria-label={isToday ? `Hoy, ${day} de marzo` : `Día ${day} de marzo`}
+                  aria-label={isToday ? `Hoy, ${day}` : `Día ${day}`}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.preventDefault() }}
                   style={{
                     aspectRatio: '1', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center',

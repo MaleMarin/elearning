@@ -119,22 +119,18 @@ export function Sidebar() {
 
   return (
     <aside
-      className="w-64 min-h-screen flex flex-col text-[18px] aside-elevation [&_nav_a]:!bg-[#1428d4] [&_nav_a]:!text-white [&_nav_a]:!shadow-none [&_nav_a[aria-current=page]]:!bg-[#1428d4] [&_nav_a[aria-current=page]]:!text-white [&_nav_a[aria-current=page]]:!font-semibold [&_nav_a[aria-current=page]]:!shadow-[inset_2px_2px_6px_rgba(0,0,0,0.25)] [&_nav_a:hover]:!bg-[#1e3ed4] [&_nav_a:hover]:!text-white [&_nav_a:hover]:!shadow-none"
+      className="min-h-screen flex flex-col shrink-0"
       aria-label="Navegación principal"
       style={{
-        background: "#0a1628",
-        boxShadow: "4px 0 16px rgba(0,0,0,0.3)",
-        ["--muted"]: "rgba(255,255,255,0.9)",
-        ["--ink"]: "#ffffff",
-        ["--primary"]: "#ffffff",
-        ["--surface"]: "#1428d4",
-        ["--surface-soft"]: "rgba(255,255,255,0.05)",
-        ["--canvas-sidebar-border"]: "rgba(255,255,255,0.08)",
-        ["--shadow-card-inset"]: "inset 2px 2px 6px rgba(0,0,0,0.25)",
-        ["--sidebar-bg"]: "#0a1628",
-      } as React.CSSProperties}
+        width: 240,
+        background: "#e8eaf0",
+        boxShadow: "4px 0 16px rgba(194,200,214,0.4), -2px 0 8px rgba(255,255,255,0.6)",
+      }}
     >
-      <div className="py-5 px-4 border-b border-[var(--canvas-sidebar-border)] flex flex-col items-center sm:items-start gap-2 shrink-0">
+      <div
+        className="py-5 px-4 flex flex-col items-center sm:items-start gap-2 shrink-0"
+        style={{ borderBottom: "1px solid rgba(194,200,214,0.35)" }}
+      >
         <Link
           href="/inicio"
           className="flex items-center justify-center sm:justify-start w-full no-underline hover:opacity-90 transition-opacity gap-3"
@@ -142,18 +138,22 @@ export function Sidebar() {
         >
           <div
             className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ background: "#1428d4" }}
+            style={{
+              background: "#e8eaf0",
+              boxShadow: "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+              color: "#1428d4",
+            }}
             aria-hidden
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-              <circle cx="10" cy="10" r="8" stroke="#ffffff" strokeWidth="1.2" fill="none" />
+              <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1.2" fill="none" />
             </svg>
           </div>
           <div className="flex flex-col items-start min-w-0">
-            <span style={{ color: "#ffffff", fontWeight: 700, fontSize: "13px", lineHeight: 1.2 }}>
+            <span style={{ color: "#0a0f8a", fontFamily: "'Space Mono', monospace", fontSize: 10, lineHeight: 1.2, letterSpacing: "0.05em" }}>
               POLÍTICA DIGITAL
             </span>
-            <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "10px", lineHeight: 1.2 }}>
+            <span style={{ color: "#8892b0", fontSize: 9, lineHeight: 1.2 }}>
               Innovación Pública
             </span>
           </div>
@@ -162,11 +162,12 @@ export function Sidebar() {
           <span
             className="inline-block truncate max-w-full"
             style={{
-              background: "rgba(255,255,255,0.1)",
-              color: "rgba(255,255,255,0.6)",
-              fontSize: "9px",
-              borderRadius: "20px",
+              background: "#e8eaf0",
+              color: "#4a5580",
+              fontSize: 9,
+              borderRadius: 20,
               padding: "3px 10px",
+              boxShadow: "inset 2px 2px 4px #c2c8d6, inset -2px -2px 4px #ffffff",
             }}
             title={cohortName}
           >
@@ -178,7 +179,7 @@ export function Sidebar() {
       <nav className="px-3 py-6 flex flex-col gap-2 flex-1" role="navigation" aria-label="Menú principal">
         <p
           className="px-4 pb-2 uppercase tracking-wider"
-          style={{ color: "rgba(255,255,255,0.25)", fontSize: "9px", fontWeight: 700, letterSpacing: "0.14em" }}
+          style={{ color: "#8892b0", fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", fontFamily: "'Space Mono', monospace" }}
         >
           Principal
         </p>
@@ -199,7 +200,15 @@ export function Sidebar() {
           <Link
             href={`/reto/${activeChallenge.id}`}
             title="Reto activo de grupo"
-            className="flex items-center gap-3 px-4 py-3.5 rounded-full min-h-[52px] transition-all duration-200 no-underline text-[var(--muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl min-h-[48px] transition-all duration-200 no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1428d4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#e8eaf0]"
+            style={{
+              background: "#e8eaf0",
+              color: "#4a5580",
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 13,
+              fontWeight: 600,
+              boxShadow: "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+            }}
           >
             <span className="w-5 h-5 shrink-0 flex items-center justify-center" aria-hidden>🏆</span>
             <span className="flex-1 min-w-0">Reto activo</span>
@@ -210,7 +219,7 @@ export function Sidebar() {
         )}
         {(role === "admin" || role === "mentor") && (
           <>
-            <div className="my-3 border-t border-[var(--canvas-sidebar-border)]" />
+            <div className="my-3" style={{ borderTop: "1px solid rgba(194,200,214,0.35)" }} />
             <SidebarNavItem href="/admin" label="Admin" />
             <SidebarNavItem href="/admin/cursos" label="Cursos (admin)" />
             {role === "admin" && (
@@ -223,18 +232,18 @@ export function Sidebar() {
         )}
       </nav>
 
-      <div className="p-4 pt-4 flex flex-col gap-3" style={{ borderTop: "0.5px solid rgba(255,255,255,0.08)" }}>
+      <div className="p-4 pt-4 flex flex-col gap-3" style={{ borderTop: "1px solid rgba(194,200,214,0.35)" }}>
         <SidebarProfileCard user={user} onSignOut={handleSignOut} showSignOutButton={false} />
         {user && (
           <>
-            <div className="my-1" style={{ borderTop: "0.5px solid rgba(255,255,255,0.08)" }} aria-hidden />
+            <div className="my-1" style={{ borderTop: "1px solid rgba(194,200,214,0.25)" }} aria-hidden />
             <button
               type="button"
               onClick={handleSignOut}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
-              style={{ color: "rgba(255,76,76,0.8)" }}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1428d4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#e8eaf0]"
+              style={{ color: "#b91c1c", fontFamily: "'Syne', sans-serif" }}
             >
-              <LogOut className="w-5 h-5 shrink-0" style={{ fill: "rgba(255,76,76,0.8)" }} stroke="rgba(255,76,76,0.8)" />
+              <LogOut className="w-5 h-5 shrink-0" style={{ fill: "#b91c1c" }} stroke="#b91c1c" />
               Cerrar sesión
             </button>
           </>

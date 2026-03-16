@@ -108,12 +108,43 @@ export default function CursoPage() {
   if (!data) {
     return (
       <div className="max-w-2xl w-full">
-        <EmptyState
-          title="Error al cargar"
-          description="No se pudo cargar tu curso. Intenta de nuevo."
-          ctaLabel="Volver a inicio"
-          ctaHref="/inicio"
-        />
+        <div
+          style={{
+            background: "#e8eaf0",
+            borderRadius: 20,
+            padding: 40,
+            textAlign: "center",
+            boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
+            maxWidth: 500,
+            margin: "40px auto",
+            fontFamily: "'Syne', sans-serif",
+          }}
+        >
+          <div style={{ fontSize: 48, marginBottom: 16 }}>📚</div>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>
+            Aún no tienes un curso asignado
+          </h2>
+          <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>
+            Pronto tendrás acceso a tu programa de formación.
+          </p>
+          <a
+            href="/inicio"
+            style={{
+              display: "inline-block",
+              padding: "12px 28px",
+              borderRadius: 14,
+              background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+              color: "white",
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 13,
+              fontWeight: 700,
+              textDecoration: "none",
+              boxShadow: "5px 5px 12px rgba(10,15,138,0.35)",
+            }}
+          >
+            Volver al inicio
+          </a>
+        </div>
       </div>
     );
   }
@@ -126,13 +157,43 @@ export default function CursoPage() {
   if (!data.course) {
     return (
       <div className="max-w-2xl w-full">
-        <EmptyState
-          title="Tu curso aparecerá aquí cuando esté asignado"
-          description="Cuando te asignen un programa, verás el contenido en esta página. Si crees que deberías tener acceso, contacta a soporte."
-          ctaLabel="Contactar soporte"
-          ctaHref="/soporte"
-          icon="📚"
-        />
+        <div
+          style={{
+            background: "#e8eaf0",
+            borderRadius: 20,
+            padding: 40,
+            textAlign: "center",
+            boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
+            maxWidth: 500,
+            margin: "40px auto",
+            fontFamily: "'Syne', sans-serif",
+          }}
+        >
+          <div style={{ fontSize: 48, marginBottom: 16 }}>📚</div>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>
+            Aún no tienes un curso asignado
+          </h2>
+          <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>
+            Pronto tendrás acceso a tu programa de formación.
+          </p>
+          <a
+            href="/inicio"
+            style={{
+              display: "inline-block",
+              padding: "12px 28px",
+              borderRadius: 14,
+              background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+              color: "white",
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 13,
+              fontWeight: 700,
+              textDecoration: "none",
+              boxShadow: "5px 5px 12px rgba(10,15,138,0.35)",
+            }}
+          >
+            Volver al inicio
+          </a>
+        </div>
       </div>
     );
   }
