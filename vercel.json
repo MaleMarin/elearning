@@ -1,4 +1,9 @@
 {
+  "build": {
+    "env": {
+      "DISABLE_PWA": "1"
+    }
+  },
   "crons": [
     {
       "path": "/api/jobs/run",
