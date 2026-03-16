@@ -211,22 +211,22 @@ html {
   font-size: 18px;
 }
 
-/* ---------- Tipografía ---------- */
+/* ---------- Tipografía (reducida para evitar sabana infinita) ---------- */
 .heading-hero {
-  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
   font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1.25;
+  line-height: 1.3;
   color: var(--ink);
 }
 .heading-section {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--ink);
 }
 .section-label {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;

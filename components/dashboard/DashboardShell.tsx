@@ -222,22 +222,22 @@ export function DashboardShell({ children, rightPanel, subtitle }: DashboardShel
         className="flex-1 overflow-y-auto min-w-0 flex flex-col"
         style={{ padding: "18px 16px" }}
       >
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-3">
           <div>
             <h1
               style={{
-                fontSize: f(20),
+                fontSize: 16,
                 fontWeight: 800,
                 color: NM.text,
-                letterSpacing: "-0.4px",
-                lineHeight: 1,
+                letterSpacing: "-0.3px",
+                lineHeight: 1.2,
               }}
             >
               Política Digital
             </h1>
             <p
               style={{
-                fontSize: f(12),
+                fontSize: 11,
                 color: NM.muted,
                 marginTop: 2,
                 fontFamily: "'Space Mono', monospace",

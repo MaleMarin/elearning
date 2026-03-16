@@ -125,26 +125,29 @@ export function PerfilContent() {
   };
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <header>
+    <div className="max-w-4xl">
+      <header className="mb-5">
         <h1 className="heading-hero text-[var(--ink)]">Mi perfil</h1>
-        <p className="text-[var(--text-muted)] text-base mt-2 max-w-xl">
+        <p className="text-[var(--text-muted)] text-sm mt-1.5 max-w-xl">
           Completa tu perfil cuando quieras; así personalizamos tu experiencia y podemos acompañarte mejor en el curso.
         </p>
       </header>
 
-      <PersonalDataForm
-        initial={initialPersonal}
-        email={email}
-        onSave={saveProfile}
-        onAvatarUpload={saveAvatar}
-        demo={DEMO_MODE}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="md:col-span-2">
+          <PersonalDataForm
+            initial={initialPersonal}
+            email={email}
+            onSave={saveProfile}
+            onAvatarUpload={saveAvatar}
+            demo={DEMO_MODE}
+          />
+        </div>
 
-      <div className="card-premium p-6">
-        <p className="section-label mb-2">Comunicación</p>
-        <h2 className="heading-section mb-4">WhatsApp y notificaciones</h2>
-        <p className="text-[var(--text-muted)] text-sm mb-4">
+        <div className="card-premium p-5 md:col-span-2">
+        <p className="section-label mb-1.5">Comunicación</p>
+        <h2 className="heading-section mb-3">WhatsApp y notificaciones</h2>
+        <p className="text-[var(--text-muted)] text-sm mb-3">
           Indica tu número en formato internacional (E.164), por ejemplo +34912345678 o +56912345678.
         </p>
         <label className="block mb-4">
@@ -199,16 +202,20 @@ export function PerfilContent() {
         </button>
       </div>
 
-      <LearningPreferences
-        preferredLanguage={(profileData.preferredLanguage as "es" | "en") ?? "es"}
-        reminderFrequency={
-          (profileData.reminderFrequency as "daily" | "weekly" | "live_only" | "never") ?? "weekly"
-        }
-        onSave={saveProfile}
-        demo={DEMO_MODE}
-      />
+        <div className="min-w-0">
+          <LearningPreferences
+            preferredLanguage={(profileData.preferredLanguage as "es" | "en") ?? "es"}
+            reminderFrequency={
+              (profileData.reminderFrequency as "daily" | "weekly" | "live_only" | "never") ?? "weekly"
+            }
+            contentMode={(profileData.contentMode as "leer" | "escuchar" | "ver") ?? "leer"}
+            onSave={saveProfile}
+            demo={DEMO_MODE}
+          />
+        </div>
 
-      <AccessibilityPreferences
+        <div className="min-w-0">
+          <AccessibilityPreferences
         initial={{
           fontSize: (profileData.accessibilityFontSize as "normal" | "large") ?? "normal",
           reduceMotion: !!profileData.accessibilityReduceMotion,
@@ -223,31 +230,48 @@ export function PerfilContent() {
         }
         demo={DEMO_MODE}
       />
+        </div>
 
-      {progress && <ProgressAndBadges data={progress} />}
+        {progress && (
+          <div className="min-w-0">
+            <ProgressAndBadges data={progress} />
+          </div>
+        )}
 
-      <CheckinHistoryCard />
+        <div className="min-w-0">
+          <CheckinHistoryCard />
+        </div>
 
-      <PrivacySection userId={uid} demo={DEMO_MODE} />
-      {!DEMO_MODE && <DeleteAccountSection />}
+        <div className="min-w-0">
+          <PrivacySection userId={uid} demo={DEMO_MODE} />
+        </div>
 
-      <div className="card-premium p-6">
-        <p className="section-label mb-2">Servicio Profesional de Carrera</p>
-        <h2 className="heading-section mb-4">Competencias SPC</h2>
-        <p className="text-[var(--text-muted)] text-sm mb-4">
-          Consulta tu radar de competencias del catálogo SPC (nivel al entrar vs al salir del programa).
-        </p>
-        <Link href="/perfil/competencias" className="btn-primary inline-block no-underline">
-          Ver mis competencias
-        </Link>
+        <div className="card-premium p-5 min-w-0">
+          <p className="section-label mb-1.5">Servicio Profesional de Carrera</p>
+          <h2 className="heading-section mb-3">Competencias SPC</h2>
+          <p className="text-[var(--text-muted)] text-sm mb-3">
+            Consulta tu radar de competencias del catálogo SPC (nivel al entrar vs al salir del programa).
+          </p>
+          <Link href="/perfil/competencias" className="btn-primary inline-block no-underline text-sm">
+            Ver mis competencias
+          </Link>
+        </div>
+
+        <div className="min-w-0 md:col-span-2">
+          <SecuritySection
+            email={email}
+            mfaEnabled={mfaEnabled}
+            lastLogin={lastLogin}
+            demo={DEMO_MODE}
+          />
+        </div>
+
+        {!DEMO_MODE && (
+          <div className="mt-4 md:col-span-2">
+            <DeleteAccountSection />
+          </div>
+        )}
       </div>
-
-      <SecuritySection
-        email={email}
-        mfaEnabled={mfaEnabled}
-        lastLogin={lastLogin}
-        demo={DEMO_MODE}
-      />
     </div>
   );
 }

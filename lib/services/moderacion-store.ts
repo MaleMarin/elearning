@@ -43,6 +43,7 @@ export interface ModerationHistoryItem {
 }
 
 export interface UserBan {
+  id: string;
   userId: string;
   reason: string;
   bannedUntil: Date;
@@ -246,6 +247,7 @@ export async function listActiveBans(): Promise<UserBan[]> {
   return snap.docs.map((d) => {
     const data = d.data();
     return {
+      id: d.id,
       userId: (data.userId as string) ?? "",
       reason: (data.reason as string) ?? "",
       bannedUntil: toDate(data.bannedUntil) ?? new Date(),
@@ -253,6 +255,12 @@ export async function listActiveBans(): Promise<UserBan[]> {
       createdAt: toDate(data.createdAt) ?? new Date(),
     };
   });
+}
+
+/** Revoca un ban antes de su fecha (desbanear). */
+export async function revokeBan(banId: string): Promise<void> {
+  const ref = db().collection(COLLECTION_BANS).doc(banId);
+  await ref.update({ bannedUntil: new Date() });
 }
 
 /** Clave de contenido para reportes/ocultar (ej. community_post:uuid). */

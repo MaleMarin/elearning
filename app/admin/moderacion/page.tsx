@@ -1,310 +1,417 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { SurfaceCard, PrimaryButton, SecondaryButton } from "@/components/ui";
-import { Alert } from "@/components/ui/Alert";
-import { ChevronLeft, Shield, Check, X, UserX, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
 
-type QueueItem = {
+interface ReporteItem {
   id: string;
-  source: string;
-  contentId: string;
-  authorId: string;
-  authorEmail?: string;
-  texto: string;
-  nivel: string;
+  tipo: "post" | "comentario" | "glosario" | "show_tell";
+  contenido: string;
+  autorId: string;
+  autorNombre: string;
   razon: string;
-  createdAt: string;
-};
+  fecha: string;
+  estado: "pendiente" | "aprobado" | "rechazado";
+}
 
-type HistoryItem = {
+interface Ban {
   id: string;
-  source: string;
-  contentId: string;
-  authorId: string;
-  texto: string;
-  nivel: string;
-  razon: string;
-  decision: string;
-  decidedBy: string;
-  decidedAt: string;
-};
-
-type BanItem = {
   userId: string;
-  reason: string;
-  bannedUntil: string;
-  bannedBy: string;
-  createdAt: string;
-};
+  razon: string;
+  dias: number;
+  hasta: string;
+  activo: boolean;
+}
 
-const SOURCE_LABEL: Record<string, string> = {
-  comunidad_post: "Post comunidad",
-  comunidad_comment: "Comentario",
-  glosario_term: "Glosario",
-  showntell_submission: "Show & Tell",
-};
-
-export default function AdminModeracionPage() {
-  const [queue, setQueue] = useState<QueueItem[]>([]);
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [bans, setBans] = useState<BanItem[]>([]);
+export default function ModeracionPage() {
+  const [tab, setTab] = useState<"cola" | "historial" | "bans">("cola");
+  const [reportes, setReportes] = useState<ReporteItem[]>([]);
+  const [bans, setBans] = useState<Ban[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [banUserId, setBanUserId] = useState("");
-  const [banReason, setBanReason] = useState("");
-  const [banDays, setBanDays] = useState(7);
-  const [banning, setBanning] = useState(false);
 
-  const fetchAll = useCallback(() => {
-    Promise.all([
-      fetch("/api/admin/moderacion/queue", { credentials: "include" }).then((r) => r.json()),
-      fetch("/api/admin/moderacion/history?limit=50", { credentials: "include" }).then((r) => r.json()),
-      fetch("/api/admin/moderacion/bans", { credentials: "include" }).then((r) => r.json()),
-    ])
-      .then(([q, h, b]) => {
-        setQueue(q.queue ?? []);
-        setHistory(h.history ?? []);
-        setBans(b.bans ?? []);
+  const [banUserId, setBanUserId] = useState("");
+  const [banRazon, setBanRazon] = useState("");
+  const [banDias, setBanDias] = useState(7);
+
+  useEffect(() => {
+    fetch("/api/admin/moderacion", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => {
+        setReportes(d.reportes || []);
+        setBans(d.bans || []);
       })
-      .catch(() => setError("Error al cargar"))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
+  const handleAprobar = async (id: string) => {
+    await fetch(`/api/admin/moderacion/${id}/aprobar`, { method: "POST", credentials: "include" });
+    setReportes((r) => r.map((x) => (x.id === id ? { ...x, estado: "aprobado" as const } : x)));
+  };
 
-  const handleResolve = (queueId: string, resolution: "aprobado" | "rechazado") => {
-    setError(null);
-    fetch("/api/admin/moderacion/resolve", {
+  const handleRechazar = async (id: string, feedback: string) => {
+    await fetch(`/api/admin/moderacion/${id}/rechazar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ queueId, resolution }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) throw new Error(data.error);
-        fetchAll();
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "Error"));
+      body: JSON.stringify({ feedback }),
+    });
+    setReportes((r) => r.map((x) => (x.id === id ? { ...x, estado: "rechazado" as const } : x)));
   };
 
-  const handleBan = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!banUserId.trim()) return;
-    setError(null);
-    setBanning(true);
-    const d = new Date();
-    d.setDate(d.getDate() + banDays);
-    fetch("/api/admin/moderacion/ban", {
+  const handleBanear = async () => {
+    if (!banUserId || !banRazon) return;
+    await fetch("/api/admin/moderacion/ban", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({
-        userId: banUserId.trim(),
-        reason: banReason.trim() || "Moderación",
-        bannedUntil: d.toISOString(),
-      }),
-    })
+      body: JSON.stringify({ userId: banUserId, razon: banRazon, dias: banDias }),
+    });
+    setBanUserId("");
+    setBanRazon("");
+    setBanDias(7);
+    fetch("/api/admin/moderacion", { credentials: "include" })
       .then((r) => r.json())
-      .then((data) => {
-        if (data.error) throw new Error(data.error);
-        setBanUserId("");
-        setBanReason("");
-        fetchAll();
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "Error"))
-      .finally(() => setBanning(false));
+      .then((d) => setBans(d.bans || []))
+      .catch(() => {});
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[var(--bg)]">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <p className="text-[var(--ink-muted)]">Cargando moderación…</p>
-        </div>
-      </div>
-    );
-  }
+  const handleDesbanear = async (banId: string) => {
+    await fetch(`/api/admin/moderacion/ban/${banId}/desbanear`, { method: "POST", credentials: "include" });
+    setBans((b) => b.filter((x) => x.id !== banId));
+  };
+
+  const pendientes = reportes.filter((r) => r.estado === "pendiente");
+  const historial = reportes.filter((r) => r.estado !== "pendiente");
+  const bansActivos = bans.filter((b) => b.activo);
 
   return (
-    <div className="min-h-screen bg-[var(--bg)]">
-      <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6">
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/admin" className="inline-flex items-center gap-2 text-[var(--ink-muted)] hover:text-[var(--ink)] no-underline text-sm font-medium">
-            <ChevronLeft className="w-4 h-4" /> Volver
-          </Link>
-        </div>
-        <h1 className="text-2xl font-bold text-[var(--ink)] mb-2 flex items-center gap-2">
-          <Shield className="w-7 h-7 text-[var(--primary)]" /> Moderación
-        </h1>
-        <p className="text-[var(--ink-muted)] mb-6">
-          Cola de contenido en revisión, historial de decisiones y baneos temporales.
-        </p>
+    <div style={{ flex: 1, padding: "18px 16px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ marginBottom: 20 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Moderación</h1>
+        <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>Gestiona reportes, contenido y usuarios sancionados</p>
+      </div>
 
-        {error && <Alert message={error} variant="error" className="mb-4" />}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+        {[
+          { id: "cola" as const, label: `Cola (${pendientes.length})` },
+          { id: "historial" as const, label: "Historial" },
+          { id: "bans" as const, label: `Bans (${bansActivos.length})` },
+        ].map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            style={{
+              padding: "8px 18px",
+              borderRadius: 12,
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 13,
+              fontWeight: 600,
+              background: tab === t.id ? "linear-gradient(135deg, #1428d4, #0a0f8a)" : "#e8eaf0",
+              color: tab === t.id ? "white" : "#4a5580",
+              boxShadow: tab === t.id ? "4px 4px 10px rgba(10,15,138,0.3)" : "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
 
-        <section className="mb-8">
-          <h2 className="text-lg font-semibold text-[var(--ink)] mb-3">Contenido en revisión</h2>
-          {queue.length === 0 ? (
-            <SurfaceCard padding="lg" clickable={false}>
-              <p className="text-[var(--ink-muted)] text-center py-6">No hay ítems en la cola.</p>
-            </SurfaceCard>
-          ) : (
-            <div className="space-y-4">
-              {queue.map((item) => (
-                <SurfaceCard key={item.id} padding="lg" clickable={false} className="border-l-4 border-l-[var(--amber)]">
-                  <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                    <span className="text-xs font-medium text-[var(--ink-muted)]">
-                      {SOURCE_LABEL[item.source] ?? item.source} · {item.authorEmail ?? item.authorId}
-                    </span>
-                    <span className="text-xs text-[var(--amber)]">{item.nivel}</span>
-                  </div>
-                  <p className="text-sm text-[var(--ink-muted)] mb-2">Razón IA: {item.razon}</p>
-                  <p className="text-sm text-[var(--ink)] whitespace-pre-wrap break-words mb-3 line-clamp-3">{item.texto}</p>
-                  <div className="flex gap-2">
-                    <PrimaryButton onClick={() => handleResolve(item.id, "aprobado")} className="!bg-[var(--green)]">
-                      <Check className="w-4 h-4" /> Aprobar
-                    </PrimaryButton>
-                    <SecondaryButton onClick={() => handleResolve(item.id, "rechazado")} className="!text-[var(--coral)]">
-                      <X className="w-4 h-4" /> Rechazar
-                    </SecondaryButton>
-                    <SecondaryButton
-                      onClick={() => {
-                        setBanUserId(item.authorId);
-                        setBanReason(item.razon);
-                      }}
-                    >
-                      <UserX className="w-4 h-4" /> Banear autor
-                    </SecondaryButton>
-                  </div>
-                </SurfaceCard>
-              ))}
+      {tab === "cola" && (
+        <div>
+          {loading ? (
+            <p style={{ color: "#8892b0", fontSize: 13 }}>Cargando reportes...</p>
+          ) : pendientes.length === 0 ? (
+            <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 40, textAlign: "center", boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+              <p style={{ fontSize: 15, fontWeight: 700, color: "#0a0f8a" }}>Cola vacía</p>
+              <p style={{ fontSize: 13, color: "#8892b0", marginTop: 6 }}>No hay contenido pendiente de revisión.</p>
             </div>
+          ) : (
+            pendientes.map((r) => (
+              <ReporteCard key={r.id} reporte={r} onAprobar={handleAprobar} onRechazar={handleRechazar} />
+            ))
           )}
-        </section>
+        </div>
+      )}
 
-        <section className="mb-8">
-          <h2 className="text-lg font-semibold text-[var(--ink)] mb-3 flex items-center gap-2">
-            <Clock className="w-5 h-5" /> Banear usuario temporalmente
-          </h2>
-          <SurfaceCard padding="lg" clickable={false}>
-            <form onSubmit={handleBan} className="flex flex-wrap items-end gap-4">
-              <div className="min-w-[200px]">
-                <label className="block text-sm font-medium text-[var(--ink)] mb-1">User ID (Firebase/Supabase)</label>
+      {tab === "historial" && (
+        <div>
+          {historial.map((r) => (
+            <div
+              key={r.id}
+              style={{
+                background: "#e8eaf0",
+                borderRadius: 14,
+                padding: "12px 16px",
+                marginBottom: 8,
+                boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <p style={{ fontSize: 13, color: "#0a0f8a", fontWeight: 600 }}>{r.contenido?.slice(0, 60)}...</p>
+                <p style={{ fontSize: 11, color: "#8892b0", marginTop: 2 }}>{r.autorNombre || r.autorId} · {r.fecha}</p>
+              </div>
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: "3px 10px",
+                  borderRadius: 20,
+                  background: r.estado === "aprobado" ? "rgba(0,184,125,0.15)" : "rgba(216,64,64,0.15)",
+                  color: r.estado === "aprobado" ? "#00b87d" : "#d84040",
+                }}
+              >
+                {r.estado === "aprobado" ? "Aprobado" : "Rechazado"}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab === "bans" && (
+        <div>
+          <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 24, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff", marginBottom: 20 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: "#0a0f8a", marginBottom: 16 }}>Banear usuario</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 12, alignItems: "end" }}>
+              <div>
+                <p style={{ fontSize: 10, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>User ID</p>
                 <input
-                  type="text"
                   value={banUserId}
                   onChange={(e) => setBanUserId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]"
-                  placeholder="uid o user id"
+                  placeholder="uid del alumno"
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: 10,
+                    border: "none",
+                    background: "#e8eaf0",
+                    boxShadow: "inset 3px 3px 7px #c2c8d6, inset -3px -3px 7px #ffffff",
+                    fontSize: 13,
+                    color: "#0a0f8a",
+                    outline: "none",
+                  }}
                 />
               </div>
-              <div className="min-w-[120px]">
-                <label className="block text-sm font-medium text-[var(--ink)] mb-1">Días</label>
+              <div>
+                <p style={{ fontSize: 10, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>Razón</p>
+                <input
+                  value={banRazon}
+                  onChange={(e) => setBanRazon(e.target.value)}
+                  placeholder="Motivo del ban"
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: 10,
+                    border: "none",
+                    background: "#e8eaf0",
+                    boxShadow: "inset 3px 3px 7px #c2c8d6, inset -3px -3px 7px #ffffff",
+                    fontSize: 13,
+                    color: "#0a0f8a",
+                    outline: "none",
+                  }}
+                />
+              </div>
+              <button
+                onClick={handleBanear}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: 12,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  background: "#d84040",
+                  color: "white",
+                  boxShadow: "4px 4px 10px rgba(216,64,64,0.3)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Banear {banDias}d
+              </button>
+            </div>
+            <div style={{ marginTop: 8 }}>
+              <label style={{ fontSize: 11, color: "#8892b0" }}>
+                Días:{" "}
                 <input
                   type="number"
                   min={1}
                   max={365}
-                  value={banDays}
-                  onChange={(e) => setBanDays(Number(e.target.value) || 7)}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]"
+                  value={banDias}
+                  onChange={(e) => setBanDias(Number(e.target.value) || 7)}
+                  style={{ width: 60, padding: "4px 8px", borderRadius: 6, border: "none", boxShadow: "inset 2px 2px 4px #c2c8d6", marginLeft: 4 }}
                 />
-              </div>
-              <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-medium text-[var(--ink)] mb-1">Motivo</label>
-                <input
-                  type="text"
-                  value={banReason}
-                  onChange={(e) => setBanReason(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]"
-                  placeholder="Opcional"
-                />
-              </div>
-              <PrimaryButton type="submit" disabled={banning || !banUserId.trim()}>
-                {banning ? "Banear…" : "Banear"}
-              </PrimaryButton>
-            </form>
-          </SurfaceCard>
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-lg font-semibold text-[var(--ink)] mb-3">Baneos activos</h2>
-          {bans.length === 0 ? (
-            <SurfaceCard padding="lg" clickable={false}>
-              <p className="text-[var(--ink-muted)] text-center py-4">Ningún baneo activo.</p>
-            </SurfaceCard>
-          ) : (
-            <div className="overflow-x-auto rounded-xl border border-[var(--line-subtle)]">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--line-subtle)] bg-[var(--bg)]">
-                    <th className="text-left py-2 px-3 font-medium text-[var(--ink)]">Usuario</th>
-                    <th className="text-left py-2 px-3 font-medium text-[var(--ink)]">Motivo</th>
-                    <th className="text-left py-2 px-3 font-medium text-[var(--ink)]">Hasta</th>
-                    <th className="text-left py-2 px-3 font-medium text-[var(--ink)]">Por</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bans.map((b, i) => (
-                    <tr key={i} className="border-b border-[var(--line-subtle)] last:border-b-0">
-                      <td className="py-2 px-3 font-mono text-[var(--ink)]">{b.userId}</td>
-                      <td className="py-2 px-3 text-[var(--ink-muted)]">{b.reason}</td>
-                      <td className="py-2 px-3 text-[var(--ink)]">{new Date(b.bannedUntil).toLocaleDateString("es")}</td>
-                      <td className="py-2 px-3 text-[var(--ink-muted)]">{b.bannedBy}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              </label>
             </div>
-          )}
-        </section>
+          </div>
 
-        <section>
-          <h2 className="text-lg font-semibold text-[var(--ink)] mb-3">Historial de decisiones</h2>
-          {history.length === 0 ? (
-            <SurfaceCard padding="lg" clickable={false}>
-              <p className="text-[var(--ink-muted)] text-center py-4">Aún no hay historial.</p>
-            </SurfaceCard>
-          ) : (
-            <div className="overflow-x-auto rounded-xl border border-[var(--line-subtle)]">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--line-subtle)] bg-[var(--bg)]">
-                    <th className="text-left py-2 px-3 font-medium text-[var(--ink)]">Origen</th>
-                    <th className="text-left py-2 px-3 font-medium text-[var(--ink)]">Decisión</th>
-                    <th className="text-left py-2 px-3 font-medium text-[var(--ink)]">Razón</th>
-                    <th className="text-left py-2 px-3 font-medium text-[var(--ink)]">Fecha</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.slice(0, 30).map((h) => (
-                    <tr key={h.id} className="border-b border-[var(--line-subtle)] last:border-b-0">
-                      <td className="py-2 px-3 text-[var(--ink)]">{SOURCE_LABEL[h.source] ?? h.source}</td>
-                      <td className="py-2 px-3">
-                        <span
-                          className={
-                            h.decision === "bloqueado" || h.decision === "revisado_rechazado"
-                              ? "text-[var(--coral)]"
-                              : "text-[var(--green)]"
-                          }
-                        >
-                          {h.decision}
-                        </span>
-                      </td>
-                      <td className="py-2 px-3 text-[var(--ink-muted)] max-w-[200px] truncate">{h.razon}</td>
-                      <td className="py-2 px-3 text-[var(--ink-muted)]">{new Date(h.decidedAt).toLocaleString("es")}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {bansActivos.map((ban) => (
+            <div
+              key={ban.id}
+              style={{
+                background: "#e8eaf0",
+                borderRadius: 14,
+                padding: "12px 16px",
+                marginBottom: 8,
+                boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <p style={{ fontSize: 13, color: "#0a0f8a", fontWeight: 600, fontFamily: "'Space Mono', monospace" }}>{ban.userId}</p>
+                <p style={{ fontSize: 11, color: "#8892b0", marginTop: 2 }}>{ban.razon} · hasta {ban.hasta}</p>
+              </div>
+              <button
+                onClick={() => handleDesbanear(ban.id)}
+                style={{
+                  padding: "6px 14px",
+                  borderRadius: 10,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  background: "#e8eaf0",
+                  color: "#4a5580",
+                  boxShadow: "3px 3px 7px #c2c8d6, -3px -3px 7px #ffffff",
+                }}
+              >
+                Desbanear
+              </button>
             </div>
-          )}
-        </section>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReporteCard({
+  reporte,
+  onAprobar,
+  onRechazar,
+}: {
+  reporte: ReporteItem;
+  onAprobar: (id: string) => void;
+  onRechazar: (id: string, feedback: string) => void;
+}) {
+  const [feedback, setFeedback] = useState("");
+  const [rechazando, setRechazando] = useState(false);
+
+  return (
+    <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 20, marginBottom: 12, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: "#8892b0", textTransform: "uppercase", letterSpacing: "1px", fontFamily: "'Space Mono', monospace" }}>{reporte.tipo}</span>
+        <span style={{ fontSize: 11, color: "#8892b0" }}>{reporte.fecha}</span>
       </div>
+      <p style={{ fontSize: 14, color: "#0a0f8a", fontWeight: 500, marginBottom: 8 }}>{reporte.contenido}</p>
+      <p style={{ fontSize: 12, color: "#8892b0", marginBottom: 4 }}>Autor: {reporte.autorNombre || reporte.autorId}</p>
+      <p style={{ fontSize: 12, color: "#d84040", marginBottom: 16 }}>Razón del reporte: {reporte.razon}</p>
+      {rechazando ? (
+        <div>
+          <input
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            placeholder="Feedback para el autor (opcional)"
+            style={{
+              width: "100%",
+              padding: "10px 14px",
+              borderRadius: 10,
+              border: "none",
+              background: "#e8eaf0",
+              boxShadow: "inset 3px 3px 7px #c2c8d6, inset -3px -3px 7px #ffffff",
+              fontSize: 13,
+              color: "#0a0f8a",
+              outline: "none",
+              marginBottom: 10,
+            }}
+          />
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => setRechazando(false)}
+              style={{
+                flex: 1,
+                padding: 10,
+                borderRadius: 10,
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 12,
+                fontWeight: 600,
+                background: "#e8eaf0",
+                color: "#4a5580",
+                boxShadow: "3px 3px 7px #c2c8d6, -3px -3px 7px #ffffff",
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => onRechazar(reporte.id, feedback)}
+              style={{
+                flex: 1,
+                padding: 10,
+                borderRadius: 10,
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 12,
+                fontWeight: 700,
+                background: "#d84040",
+                color: "white",
+                boxShadow: "4px 4px 10px rgba(216,64,64,0.3)",
+              }}
+            >
+              Confirmar rechazo
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", gap: 10 }}>
+          <button
+            onClick={() => onAprobar(reporte.id)}
+            style={{
+              flex: 1,
+              padding: 10,
+              borderRadius: 10,
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 12,
+              fontWeight: 700,
+              background: "linear-gradient(135deg, #00b87d, #00a06c)",
+              color: "white",
+              boxShadow: "4px 4px 10px rgba(0,184,125,0.3)",
+            }}
+          >
+            ✓ Aprobar
+          </button>
+          <button
+            onClick={() => setRechazando(true)}
+            style={{
+              flex: 1,
+              padding: 10,
+              borderRadius: 10,
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 12,
+              fontWeight: 700,
+              background: "#e8eaf0",
+              color: "#d84040",
+              boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+            }}
+          >
+            ✗ Rechazar
+          </button>
+        </div>
+      )}
     </div>
   );
 }

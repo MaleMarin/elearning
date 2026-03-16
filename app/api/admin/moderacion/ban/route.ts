@@ -17,14 +17,15 @@ export async function POST(req: NextRequest) {
     if (auth.role !== "admin") return NextResponse.json({ error: "Solo administradores" }, { status: 403 });
     const body = await req.json().catch(() => ({}));
     const userId = (body.userId as string)?.trim();
-    const reason = (body.reason as string)?.trim() ?? "Moderación";
+    const reason = ((body.razon as string)?.trim() || (body.reason as string)?.trim()) ?? "Moderación";
+    const dias = typeof body.dias === "number" ? body.dias : parseInt(String(body.dias), 10);
     let bannedUntil = new Date();
     if (body.bannedUntil) {
       const parsed = new Date(body.bannedUntil as string);
       if (!Number.isNaN(parsed.getTime())) bannedUntil = parsed;
-      else bannedUntil.setDate(bannedUntil.getDate() + 7);
+      else bannedUntil.setDate(bannedUntil.getDate() + (Number.isNaN(dias) ? 7 : Math.max(1, dias)));
     } else {
-      bannedUntil.setDate(bannedUntil.getDate() + 7);
+      bannedUntil.setDate(bannedUntil.getDate() + (Number.isNaN(dias) ? 7 : Math.max(1, dias)));
     }
     if (!userId) return NextResponse.json({ error: "Falta userId" }, { status: 400 });
     await modStore.banUser(userId, reason, bannedUntil, auth.uid);

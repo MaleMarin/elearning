@@ -21,6 +21,8 @@ import {
   Route,
   LayoutDashboard,
   LogOut,
+  FileEdit,
+  Bookmark,
 } from "lucide-react";
 
 const SIDEBAR_BG = "#1428d4";
@@ -32,6 +34,8 @@ const SECTIONS = [
     items: [
       { href: "/admin/cursos", label: "Cursos", icon: BookOpen },
       { href: "/admin/banco-preguntas", label: "Banco de preguntas", icon: Library },
+      { href: "/admin/propuestas", label: "Propuestas", icon: FileEdit },
+      { href: "/admin/glosario", label: "Glosario", icon: Bookmark },
     ],
   },
   {

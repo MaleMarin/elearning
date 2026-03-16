@@ -2,12 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { SurfaceCard, PrimaryButton, SecondaryButton, Badge } from "@/components/ui";
-import { Alert } from "@/components/ui/Alert";
-import type { ContenidoGenerado } from "@/lib/types/lessonProposal";
-import { ChevronLeft, Check, X, Edit } from "lucide-react";
 
-type Propuesta = {
+interface Propuesta {
   id: string;
   titulo: string;
   descripcion: string;
@@ -15,212 +11,166 @@ type Propuesta = {
   autorInstitucion: string;
   moduleIdSugerido: string;
   estado: string;
-  feedbackAdmin: string;
-  contenidoGenerado: ContenidoGenerado | null;
-  createdAt: string;
-};
+  feedbackAdmin?: string;
+  createdAt?: string;
+}
 
-export default function AdminPropuestasPage() {
+export default function PropuestasPage() {
   const [propuestas, setPropuestas] = useState<Propuesta[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"enviada" | "todas">("enviada");
-  const [rejectId, setRejectId] = useState<string | null>(null);
-  const [rejectFeedback, setRejectFeedback] = useState("");
-  const [rejectSubmitting, setRejectSubmitting] = useState(false);
-  const [approvingId, setApprovingId] = useState<string | null>(null);
-
-  const fetchPropuestas = () => {
-    setLoading(true);
-    const q = filter === "enviada" ? "?estado=enviada" : "";
-    fetch(`/api/admin/propuestas${q}`, { credentials: "include" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) throw new Error(data.error);
-        setPropuestas(data.propuestas ?? []);
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "Error al cargar"))
-      .finally(() => setLoading(false));
-  };
+  const [rechazandoId, setRechazandoId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
-    fetchPropuestas();
-  }, [filter]);
+    fetch("/api/admin/propuestas", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => setPropuestas(d.propuestas || []))
+      .catch(() => setPropuestas([]))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const handleApprove = (id: string) => {
-    setError(null);
-    setApprovingId(id);
-    fetch(`/api/admin/propuestas/${id}`, {
+  const handleAprobar = async (id: string) => {
+    const res = await fetch(`/api/admin/propuestas/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ action: "aprobar" }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) throw new Error(data.error);
-        setPropuestas((prev) => prev.filter((p) => p.id !== id));
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "Error al aprobar"))
-      .finally(() => setApprovingId(null));
+    });
+    if (res.ok) setPropuestas((p) => p.map((x) => (x.id === id ? { ...x, estado: "aprobada" } : x)));
   };
 
-  const handleReject = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!rejectId) return;
-    setError(null);
-    setRejectSubmitting(true);
-    fetch(`/api/admin/propuestas/${rejectId}`, {
+  const handleRechazar = async (id: string) => {
+    const res = await fetch(`/api/admin/propuestas/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ action: "rechazar", feedbackAdmin: rejectFeedback.trim() }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) throw new Error(data.error);
-        setPropuestas((prev) => prev.filter((p) => p.id !== rejectId));
-        setRejectId(null);
-        setRejectFeedback("");
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "Error al rechazar"))
-      .finally(() => setRejectSubmitting(false));
+      body: JSON.stringify({ action: "rechazar", feedbackAdmin: feedback }),
+    });
+    if (res.ok) {
+      setPropuestas((p) => p.map((x) => (x.id === id ? { ...x, estado: "rechazada" } : x)));
+      setRechazandoId(null);
+      setFeedback("");
+    }
   };
 
-  const estadoBadge = (estado: string) => {
-    if (estado === "aprobada") return <Badge variant="completado">Aprobada</Badge>;
-    if (estado === "rechazada") return <Badge variant="pendiente">Rechazada</Badge>;
-    if (estado === "enviada") return <Badge variant="en-curso">Enviada</Badge>;
-    return <Badge variant="pendiente">{estado}</Badge>;
-  };
+  const pendientes = propuestas.filter((p) => p.estado === "enviada" || p.estado === "en_revision" || p.estado === "borrador");
+  const resueltas = propuestas.filter((p) => p.estado === "aprobada" || p.estado === "rechazada");
 
   return (
-    <div className="min-h-screen bg-[var(--bg)]">
-      <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6">
-        <div className="flex items-center gap-4 mb-8">
-          <Link
-            href="/admin"
-            className="inline-flex items-center gap-2 text-[var(--ink-muted)] hover:text-[var(--ink)] no-underline text-sm font-medium"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Volver
-          </Link>
-        </div>
-
-        <h1 className="text-2xl font-bold text-[var(--ink)] mb-2">Propuestas de lecciones (UGC)</h1>
-        <p className="text-[var(--ink-muted)] mb-6">
-          Revisa las propuestas enviadas por la comunidad. Aprobar crea la lección con badge &quot;Comunidad&quot; y otorga al autor el badge &quot;Experto Contribuidor&quot;.
-        </p>
-
-        {error && <Alert message={error} variant="error" className="mb-4" />}
-
-        <div className="flex gap-2 mb-6">
-          <button
-            type="button"
-            onClick={() => setFilter("enviada")}
-            className={`px-4 py-2 rounded-xl text-sm font-medium ${filter === "enviada" ? "bg-[var(--primary)] text-white" : "bg-[var(--surface)] border border-[var(--line)] text-[var(--ink)]"}`}
-          >
-            Pendientes
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilter("todas")}
-            className={`px-4 py-2 rounded-xl text-sm font-medium ${filter === "todas" ? "bg-[var(--primary)] text-white" : "bg-[var(--surface)] border border-[var(--line)] text-[var(--ink)]"}`}
-          >
-            Todas
-          </button>
-        </div>
-
-        {loading ? (
-          <p className="text-[var(--ink-muted)]">Cargando propuestas…</p>
-        ) : propuestas.length === 0 ? (
-          <SurfaceCard padding="lg" clickable={false}>
-            <p className="text-[var(--ink-muted)] text-center py-8">No hay propuestas con el filtro seleccionado.</p>
-          </SurfaceCard>
-        ) : (
-          <div className="space-y-6">
-            {propuestas.map((p) => (
-              <SurfaceCard key={p.id} padding="lg" clickable={false}>
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-[var(--ink)]">{p.titulo}</h3>
-                    <p className="text-sm text-[var(--ink-muted)] mt-1">
-                      {p.autorNombre}
-                      {p.autorInstitucion && ` · ${p.autorInstitucion}`}
-                    </p>
-                    <p className="text-xs text-[var(--muted)] mt-1">Módulo sugerido: {p.moduleIdSugerido}</p>
-                    <div className="mt-2">{estadoBadge(p.estado)}</div>
-                  </div>
-                </div>
-
-                {p.descripcion && (
-                  <p className="mt-3 text-sm text-[var(--ink)]">{p.descripcion}</p>
-                )}
-
-                {p.contenidoGenerado && (
-                  <div className="mt-4 p-4 rounded-xl bg-[var(--surface-soft)] border border-[var(--line-subtle)] space-y-2">
-                    <h4 className="text-sm font-semibold text-[var(--ink)]">Contenido generado</h4>
-                    <p className="text-sm"><strong>Objetivo:</strong> {p.contenidoGenerado.objetivo}</p>
-                    <p className="text-sm line-clamp-2"><strong>Introducción:</strong> {p.contenidoGenerado.introduccion}</p>
-                    <p className="text-xs text-[var(--muted)]">
-                      Quiz: {p.contenidoGenerado.quiz?.length ?? 0} preguntas
-                    </p>
-                  </div>
-                )}
-
-                {p.feedbackAdmin && (
-                  <p className="mt-3 text-sm text-[var(--muted)]"><strong>Feedback:</strong> {p.feedbackAdmin}</p>
-                )}
-
-                {p.estado === "enviada" && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <PrimaryButton
-                      type="button"
-                      onClick={() => handleApprove(p.id)}
-                      disabled={approvingId === p.id}
-                    >
-                      <Check className="w-4 h-4" /> {approvingId === p.id ? "Aprobando…" : "Aprobar"}
-                    </PrimaryButton>
-                    <SecondaryButton type="button" onClick={() => { setRejectId(p.id); setRejectFeedback(""); }}>
-                      <X className="w-4 h-4" /> Rechazar con feedback
-                    </SecondaryButton>
-                    <SecondaryButton
-                      type="button"
-                      title="Aprobar creando la lección; el contenido se toma de la propuesta. Para cambiar el texto, edita la propuesta antes de aprobar."
-                    >
-                      <Edit className="w-4 h-4" /> Editar y aprobar (próximamente)
-                    </SecondaryButton>
-                  </div>
-                )}
-              </SurfaceCard>
-            ))}
-          </div>
-        )}
-
-        {rejectId && (
-          <SurfaceCard padding="lg" clickable={false} className="mt-6 border-2 border-[var(--coral)]">
-            <h4 className="font-semibold text-[var(--ink)] mb-2">Rechazar propuesta</h4>
-            <form onSubmit={handleReject}>
-              <label className="block text-sm font-medium text-[var(--ink)] mb-1">Feedback para el autor (opcional)</label>
-              <textarea
-                value={rejectFeedback}
-                onChange={(e) => setRejectFeedback(e.target.value)}
-                rows={3}
-                className="w-full px-4 py-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] mb-3"
-                placeholder="Indica por qué se rechaza o qué podría mejorar..."
-              />
-              <div className="flex gap-2">
-                <PrimaryButton type="submit" disabled={rejectSubmitting} className="bg-[var(--coral)] hover:bg-[var(--coral-hover)]">
-                  {rejectSubmitting ? "Enviando…" : "Rechazar"}
-                </PrimaryButton>
-                <SecondaryButton type="button" onClick={() => { setRejectId(null); setRejectFeedback(""); }}>
-                  Cancelar
-                </SecondaryButton>
-              </div>
-            </form>
-          </SurfaceCard>
-        )}
+    <div style={{ flex: 1, padding: "18px 16px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ marginBottom: 20 }}>
+        <Link href="/admin" style={{ fontSize: 13, color: "#8892b0", marginBottom: 8, display: "inline-block" }}>← Admin</Link>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Propuestas UGC</h1>
+        <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>Lecciones enviadas por alumnos. Aprobar crea borrador en el módulo sugerido.</p>
       </div>
+
+      {loading ? (
+        <p style={{ color: "#8892b0", fontSize: 13 }}>Cargando…</p>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, background: "#e8eaf0", borderRadius: 14, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: "left", padding: "12px 16px", color: "#8892b0", fontWeight: 600 }}>Título</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", color: "#8892b0", fontWeight: 600 }}>Autor</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", color: "#8892b0", fontWeight: 600 }}>Institución</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", color: "#8892b0", fontWeight: 600 }}>Módulo sugerido</th>
+                <th style={{ textAlign: "left", padding: "12px 16px", color: "#8892b0", fontWeight: 600 }}>Estado</th>
+                <th style={{ textAlign: "right", padding: "12px 16px", color: "#8892b0", fontWeight: 600 }}>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...pendientes, ...resueltas].map((p) => (
+                <tr key={p.id} style={{ borderTop: "1px solid rgba(194,200,214,0.5)" }}>
+                  <td style={{ padding: "12px 16px", color: "#0a0f8a", fontWeight: 500 }}>{p.titulo}</td>
+                  <td style={{ padding: "12px 16px", color: "#4a5580" }}>{p.autorNombre}</td>
+                  <td style={{ padding: "12px 16px", color: "#8892b0" }}>{p.autorInstitucion || "—"}</td>
+                  <td style={{ padding: "12px 16px", fontFamily: "'Space Mono', monospace", fontSize: 11, color: "#4a5580" }}>{p.moduleIdSugerido || "—"}</td>
+                  <td style={{ padding: "12px 16px" }}>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        padding: "3px 10px",
+                        borderRadius: 20,
+                        background: p.estado === "aprobada" ? "rgba(0,184,125,0.15)" : p.estado === "rechazada" ? "rgba(216,64,64,0.15)" : "rgba(20,40,212,0.1)",
+                        color: p.estado === "aprobada" ? "#00b87d" : p.estado === "rechazada" ? "#d84040" : "#1428d4",
+                      }}
+                    >
+                      {p.estado}
+                    </span>
+                  </td>
+                  <td style={{ padding: "12px 16px", textAlign: "right" }}>
+                    {(p.estado === "enviada" || p.estado === "en_revision") && (
+                      <>
+                        {rechazandoId === p.id ? (
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
+                            <input
+                              value={feedback}
+                              onChange={(e) => setFeedback(e.target.value)}
+                              placeholder="Feedback (opcional)"
+                              style={{
+                                width: "100%",
+                                padding: "8px 12px",
+                                borderRadius: 10,
+                                border: "none",
+                                background: "#e8eaf0",
+                                boxShadow: "inset 2px 2px 5px #c2c8d6",
+                                fontSize: 12,
+                                color: "#0a0f8a",
+                              }}
+                            />
+                            <div style={{ display: "flex", gap: 6 }}>
+                              <button
+                                type="button"
+                                onClick={() => { setRechazandoId(null); setFeedback(""); }}
+                                style={{ padding: "6px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 600, background: "#e8eaf0", color: "#4a5580", boxShadow: "2px 2px 5px #c2c8d6" }}
+                              >
+                                Cancelar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRechazar(p.id)}
+                                style={{ padding: "6px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: "#d84040", color: "white" }}
+                              >
+                                Rechazar
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                            <button
+                              type="button"
+                              onClick={() => handleAprobar(p.id)}
+                              style={{ padding: "6px 14px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 11, fontWeight: 700, background: "linear-gradient(135deg, #00b87d, #00a06c)", color: "white" }}
+                            >
+                              Aprobar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setRechazandoId(p.id)}
+                              style={{ padding: "6px 14px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 11, fontWeight: 600, background: "#e8eaf0", color: "#d84040", boxShadow: "2px 2px 5px #c2c8d6" }}
+                            >
+                              Rechazar
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {!loading && propuestas.length === 0 && (
+        <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 40, textAlign: "center", boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+          <p style={{ fontSize: 15, fontWeight: 700, color: "#0a0f8a" }}>Sin propuestas</p>
+          <p style={{ fontSize: 13, color: "#8892b0", marginTop: 6 }}>No hay propuestas de lección enviadas por alumnos.</p>
+        </div>
+      )}
     </div>
   );
 }
