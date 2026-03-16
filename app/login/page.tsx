@@ -268,7 +268,7 @@ export default function LoginPage() {
         }
         .login-form-col input::placeholder { color: #b0b8c8; }
         @media (max-width: 767px) {
-          .login-card { flex-direction: column; max-width: 100%; height: auto; min-height: 560px; }
+          .login-card { flex-direction: column; max-width: 100%; height: auto; min-height: 580px; }
           .login-panel-azul { display: none; }
           .login-form-col { width: 100%; }
         }
@@ -280,7 +280,7 @@ export default function LoginPage() {
           alignItems: "center",
           justifyContent: "center",
           background: "#e8eaf0",
-          padding: 24,
+          padding: "40px 24px",
         }}
       >
         <div
@@ -289,9 +289,9 @@ export default function LoginPage() {
             display: "flex",
             width: "100%",
             maxWidth: 820,
-            height: 560,
+            minHeight: 580,
+            height: "auto",
             borderRadius: 24,
-            overflow: "hidden",
             boxShadow: "8px 8px 24px #c2c8d6, -8px -8px 24px #ffffff",
           }}
         >
@@ -350,13 +350,13 @@ export default function LoginPage() {
             style={{
               flex: 1,
               background: "#e8eaf0",
-              padding: "36px 40px",
+              padding: "40px 40px",
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
               gap: 14,
               animation: "fadeInRight 0.6s ease-out 0.2s both",
-              overflowY: "auto",
+              overflowY: "visible",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
