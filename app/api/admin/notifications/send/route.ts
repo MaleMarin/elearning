@@ -30,8 +30,10 @@ export async function POST(req: NextRequest) {
   const userId = body.userId as string | undefined;
   const channel = (body.channel as string) ?? "push";
   const templateKey = (body.templateKey as string) ?? "recordatorio_sesion";
+  const customBody = (body.mensaje as string)?.trim();
 
-  const payload = TEMPLATE_MESSAGES[templateKey] ?? TEMPLATE_MESSAGES.recordatorio_sesion;
+  const basePayload = TEMPLATE_MESSAGES[templateKey] ?? TEMPLATE_MESSAGES.recordatorio_sesion;
+  const payload = customBody ? { ...basePayload, body: customBody } : basePayload;
 
   let userIds: string[] = [];
   if (scope === "user" && userId) {

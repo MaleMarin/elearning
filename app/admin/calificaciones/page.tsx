@@ -34,15 +34,22 @@ export default function AdminCalificacionesPage() {
       .finally(() => setLoading(false));
   }, [cohortId]);
 
-  const exportCsv = () => {
-    const headers = ["userId", "email", "finalGrade", "progressPercent"];
-    const lines = [headers.join(","), ...rows.map((r) => [r.userId, r.email ?? "", r.finalGrade ?? "", r.progressPercent].join(","))];
-    const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `calificaciones-${cohortId}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+  const [exportingCsv, setExportingCsv] = useState(false);
+  const exportCsv = async () => {
+    if (!cohortId) return;
+    setExportingCsv(true);
+    try {
+      const res = await fetch(`/api/admin/calificaciones/exportar?cohortId=${encodeURIComponent(cohortId)}`, { credentials: "include" });
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `calificaciones-${cohortId}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExportingCsv(false);
+    }
   };
 
   return (
@@ -57,8 +64,8 @@ export default function AdminCalificacionesPage() {
         <select value={cohortId} onChange={(e) => setCohortId(e.target.value)} className="px-3 py-2 rounded-lg border border-[var(--line)] text-[var(--ink)]">
           {cohorts.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
-        <button type="button" onClick={exportCsv} className="btn-primary inline-flex items-center gap-2">
-          <Download className="w-4 h-4" /> Exportar CSV
+        <button type="button" onClick={exportCsv} disabled={exportingCsv || !cohortId} className="btn-primary inline-flex items-center gap-2">
+          <Download className="w-4 h-4" /> {exportingCsv ? "Exportando…" : "Exportar CSV"}
         </button>
       </div>
       {loading ? (

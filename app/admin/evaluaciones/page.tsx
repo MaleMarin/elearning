@@ -24,6 +24,42 @@ type Stats = {
 
 const COMMENTS_PER_PAGE = 10;
 
+type NpsStats = { nps: number; promotores: number; pasivos: number; detractores: number; total: number } | null;
+
+function NPSPanel() {
+  const [stats, setStats] = useState<NpsStats>(null);
+  useEffect(() => {
+    fetch("/api/admin/evaluaciones/nps", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => setStats(d))
+      .catch(() => setStats(null));
+  }, []);
+  return (
+    <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 24, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff", marginBottom: 16 }}>
+      <p style={{ fontSize: 10, fontWeight: 700, color: "#8892b0", textTransform: "uppercase", letterSpacing: "1.5px", fontFamily: "'Space Mono', monospace", marginBottom: 16 }}>
+        Net Promoter Score del programa
+      </p>
+      {!stats ? (
+        <p style={{ fontSize: 13, color: "#8892b0" }}>Cargando NPS…</p>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+          {[
+            { val: stats.nps ?? 0, lbl: "NPS Score", color: (stats.nps ?? 0) > 50 ? "#00b87d" : (stats.nps ?? 0) > 0 ? "#c89000" : "#d84040" },
+            { val: `${stats.promotores ?? 0}%`, lbl: "Promotores (9-10)", color: "#00b87d" },
+            { val: `${stats.pasivos ?? 0}%`, lbl: "Pasivos (7-8)", color: "#c89000" },
+            { val: `${stats.detractores ?? 0}%`, lbl: "Detractores (1-6)", color: "#d84040" },
+          ].map((item, i) => (
+            <div key={i} style={{ background: "#e8eaf0", borderRadius: 14, padding: 16, boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff", textAlign: "center" }}>
+              <div style={{ fontSize: 24, fontWeight: 800, color: item.color, fontFamily: "'Space Mono', monospace" }}>{item.val}</div>
+              <div style={{ fontSize: 10, color: "#8892b0", marginTop: 4 }}>{item.lbl}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function BarChart({ data }: { data: Record<string, number> }) {
   const entries = Object.entries(data).filter(([, v]) => v > 0);
   const max = Math.max(...entries.map(([, v]) => v), 1);
@@ -56,6 +92,7 @@ export default function AdminEvaluacionesPage() {
   const [error, setError] = useState<string | null>(null);
   const [commentPage, setCommentPage] = useState(0);
   const [exporting, setExporting] = useState(false);
+  const [exportingNps, setExportingNps] = useState(false);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -76,6 +113,22 @@ export default function AdminEvaluacionesPage() {
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
+
+  const handleExportNpsCsv = async () => {
+    setExportingNps(true);
+    try {
+      const res = await fetch("/api/admin/evaluaciones/exportar", { credentials: "include" });
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "evaluaciones-politica-digital.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExportingNps(false);
+    }
+  };
 
   const handleExportCsv = async () => {
     setExporting(true);
@@ -155,11 +208,34 @@ export default function AdminEvaluacionesPage() {
           <ChevronLeft className="w-5 h-5" />
           Admin
         </Link>
-        <PrimaryButton onClick={handleExportCsv} disabled={exporting}>
-          {exporting ? "Exportando…" : "Exportar CSV"}
-          <Download className="w-4 h-4 ml-2 inline" />
-        </PrimaryButton>
+        <div className="flex items-center gap-2">
+          <PrimaryButton onClick={handleExportCsv} disabled={exporting}>
+            {exporting ? "Exportando…" : "Exportar CSV"}
+            <Download className="w-4 h-4 ml-2 inline" />
+          </PrimaryButton>
+          <button
+            type="button"
+            onClick={handleExportNpsCsv}
+            disabled={exportingNps}
+            style={{
+              padding: "10px 20px",
+              borderRadius: 12,
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 12,
+              fontWeight: 700,
+              background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+              color: "white",
+              boxShadow: "4px 4px 10px rgba(10,15,138,0.3)",
+            }}
+          >
+            {exportingNps ? "Exportando…" : "Exportar CSV (NPS)"}
+          </button>
+        </div>
       </div>
+
+      <NPSPanel />
 
       <PageSection title="Evaluaciones" subtitle="Diagnósticos, quiz final y encuesta de cierre.">
         <></>

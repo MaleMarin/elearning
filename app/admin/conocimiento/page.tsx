@@ -22,6 +22,12 @@ export default function AdminConocimientoPage() {
   const [loading, setLoading] = useState(true);
   const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
   const [learners, setLearners] = useState<{ userId: string; lessonId: string; completedAt: string; userName?: string }[]>([]);
+  const [editingNode, setEditingNode] = useState<KnowledgeNode | null>(null);
+  const [showNodeForm, setShowNodeForm] = useState(false);
+  const [formConcepto, setFormConcepto] = useState("");
+  const [formModulo, setFormModulo] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +42,7 @@ export default function AdminConocimientoPage() {
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
+  const fetchNodes = useCallback(() => {
     if (!institutionId) return;
     setLoading(true);
     fetch(`/api/admin/conocimiento?institutionId=${encodeURIComponent(institutionId)}`, { credentials: "include" })
@@ -45,6 +51,56 @@ export default function AdminConocimientoPage() {
       .catch(() => setNodes([]))
       .finally(() => setLoading(false));
   }, [institutionId]);
+
+  useEffect(() => {
+    if (!institutionId) return;
+    fetchNodes();
+  }, [institutionId, fetchNodes]);
+
+  const handleSaveNode = async () => {
+    if (!formConcepto.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/conocimiento", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          institutionId,
+          conceptId: editingNode?.id,
+          concepto: formConcepto.trim(),
+          modulo: formModulo.trim(),
+          relacionados: editingNode?.relacionados ?? [],
+        }),
+      });
+      if (res.ok) {
+        setEditingNode(null);
+        setShowNodeForm(false);
+        setFormConcepto("");
+        setFormModulo("");
+        fetchNodes();
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteNode = async (conceptId: string) => {
+    if (!confirm("¿Eliminar este nodo?")) return;
+    setDeleting(conceptId);
+    try {
+      const res = await fetch(
+        `/api/admin/conocimiento?institutionId=${encodeURIComponent(institutionId)}&conceptId=${encodeURIComponent(conceptId)}`,
+        { method: "DELETE", credentials: "include" }
+      );
+      if (res.ok) {
+        setSelectedNode(null);
+        fetchNodes();
+      }
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   useEffect(() => {
     if (selectedNode) {
@@ -232,6 +288,104 @@ export default function AdminConocimientoPage() {
         </SurfaceCard>
       ) : (
         <>
+          <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 24, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff", marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: "#8892b0", textTransform: "uppercase", letterSpacing: "1.5px", fontFamily: "'Space Mono', monospace" }}>
+                Nodos del grafo · Aprendices
+              </p>
+              <button
+                type="button"
+                onClick={() => { setShowNodeForm(true); setEditingNode(null); setFormConcepto(""); setFormModulo(""); }}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 12,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+                  color: "white",
+                  boxShadow: "4px 4px 10px rgba(10,15,138,0.3)",
+                }}
+              >
+                Agregar nodo
+              </button>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: "left", padding: "10px 12px", color: "#8892b0", fontWeight: 600 }}>Concepto</th>
+                    <th style={{ textAlign: "left", padding: "10px 12px", color: "#8892b0", fontWeight: 600 }}>Módulo</th>
+                    <th style={{ textAlign: "right", padding: "10px 12px", color: "#8892b0", fontWeight: 600 }}>Aprendices</th>
+                    <th style={{ textAlign: "right", padding: "10px 12px", color: "#8892b0", fontWeight: 600 }}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {nodes.map((n) => (
+                    <tr
+                      key={n.id}
+                      style={{ cursor: "pointer", background: selectedNode?.id === n.id ? "rgba(20,40,212,0.08)" : "transparent" }}
+                      onClick={() => setSelectedNode(n)}
+                    >
+                      <td style={{ padding: "10px 12px", color: "#0a0f8a", fontFamily: "'Syne', sans-serif" }}>{n.concepto}</td>
+                      <td style={{ padding: "10px 12px", color: "#8892b0" }}>{n.modulo || "—"}</td>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'Space Mono', monospace", color: "#1428d4" }}>{n.usuariosQueLoDominan}</td>
+                      <td style={{ padding: "10px 12px", textAlign: "right" }}>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setShowNodeForm(true); setEditingNode(n); setFormConcepto(n.concepto); setFormModulo(n.modulo); }}
+                          style={{ marginRight: 8, padding: "4px 10px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 11, background: "#e8eaf0", boxShadow: "inset 2px 2px 4px #c2c8d6", color: "#0a0f8a" }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleDeleteNode(n.id); }}
+                          disabled={deleting === n.id}
+                          style={{ padding: "4px 10px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 11, background: "rgba(216,64,64,0.15)", color: "#d84040" }}
+                        >
+                          {deleting === n.id ? "…" : "Eliminar"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {(showNodeForm || editingNode !== null) && (
+            <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 24, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff", marginBottom: 16 }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: "#8892b0", textTransform: "uppercase", letterSpacing: "1.5px", fontFamily: "'Space Mono', monospace", marginBottom: 12 }}>
+                {editingNode ? "Editar nodo" : "Nuevo nodo"}
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 400 }}>
+                <input
+                  placeholder="Concepto"
+                  value={formConcepto}
+                  onChange={(e) => setFormConcepto(e.target.value)}
+                  style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff", color: "#0a0f8a", fontFamily: "'Syne', sans-serif" }}
+                />
+                <input
+                  placeholder="Módulo"
+                  value={formModulo}
+                  onChange={(e) => setFormModulo(e.target.value)}
+                  style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff", color: "#0a0f8a", fontFamily: "'Syne', sans-serif" }}
+                />
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button type="button" onClick={handleSaveNode} disabled={saving} style={{ padding: "10px 20px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)" }}>
+                    {saving ? "Guardando…" : "Guardar"}
+                  </button>
+                  <button type="button" onClick={() => { setShowNodeForm(false); setEditingNode(null); setFormConcepto(""); setFormModulo(""); }} style={{ padding: "10px 20px", borderRadius: 12, border: "none", cursor: "pointer", background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6", color: "#0a0f8a" }}>
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <SurfaceCard padding="md" clickable={false} className="mb-6">
             <div ref={containerRef} className="w-full overflow-hidden rounded-xl bg-[var(--surface-soft)]">
               <svg ref={svgRef} className="w-full" style={{ minHeight: 500 }} />

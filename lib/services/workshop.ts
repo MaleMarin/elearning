@@ -90,6 +90,69 @@ export async function getWorkshop(workshopId: string): Promise<Workshop | null> 
   } as Workshop;
 }
 
+export async function createWorkshop(data: {
+  moduleId: string;
+  title: string;
+  description: string;
+  rubric: RubricCriterion[];
+  deadline: string | null;
+  reviewDeadline: string | null;
+  peerCount: number;
+}): Promise<Workshop> {
+  const now = new Date().toISOString();
+  const ref = db().collection(WORKSHOPS).doc();
+  await ref.set({
+    moduleId: data.moduleId,
+    title: data.title.trim(),
+    description: data.description.trim(),
+    rubric: data.rubric,
+    deadline: data.deadline ?? null,
+    reviewDeadline: data.reviewDeadline ?? null,
+    peerCount: data.peerCount ?? 2,
+    createdAt: now,
+    updatedAt: now,
+  });
+  const snap = await ref.get();
+  const x = snap.data()!;
+  return {
+    id: snap.id,
+    moduleId: x.moduleId,
+    title: x.title ?? "",
+    description: x.description ?? "",
+    rubric: Array.isArray(x.rubric) ? x.rubric : [],
+    deadline: x.deadline ?? null,
+    reviewDeadline: x.reviewDeadline ?? null,
+    peerCount: x.peerCount ?? 2,
+    createdAt: x.createdAt ?? "",
+    updatedAt: x.updatedAt ?? "",
+  } as Workshop;
+}
+
+export async function updateWorkshop(
+  workshopId: string,
+  data: Partial<{
+    moduleId: string;
+    title: string;
+    description: string;
+    rubric: RubricCriterion[];
+    deadline: string | null;
+    reviewDeadline: string | null;
+    peerCount: number;
+  }>
+): Promise<Workshop | null> {
+  const ref = db().collection(WORKSHOPS).doc(workshopId);
+  const clean: Record<string, unknown> = { updatedAt: new Date().toISOString() };
+  if (data.moduleId !== undefined) clean.moduleId = data.moduleId;
+  if (data.title !== undefined) clean.title = data.title.trim();
+  if (data.description !== undefined) clean.description = data.description.trim();
+  if (data.rubric !== undefined) clean.rubric = data.rubric;
+  if (data.deadline !== undefined) clean.deadline = data.deadline;
+  if (data.reviewDeadline !== undefined) clean.reviewDeadline = data.reviewDeadline;
+  if (data.peerCount !== undefined) clean.peerCount = data.peerCount;
+  await ref.update(clean);
+  return getWorkshop(workshopId);
+}
+
 export async function getSubmission(workshopId: string, userId: string): Promise<WorkshopSubmission | null> {
   const doc = await db().collection(WORKSHOPS).doc(workshopId).collection(SUBMISSIONS).doc(userId).get();
   if (!doc.exists) return null;

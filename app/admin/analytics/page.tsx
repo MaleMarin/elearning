@@ -5,6 +5,48 @@ import { PageSection, SurfaceCard } from "@/components/ui";
 import { Alert } from "@/components/ui/Alert";
 import Link from "next/link";
 
+type VideoAbandonDato = { segundo: number; abandonos: number };
+
+function VideoAbandonChart() {
+  const [datos, setDatos] = useState<VideoAbandonDato[]>([]);
+  useEffect(() => {
+    fetch("/api/admin/analytics/video-abandon", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => setDatos(d.datos ?? []))
+      .catch(() => setDatos([]));
+  }, []);
+  const maxAbandon = datos.length ? Math.max(...datos.map((x) => x.abandonos)) : 1;
+  return (
+    <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 24, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff", marginBottom: 16 }}>
+      <p style={{ fontSize: 10, fontWeight: 700, color: "#8892b0", textTransform: "uppercase", letterSpacing: "1.5px", fontFamily: "'Space Mono', monospace", marginBottom: 16 }}>
+        Abandono de video por segundo
+      </p>
+      {datos.length === 0 ? (
+        <p style={{ fontSize: 13, color: "#8892b0", textAlign: "center", padding: "20px 0" }}>
+          Sin datos de reproducción aún. Los datos aparecen cuando los alumnos vean videos.
+        </p>
+      ) : (
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 120 }}>
+          {datos.map((d, i) => (
+            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+              <div
+                style={{
+                  width: "100%",
+                  background: `rgba(216,64,64,${Math.min(d.abandonos / 10, 1)})`,
+                  borderRadius: "4px 4px 0 0",
+                  height: `${(d.abandonos / maxAbandon) * 100}px`,
+                  minHeight: 4,
+                }}
+              />
+              <span style={{ fontSize: 9, color: "#8892b0", fontFamily: "'Space Mono', monospace" }}>{d.segundo}s</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 type CompletionByLesson = {
   lessonId: string;
   title: string;
@@ -126,6 +168,8 @@ function AnalyticsView({ d, maxAbandon }: { d: AnalyticsData; maxAbandon: number
           </div>
         )}
       </SurfaceCard>
+
+      <VideoAbandonChart />
 
       <SurfaceCard padding="lg" as="section">
         <h2 className="text-lg font-semibold text-[var(--ink)] mb-4">

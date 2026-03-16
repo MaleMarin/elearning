@@ -4,16 +4,18 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
-const TEMPLATE_OPTIONS = [
-  { value: "recordatorio_sesion", label: "Recordatorio de sesión" },
-  { value: "recordatorio_tarea", label: "Recordatorio de tarea" },
-  { value: "certificado_listo", label: "Certificado listo" },
-  { value: "inactividad", label: "Inactividad" },
-  { value: "racha", label: "Racha" },
-  { value: "bienvenida", label: "Bienvenida" },
-  { value: "recordatorio_modulo", label: "Recordatorio de módulo" },
-  { value: "recordatorio_quiz", label: "Recordatorio de quiz" },
+const PLANTILLAS = [
+  { id: "recordatorio_sesion", label: "Recordatorio de sesión", mensaje: "Recuerda que tienes una sesión en vivo hoy. ¡No te la pierdas!" },
+  { id: "recordatorio_tarea", label: "Recordatorio de tarea", mensaje: "Tienes una tarea pendiente. La fecha límite se acerca." },
+  { id: "certificado_listo", label: "Certificado disponible", mensaje: "¡Felicidades! Tu certificado está listo para descargar." },
+  { id: "inactividad", label: "Recordatorio de inactividad", mensaje: "Te extrañamos. ¡Retoma tu curso donde lo dejaste!" },
+  { id: "racha", label: "Mantén tu racha", mensaje: "¡Tienes una racha activa! Estudia hoy para mantenerla." },
+  { id: "bienvenida", label: "Bienvenida al programa", mensaje: "Bienvenido/a a Política Digital. Tu formación comienza hoy." },
+  { id: "recordatorio_modulo", label: "Nuevo módulo disponible", mensaje: "Tienes un nuevo módulo disponible. ¡Empiézalo hoy!" },
+  { id: "recordatorio_quiz", label: "Quiz pendiente", mensaje: "Tienes un quiz pendiente. ¡Complétalo para avanzar!" },
 ];
+
+const TEMPLATE_OPTIONS = PLANTILLAS.map((p) => ({ value: p.id, label: p.label }));
 
 const CHANNEL_OPTIONS = [
   { value: "push", label: "Push (navegador)" },
@@ -40,6 +42,7 @@ export default function AdminNotificacionesPage() {
   const [userId, setUserId] = useState("");
   const [channel, setChannel] = useState("push");
   const [templateKey, setTemplateKey] = useState("recordatorio_sesion");
+  const [mensaje, setMensaje] = useState(PLANTILLAS[0]?.mensaje ?? "");
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState<string | null>(null);
   const [logs, setLogs] = useState<LogRow[]>([]);
@@ -90,7 +93,8 @@ export default function AdminNotificacionesPage() {
         cohortId: scope === "cohort" ? cohortId : undefined,
         userId: scope === "user" ? userId || undefined : undefined,
         channel,
-        templateKey,
+        templateKey: templateKey || "recordatorio_sesion",
+        mensaje: mensaje.trim() || undefined,
       }),
     })
       .then((r) => r.json())
@@ -161,16 +165,31 @@ export default function AdminNotificacionesPage() {
             </label>
           )}
           <label className="block">
-            <span className="font-medium text-[var(--text)]">Tipo de mensaje</span>
+            <span className="font-medium text-[var(--text)]">Plantilla</span>
             <select
               value={templateKey}
-              onChange={(e) => setTemplateKey(e.target.value)}
+              onChange={(e) => {
+                const id = e.target.value;
+                setTemplateKey(id);
+                setMensaje(PLANTILLAS.find((p) => p.id === id)?.mensaje ?? "");
+              }}
               className="mt-1 block w-full max-w-xs px-4 py-3 rounded-lg border border-[var(--line)] bg-[var(--surface)] min-h-[48px]"
             >
-              {TEMPLATE_OPTIONS.map((t) => (
-                <option key={t.value} value={t.value}>{t.label}</option>
+              <option value="">Seleccionar plantilla…</option>
+              {PLANTILLAS.map((p) => (
+                <option key={p.id} value={p.id}>{p.label}</option>
               ))}
             </select>
+          </label>
+          <label className="block">
+            <span className="font-medium text-[var(--text)]">Mensaje (se rellena con la plantilla)</span>
+            <textarea
+              value={mensaje}
+              onChange={(e) => setMensaje(e.target.value)}
+              rows={3}
+              className="mt-1 block w-full max-w-md px-4 py-3 rounded-lg border border-[var(--line)] bg-[var(--surface)] min-h-[80px]"
+              placeholder="Texto del mensaje"
+            />
           </label>
           <label className="block">
             <span className="font-medium text-[var(--text)]">Canal</span>
@@ -185,7 +204,7 @@ export default function AdminNotificacionesPage() {
             </select>
           </label>
           <p className="text-sm text-[var(--text-muted)]">
-            Vista previa: <strong>{TEMPLATE_OPTIONS.find((t) => t.value === templateKey)?.label ?? templateKey}</strong>
+            Vista previa: <strong>{PLANTILLAS.find((p) => p.id === templateKey)?.label ?? templateKey}</strong>
           </p>
           <button
             type="button"

@@ -69,6 +69,22 @@ export default function AdminCohortRetosPage() {
     }
   };
 
+  const [declarando, setDeclarando] = useState<string | null>(null);
+  const handleDeclararGanador = async (retoId: string, teamId: string) => {
+    setDeclarando(retoId);
+    try {
+      const res = await fetch(`/api/admin/cohorts/${id}/challenges/${retoId}/ganador`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ teamId }),
+      });
+      if (res.ok) fetchChallenges();
+    } finally {
+      setDeclarando(null);
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
       <Link href="/admin/cohortes" className="inline-flex items-center gap-2 text-sm text-[var(--ink-muted)] mb-6">
@@ -107,7 +123,41 @@ export default function AdminCohortRetosPage() {
                       <span className="text-xs text-[var(--ink-muted)]">
                         {c.equipos.length} equipo(s)
                       </span>
+                      {c.ganador && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--success)]/20 text-[var(--success)]">
+                          Ganador declarado
+                        </span>
+                      )}
                     </div>
+                    {c.equipos.length > 0 && (
+                      <div className="mt-3 space-y-1">
+                        <p className="text-xs font-medium text-[var(--ink-muted)]">Equipos participantes</p>
+                        <ul className="space-y-1">
+                          {c.equipos.map((eq) => (
+                            <li key={eq.id} className="flex items-center justify-between text-sm">
+                              <span className="text-[var(--ink)]">{eq.nombre}</span>
+                              {eq.propuesta ? (
+                                <span className="text-[var(--ink-muted)] text-xs">Entregado</span>
+                              ) : (
+                                <span className="text-[var(--ink-muted)] text-xs">Sin entregar</span>
+                              )}
+                              {c.ganador === eq.id ? (
+                                <span className="text-xs font-semibold text-[var(--success)]">Ganador</span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeclararGanador(c.id, eq.id)}
+                                  disabled={declarando === c.id}
+                                  className="text-xs px-2 py-1 rounded bg-[var(--primary)]/15 text-[var(--primary)] hover:bg-[var(--primary)]/25 disabled:opacity-50"
+                                >
+                                  {declarando === c.id ? "…" : "Declarar ganador"}
+                                </button>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     <div className="flex flex-wrap gap-2 mt-3">
                       {c.estado === "proximo" && (
                         <SecondaryButton
