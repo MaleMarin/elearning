@@ -7,6 +7,7 @@ import { SUPPORT_FAQ } from "@/lib/ai/prompts/support";
 export default function SoportePage() {
   const { openDrawer } = useAssistant();
   const [tickets, setTickets] = useState<Array<{ id: string; category: string; summary: string; status: string; created_at: string }>>([]);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/support/tickets")
@@ -16,61 +17,83 @@ export default function SoportePage() {
   }, []);
 
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-2xl font-bold text-[var(--text)] mb-4">Ayuda</h1>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4 }}>Soporte</h1>
+      <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>Ayuda y preguntas frecuentes</p>
 
-      <section className="card-white p-6 mb-6">
-        <h2 className="text-lg font-semibold text-[var(--text)] mb-3">
-          Preguntas frecuentes
-        </h2>
-        <ul className="space-y-4 text-base">
-          {SUPPORT_FAQ.map((faq, i) => (
-            <li key={i}>
-              <p className="font-medium text-[var(--text)]">{faq.q}</p>
-              <p className="text-[var(--text-muted)] mt-1">{faq.a}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="card-white p-6 mb-6">
-        <h2 className="text-lg font-semibold text-[var(--text)] mb-3">
-          Chat de soporte
-        </h2>
-        <p className="text-[var(--text-muted)] mb-4">
-          Si no encuentras la respuesta, abre el chat y te ayudamos. Si hace falta, crearemos un ticket.
-        </p>
-        <button
-          type="button"
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div
+          style={{ background: "#e8eaf0", borderRadius: 18, padding: 20, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff", cursor: "pointer" }}
           onClick={() => openDrawer({ mode: "support" })}
-          className="btn-primary"
         >
-          Abrir chat de soporte
-        </button>
-      </section>
+          <p style={{ fontSize: 14, fontWeight: 700, color: "#0a0f8a", marginBottom: 4 }}>Hablar con el Bot PD</p>
+          <p style={{ fontSize: 12, color: "#8892b0" }}>Abre el asistente para consultas rápidas.</p>
+        </div>
 
-      <section className="card-white p-6">
-        <h2 className="text-lg font-semibold text-[var(--text)] mb-3">
-          Mis tickets
-        </h2>
-        {tickets.length === 0 ? (
-          <p className="text-[var(--text-muted)]">No tienes tickets aún.</p>
-        ) : (
-          <ul className="space-y-3">
-            {tickets.map((t) => (
-              <li
-                key={t.id}
-                className="border border-gray-200 rounded-lg p-3 text-base"
+        <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 20, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: "#0a0f8a", marginBottom: 4 }}>Reportar un problema</p>
+          <p style={{ fontSize: 12, color: "#8892b0", marginBottom: 12 }}>Abre el chat de soporte y describe el problema; se creará un ticket.</p>
+          <button
+            type="button"
+            onClick={() => openDrawer({ mode: "support" })}
+            style={{ padding: "10px 18px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)" }}
+          >
+            Abrir chat de soporte
+          </button>
+        </div>
+
+        <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 20, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: "#0a0f8a", marginBottom: 14 }}>Preguntas frecuentes</p>
+          {SUPPORT_FAQ.map((faq, i) => (
+            <div key={i} style={{ marginBottom: 8 }}>
+              <button
+                type="button"
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                style={{
+                  width: "100%",
+                  padding: "12px 14px",
+                  borderRadius: 12,
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#0a0f8a",
+                  background: "#e8eaf0",
+                  boxShadow: openFaq === i ? "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff" : "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+                }}
               >
-                <span className="font-medium">{t.summary}</span>
-                <span className="text-[var(--text-muted)] ml-2">
-                  — {t.status} · {new Date(t.created_at).toLocaleDateString()}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                {faq.q}
+              </button>
+              {openFaq === i && (
+                <p style={{ fontSize: 13, color: "#4a5580", lineHeight: 1.6, marginTop: 8, paddingLeft: 4 }}>{faq.a}</p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 20, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: "#0a0f8a", marginBottom: 4 }}>Contactar facilitador</p>
+          <p style={{ fontSize: 12, color: "#8892b0" }}>Usa el chat de soporte o el canal que tu grupo haya indicado.</p>
+        </div>
+
+        <div style={{ background: "#e8eaf0", borderRadius: 18, padding: 20, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: "#0a0f8a", marginBottom: 12 }}>Mis tickets</p>
+          {tickets.length === 0 ? (
+            <p style={{ fontSize: 13, color: "#8892b0" }}>No tienes tickets aún.</p>
+          ) : (
+            <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+              {tickets.map((t) => (
+                <li key={t.id} style={{ padding: "10px 0", borderBottom: "1px solid rgba(194,200,214,0.3)" }}>
+                  <span style={{ fontWeight: 600, color: "#0a0f8a" }}>{t.summary}</span>
+                  <span style={{ fontSize: 12, color: "#8892b0", marginLeft: 8 }}>— {t.status} · {new Date(t.created_at).toLocaleDateString()}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

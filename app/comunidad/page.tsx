@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAssistant } from "@/contexts/AssistantContext";
-import { EmptyState } from "@/components/ui/EmptyState";
 
 interface Post {
   id: string;
@@ -66,7 +65,7 @@ export default function ComunidadPage() {
     })
       .then((r) => r.json())
       .then((d) => setDigestResult(d.error ?? `Digest creado. Notificados: ${d.notified ?? 0}`))
-      .catch((e) => setDigestResult(e.message))
+      .catch((e) => setDigestResult(String(e)))
       .finally(() => setDigestLoading(false));
   };
 
@@ -81,17 +80,23 @@ export default function ComunidadPage() {
     })
       .then((r) => r.json())
       .then((d) => setUnansweredResult(d.error ?? `Encontrados: ${d.count ?? 0}. ${d.summary ?? ""}`))
-      .catch((e) => setUnansweredResult(e.message))
+      .catch((e) => setUnansweredResult(String(e)))
       .finally(() => setUnansweredLoading(false));
   };
 
+  const baseStyle = {
+    flex: 1,
+    padding: "20px 20px",
+    background: "#e8eaf0",
+    minHeight: "100vh",
+    fontFamily: "'Syne', sans-serif",
+  } as const;
+
   if (loading) {
     return (
-      <div className="max-w-3xl">
-        <h1 className="text-2xl font-bold text-[var(--text)] mb-4">Comunidad</h1>
-        <div className="card-white p-6 animate-pulse">
-          <div className="h-5 bg-gray-100 rounded w-2/3" />
-        </div>
+      <div style={baseStyle}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4 }}>Comunidad</h1>
+        <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>Cargando…</p>
       </div>
     );
   }
@@ -101,52 +106,103 @@ export default function ComunidadPage() {
 
   if (noCohort || noPosts) {
     return (
-      <div className="max-w-3xl">
-        <h1 className="text-2xl font-bold text-[var(--text)] mb-6">Comunidad</h1>
-        <EmptyState
-          title={noCohort ? "Aún no formas parte de un grupo" : "Sé el primero en publicar"}
-          description={
-            noCohort
-              ? "Cuando te asignen a un programa, podrás ver y escribir en la comunidad. Si crees que deberías tener acceso, contacta a soporte."
-              : "Las mejores comunidades empiezan con una sola persona que dice hola."
-          }
-          ctaLabel={noCohort ? "Ir a soporte" : "Crear publicación"}
-          ctaHref={noCohort ? "/soporte" : undefined}
-          onCtaClick={noCohort ? undefined : () => openDrawer({ mode: "community", cohortId, courseId: null })}
-          icon="💬"
-        />
+      <div style={baseStyle}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4 }}>Comunidad</h1>
+        <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>Foro de tu grupo</p>
+        <div
+          style={{
+            background: "#e8eaf0",
+            borderRadius: 20,
+            padding: 40,
+            textAlign: "center",
+            maxWidth: 500,
+            margin: "0 auto",
+            boxShadow: "8px 8px 20px #c2c8d6, -8px -8px 20px #ffffff",
+          }}
+        >
+          <div style={{ fontSize: 48, marginBottom: 16 }}>💬</div>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>
+            {noCohort ? "Aún no formas parte de un grupo" : "Sé el primero en publicar"}
+          </h2>
+          <p style={{ fontSize: 13, color: "#8892b0", lineHeight: 1.6, marginBottom: 24 }}>
+            {noCohort
+              ? "Cuando te asignen a un programa, podrás ver y escribir en la comunidad."
+              : "Las mejores comunidades empiezan con una sola persona que dice hola."}
+          </p>
+          {noCohort ? (
+            <Link
+              href="/soporte"
+              style={{
+                display: "inline-block",
+                padding: "12px 28px",
+                borderRadius: 14,
+                background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+                color: "white",
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 13,
+                fontWeight: 700,
+                textDecoration: "none",
+                boxShadow: "5px 5px 12px rgba(10,15,138,0.35)",
+              }}
+            >
+              Ir a soporte
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => openDrawer({ mode: "community", cohortId, courseId: null })}
+              style={{
+                padding: "12px 28px",
+                borderRadius: 14,
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 13,
+                fontWeight: 700,
+                background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+                color: "white",
+                boxShadow: "5px 5px 12px rgba(10,15,138,0.35)",
+              }}
+            >
+              Crear publicación
+            </button>
+          )}
+        </div>
         {!noCohort && (
-          <>
-            <p className="mt-4 text-center text-[var(--text-muted)] text-base">
-              Ideas: &quot;Pregunta sobre el contenido&quot;, &quot;Compartir un recurso&quot;, &quot;Duda sobre la entrega&quot;
-            </p>
-            <p className="mt-2 text-center text-base">
-              <Link href="/comunidad/show-and-tell" className="text-[var(--primary)] font-medium hover:underline">
-                Ir a Show & Tell
-              </Link>
-            </p>
-          </>
+          <p style={{ marginTop: 20, textAlign: "center" }}>
+            <Link href="/comunidad/show-and-tell" style={{ fontSize: 13, color: "#1428d4", fontWeight: 600 }}>
+              Ir a Show & Tell
+            </Link>
+          </p>
         )}
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-2xl font-bold text-[var(--text)] mb-4">Comunidad</h1>
+    <div style={baseStyle}>
+      <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4 }}>Comunidad</h1>
+      <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>Foro privado de tu grupo</p>
 
       {cohortId && (
-        <div className="flex border-b border-[var(--line)] mb-6" role="tablist" aria-label="Secciones de comunidad">
+        <div style={{ display: "flex", gap: 8, marginBottom: 20 }} role="tablist">
           <button
             type="button"
             role="tab"
             aria-selected={activeTab === "mi-grupo"}
             onClick={() => setActiveTab("mi-grupo")}
-            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-              activeTab === "mi-grupo"
-                ? "border-[var(--primary)] text-[var(--primary)]"
-                : "border-transparent text-[var(--text-muted)] hover:text-[var(--text)]"
-            }`}
+            style={{
+              padding: "10px 18px",
+              borderRadius: 12,
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 13,
+              fontWeight: 600,
+              background: "#e8eaf0",
+              color: activeTab === "mi-grupo" ? "#0a0f8a" : "#8892b0",
+              boxShadow: activeTab === "mi-grupo" ? "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff" : "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+            }}
           >
             Mi grupo
           </button>
@@ -155,42 +211,92 @@ export default function ComunidadPage() {
             role="tab"
             aria-selected={activeTab === "general"}
             onClick={() => setActiveTab("general")}
-            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-              activeTab === "general"
-                ? "border-[var(--primary)] text-[var(--primary)]"
-                : "border-transparent text-[var(--text-muted)] hover:text-[var(--text)]"
-            }`}
+            style={{
+              padding: "10px 18px",
+              borderRadius: 12,
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 13,
+              fontWeight: 600,
+              background: "#e8eaf0",
+              color: activeTab === "general" ? "#0a0f8a" : "#8892b0",
+              boxShadow: activeTab === "general" ? "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff" : "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+            }}
           >
             General
           </button>
         </div>
       )}
 
-      {activeTab === "mi-grupo" && cohortId && (
-        <p className="text-sm text-[var(--text-muted)] mb-4">
-          Foro privado de tu grupo. Solo los miembros pueden ver y participar. El facilitador puede fijar anuncios y abrir hilos por módulo.
-        </p>
-      )}
-
-      <div className="flex flex-wrap gap-4 mb-6">
-        <Link href="/comunidad/show-and-tell" className="btn-primary min-h-[44px] inline-flex items-center">
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 20 }}>
+        <Link
+          href="/comunidad/show-and-tell"
+          style={{
+            padding: "10px 18px",
+            borderRadius: 12,
+            background: "#e8eaf0",
+            color: "#1428d4",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 12,
+            fontWeight: 700,
+            textDecoration: "none",
+            boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+          }}
+        >
           Show & Tell
         </Link>
-        <Link href="/comunidad/proponer-leccion" className="btn-primary min-h-[44px] inline-flex items-center">
-          Proponer una lección
+        <Link
+          href="/comunidad/proponer-leccion"
+          style={{
+            padding: "10px 18px",
+            borderRadius: 12,
+            background: "#e8eaf0",
+            color: "#1428d4",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 12,
+            fontWeight: 700,
+            textDecoration: "none",
+            boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+          }}
+        >
+          Proponer lección
         </Link>
         <button
           type="button"
           onClick={() => openDrawer({ mode: "community", cohortId, courseId: null })}
-          className="btn-primary min-h-[44px]"
+          style={{
+            padding: "10px 18px",
+            borderRadius: 12,
+            border: "none",
+            cursor: "pointer",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 12,
+            fontWeight: 700,
+            background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+            color: "white",
+            boxShadow: "4px 4px 10px rgba(10,15,138,0.3)",
+          }}
         >
-          Abrir asistente comunidad
+          Abrir asistente
         </button>
         <button
           type="button"
           onClick={handleDigest}
           disabled={digestLoading}
-          className="btn-primary disabled:opacity-50 min-h-[44px]"
+          style={{
+            padding: "10px 18px",
+            borderRadius: 12,
+            border: "none",
+            cursor: digestLoading ? "wait" : "pointer",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 12,
+            fontWeight: 700,
+            background: "#e8eaf0",
+            color: "#4a5580",
+            boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+            opacity: digestLoading ? 0.7 : 1,
+          }}
         >
           {digestLoading ? "Generando…" : "Resumir semana"}
         </button>
@@ -198,59 +304,58 @@ export default function ComunidadPage() {
           type="button"
           onClick={handleUnanswered}
           disabled={unansweredLoading}
-          className="btn-primary disabled:opacity-50 min-h-[44px]"
+          style={{
+            padding: "10px 18px",
+            borderRadius: 12,
+            border: "none",
+            cursor: unansweredLoading ? "wait" : "pointer",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 12,
+            fontWeight: 700,
+            background: "#e8eaf0",
+            color: "#4a5580",
+            boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+            opacity: unansweredLoading ? 0.7 : 1,
+          }}
         >
           {unansweredLoading ? "Buscando…" : "Preguntas sin respuesta"}
         </button>
       </div>
 
       {digestResult && (
-        <div className="card-white p-4 mb-4 text-base">
-          <strong>Digest:</strong> {digestResult}
+        <div style={{ background: "#e8eaf0", borderRadius: 14, padding: 14, marginBottom: 16, boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff" }}>
+          <strong style={{ color: "#0a0f8a" }}>Digest:</strong> <span style={{ color: "#4a5580" }}>{digestResult}</span>
         </div>
       )}
       {unansweredResult && (
-        <div className="card-white p-4 mb-4 text-base">
-          <strong>Sin respuesta:</strong> {unansweredResult}
+        <div style={{ background: "#e8eaf0", borderRadius: 14, padding: 14, marginBottom: 16, boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff" }}>
+          <strong style={{ color: "#0a0f8a" }}>Sin respuesta:</strong> <span style={{ color: "#4a5580" }}>{unansweredResult}</span>
         </div>
       )}
 
-      {flags.length > 0 && (
-        <section className="card-white p-6 mb-6">
-          <h2 className="text-lg font-semibold text-[var(--text)] mb-3">Cola de flags (mentor/admin)</h2>
-          <ul className="space-y-3">
-            {flags.map((f) => (
-              <li key={f.id} className="border border-gray-200 rounded-lg p-3 flex justify-between items-start">
-                <div>
-                  <span className="font-medium">{f.reason}</span>
-                  <span className="text-[var(--text-muted)] ml-2">
-                    Severidad {f.severity} · {f.status}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-[var(--text)]">Posts</h2>
+      <section style={{ marginTop: 24 }}>
+        <h2 style={{ fontSize: 14, fontWeight: 700, color: "#0a0f8a", marginBottom: 14 }}>Posts</h2>
         {reportResult && (
-          <p className="text-sm text-[var(--primary)] bg-[var(--primary-soft)] px-3 py-2 rounded-lg">
-            {reportResult}
-          </p>
+          <p style={{ fontSize: 13, color: "#1428d4", marginBottom: 12, padding: "8px 12px", background: "rgba(20,40,212,0.08)", borderRadius: 10 }}>{reportResult}</p>
         )}
         {posts.map((p) => (
-          <article key={p.id} className="card-white p-4">
+          <article
+            key={p.id}
+            style={{
+              background: "#e8eaf0",
+              borderRadius: 18,
+              padding: 20,
+              marginBottom: 14,
+              boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
+            }}
+          >
             {p.pinned && (
-              <span className="text-[var(--accent)] text-sm font-medium mb-2 block">Fijado</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#00b87d", fontFamily: "'Space Mono', monospace", marginBottom: 8, display: "block" }}>Fijado</span>
             )}
-            <h3 className="font-semibold text-[var(--text)]">{p.title}</h3>
-            <p className="text-[var(--text-muted)] text-base mt-1">{p.body}</p>
-            <div className="flex items-center justify-between mt-2 flex-wrap gap-2">
-              <p className="text-sm text-[var(--text-muted)]">
-                {new Date(p.created_at).toLocaleDateString("es")}
-              </p>
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: "#0a0f8a", marginBottom: 6 }}>{p.title}</h3>
+            <p style={{ fontSize: 13, color: "#4a5580", lineHeight: 1.6, marginBottom: 12 }}>{p.body}</p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+              <p style={{ fontSize: 11, color: "#8892b0", fontFamily: "'Space Mono', monospace" }}>{new Date(p.created_at).toLocaleDateString("es")}</p>
               <button
                 type="button"
                 disabled={reportingId === p.id}
@@ -274,7 +379,18 @@ export default function ComunidadPage() {
                     .catch(() => setReportResult("Error al reportar"))
                     .finally(() => setReportingId(null));
                 }}
-                className="text-xs text-[var(--ink-muted)] hover:text-[var(--coral)] hover:underline disabled:opacity-50"
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: 8,
+                  border: "none",
+                  cursor: reportingId === p.id ? "wait" : "pointer",
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  background: "#e8eaf0",
+                  color: "#8892b0",
+                  boxShadow: "2px 2px 5px #c2c8d6, -2px -2px 5px #ffffff",
+                }}
               >
                 {reportingId === p.id ? "Enviando…" : "Reportar"}
               </button>

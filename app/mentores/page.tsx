@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { SurfaceCard } from "@/components/ui";
 import { MentorCard } from "@/components/community/MentorCard";
-import { ChevronLeft, Users } from "lucide-react";
 
 interface Mentor {
   userId: string;
@@ -70,52 +68,44 @@ export default function MentoresPage() {
   };
 
   return (
-    <div className="max-w-2xl w-full space-y-6">
-      <nav className="text-sm text-[var(--ink-muted)]">
-        <Link href="/inicio" className="hover:text-[var(--primary)] rounded">Inicio</Link>
-        {" · "}
-        <span className="text-[var(--ink)] font-medium">Mentores</span>
-      </nav>
-      <Link href="/inicio" className="inline-flex items-center gap-2 text-[var(--ink-muted)] hover:text-[var(--ink)] text-sm font-medium">
-        <ChevronLeft className="w-4 h-4" /> Volver
-      </Link>
-      <SurfaceCard padding="lg" clickable={false}>
-        <h1 className="text-xl font-semibold text-[var(--ink)] mb-2 flex items-center gap-2">
-          <Users className="w-6 h-6 text-[var(--primary)]" />
-          Mentores
-        </h1>
-        <p className="text-sm text-[var(--ink-muted)] mb-6">
-          Egresados ofrecen una sesión de 30 min. Solicita una y el equipo coordinará la conexión.
-        </p>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ marginBottom: 24 }}>
+        <Link href="/inicio" style={{ fontSize: 13, color: "#8892b0", marginBottom: 8, display: "inline-block" }}>← Inicio</Link>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Mentores</h1>
+        <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>Egresados ofrecen una sesión de 30 min. Solicita una y el equipo coordinará la conexión.</p>
+      </div>
+      <div style={{ background: "#e8eaf0", borderRadius: 20, padding: 24, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
         {loading ? (
-          <p className="text-[var(--ink-muted)]">Cargando…</p>
+          <p style={{ fontSize: 13, color: "#8892b0" }}>Cargando…</p>
         ) : mentors.length === 0 ? (
-          <p className="text-[var(--ink-muted)]">Aún no hay mentores.</p>
+          <div style={{ textAlign: "center", padding: "32px 0" }}>
+            <p style={{ fontSize: 15, fontWeight: 700, color: "#0a0f8a" }}>Los mentores aparecerán pronto</p>
+          </div>
         ) : (
-          <ul className="space-y-4 list-none">
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 14 }}>
             {mentors.map((m) => (
-              <li key={m.userId}>
+              <li key={m.userId} style={{ background: "#e8eaf0", borderRadius: 16, padding: 18, boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff" }}>
                 <MentorCard mentor={m} onRequest={handleRequestClick} requested={requestedIds.has(m.userId)} />
               </li>
             ))}
           </ul>
         )}
-      </SurfaceCard>
+      </div>
       {modal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-lg">
-            <h2 className="font-semibold text-[var(--ink)] mb-2">Solicitar sesión con {modal.mentorName}</h2>
+        <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "rgba(10,15,138,0.2)" }} role="dialog" aria-modal="true">
+          <div style={{ background: "#e8eaf0", borderRadius: 20, padding: 24, maxWidth: 400, width: "100%", boxShadow: "8px 8px 24px #c2c8d6, -8px -8px 24px #ffffff" }}>
+            <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 12 }}>Solicitar sesión con {modal.mentorName}</h2>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value.slice(0, 500))}
               placeholder="Tema o duda (opcional)"
               rows={3}
               maxLength={500}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--line)] text-sm mb-4"
+              style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "none", background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff", fontSize: 13, color: "#0a0f8a", outline: "none", marginBottom: 16 }}
             />
-            <div className="flex gap-2 justify-end">
-              <button type="button" onClick={() => setModal(null)} className="btn-ghost">Cancelar</button>
-              <button type="button" onClick={handleSubmitRequest} disabled={submitting} className="btn-primary">Enviar</button>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button type="button" onClick={() => setModal(null)} style={{ padding: "10px 18px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 600, background: "#e8eaf0", color: "#4a5580", boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff" }}>Cancelar</button>
+              <button type="button" onClick={handleSubmitRequest} disabled={submitting} style={{ padding: "10px 18px", borderRadius: 12, border: "none", cursor: submitting ? "wait" : "pointer", fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)" }}>{submitting ? "Enviando…" : "Enviar"}</button>
             </div>
           </div>
         </div>

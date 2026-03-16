@@ -2,41 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  SurfaceCard,
-  PrimaryButton,
-  EmptyState,
-  ListRow,
-  PageSection,
-} from "@/components/ui";
 import type { CursoApiResponse } from "@/app/api/curso/route";
 import type { ProgramaApiResponse } from "@/app/api/curso/programa/route";
-import { ModuleCard } from "@/components/curso/ModuleCard";
 import { ModuleProgramView } from "@/components/modules";
 import { getDemoMode } from "@/lib/env";
-import { ChevronRight, List, LayoutList } from "lucide-react";
-
-function Skeleton() {
-  return (
-    <div className="max-w-2xl space-y-4" aria-busy="true">
-      <div className="h-8 w-48 rounded-xl bg-[var(--surface-soft)] animate-pulse" />
-      <SurfaceCard padding="md" clickable={false}>
-        <div className="space-y-3">
-          <div className="h-5 rounded bg-[var(--surface-soft)] animate-pulse w-3/4" />
-          <div className="h-4 rounded bg-[var(--surface-soft)] animate-pulse w-full" />
-          <div className="h-4 rounded bg-[var(--surface-soft)] animate-pulse w-1/2" />
-        </div>
-      </SurfaceCard>
-      <SurfaceCard padding="md" clickable={false}>
-        <div className="space-y-2">
-          <div className="h-4 rounded bg-[var(--surface-soft)] animate-pulse w-1/3" />
-          <div className="h-12 rounded-xl bg-[var(--surface-soft)] animate-pulse" />
-          <div className="h-12 rounded-xl bg-[var(--surface-soft)] animate-pulse" />
-        </div>
-      </SurfaceCard>
-    </div>
-  );
-}
 
 type CursoView = "modulos" | "programa";
 
@@ -99,33 +68,27 @@ export default function CursoPage() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl w-full">
-        <Skeleton />
+      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Mi curso</h1>
+          <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>Cargando…</p>
+        </div>
+        <div style={{ background: "#e8eaf0", borderRadius: 20, padding: 40, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+          <div style={{ height: 24, width: "60%", background: "#e8eaf0", borderRadius: 8, boxShadow: "inset 3px 3px 8px #c2c8d6" }} />
+        </div>
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="max-w-2xl w-full">
-        <div
-          style={{
-            background: "#e8eaf0",
-            borderRadius: 20,
-            padding: 40,
-            textAlign: "center",
-            boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
-            maxWidth: 500,
-            margin: "40px auto",
-            fontFamily: "var(--font-heading)",
-          }}
-        >
-          <div style={{ fontSize: 48, marginBottom: 16 }}>📚</div>
-          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>
-            Aún no tienes un curso asignado
-          </h2>
-          <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>
-            Pronto tendrás acceso a tu programa de formación.
+      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+        <div style={{ background: "#e8eaf0", borderRadius: 20, padding: 40, textAlign: "center", maxWidth: 500, margin: "40px auto", boxShadow: "8px 8px 20px #c2c8d6, -8px -8px 20px #ffffff" }}>
+          <div style={{ fontSize: 56, marginBottom: 16 }}>📚</div>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>Aún no tienes un curso asignado</h2>
+          <p style={{ fontSize: 13, color: "#8892b0", lineHeight: 1.7, marginBottom: 24 }}>
+            Pronto tendrás acceso a tu programa de formación.<br />
+            El administrador te notificará cuando esté listo.
           </p>
           <a
             href="/inicio"
@@ -135,7 +98,7 @@ export default function CursoPage() {
               borderRadius: 14,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
               color: "white",
-              fontFamily: "var(--font-heading)",
+              fontFamily: "'Syne', sans-serif",
               fontSize: 13,
               fontWeight: 700,
               textDecoration: "none",
@@ -156,25 +119,13 @@ export default function CursoPage() {
 
   if (!data.course) {
     return (
-      <div className="max-w-2xl w-full">
-        <div
-          style={{
-            background: "#e8eaf0",
-            borderRadius: 20,
-            padding: 40,
-            textAlign: "center",
-            boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
-            maxWidth: 500,
-            margin: "40px auto",
-            fontFamily: "var(--font-heading)",
-          }}
-        >
-          <div style={{ fontSize: 48, marginBottom: 16 }}>📚</div>
-          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>
-            Aún no tienes un curso asignado
-          </h2>
-          <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>
-            Pronto tendrás acceso a tu programa de formación.
+      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+        <div style={{ background: "#e8eaf0", borderRadius: 20, padding: 40, textAlign: "center", maxWidth: 500, margin: "40px auto", boxShadow: "8px 8px 20px #c2c8d6, -8px -8px 20px #ffffff" }}>
+          <div style={{ fontSize: 56, marginBottom: 16 }}>📚</div>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>Aún no tienes un curso asignado</h2>
+          <p style={{ fontSize: 13, color: "#8892b0", lineHeight: 1.7, marginBottom: 24 }}>
+            Pronto tendrás acceso a tu programa de formación.<br />
+            El administrador te notificará cuando esté listo.
           </p>
           <a
             href="/inicio"
@@ -184,7 +135,7 @@ export default function CursoPage() {
               borderRadius: 14,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
               color: "white",
-              fontFamily: "var(--font-heading)",
+              fontFamily: "'Syne', sans-serif",
               fontSize: 13,
               fontWeight: 700,
               textDecoration: "none",
@@ -201,59 +152,68 @@ export default function CursoPage() {
   const hasContent = data.modules.some((m) => m.lessonCount > 0);
   if (!hasContent) {
     return (
-      <div className="max-w-2xl w-full">
-        <EmptyState
-          title="El contenido se está preparando"
-          description="Tu curso ya está asignado; los módulos y lecciones se publicarán pronto. Revisa más tarde o vuelve al inicio."
-          ctaLabel="Volver a inicio"
-          ctaHref="/inicio"
-          icon="📖"
-        />
+      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Mi curso</h1>
+          <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>{data.course.title}</p>
+        </div>
+        <div style={{ background: "#e8eaf0", borderRadius: 20, padding: 40, textAlign: "center", maxWidth: 500, margin: "40px auto", boxShadow: "8px 8px 20px #c2c8d6, -8px -8px 20px #ffffff" }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>📖</div>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>El contenido se está preparando</h2>
+          <p style={{ fontSize: 13, color: "#8892b0", lineHeight: 1.7, marginBottom: 24 }}>
+            Tu curso ya está asignado; los módulos y lecciones se publicarán pronto.
+          </p>
+          <a
+            href="/inicio"
+            style={{
+              display: "inline-block",
+              padding: "12px 28px",
+              borderRadius: 14,
+              background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+              color: "white",
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 13,
+              fontWeight: 700,
+              textDecoration: "none",
+              boxShadow: "5px 5px 12px rgba(10,15,138,0.35)",
+            }}
+          >
+            Volver al inicio
+          </a>
+        </div>
       </div>
     );
   }
 
   const moduleAccess = data.moduleAccess ?? {};
-  const moduleLockReasons = data.moduleLockReasons ?? {};
-  const firstUnlockedModule = data.modules.find((m) => m.lessonCount > 0 && moduleAccess[m.id] !== "locked");
-  const firstLessonIdUnlocked = firstUnlockedModule?.lessons[0]?.id ?? data.firstLessonId;
-  const firstHref = firstLessonIdUnlocked ? `/curso/lecciones/${firstLessonIdUnlocked}` : "/curso";
   const lessonById = new Map(data.lessons.map((l) => [l.id, l]));
-  const useModuleCards = Object.keys(moduleAccess).length > 0;
 
   return (
-    <div className="max-w-2xl w-full space-y-8">
-      <PageSection
-        id="curso-header"
-        title={data.course.title}
-        subtitle={data.course.description ?? undefined}
-      >
-        <PrimaryButton
-          href={firstHref}
-          className="inline-flex items-center gap-2 w-fit min-h-[48px]"
-          aria-label={firstLessonIdUnlocked ? "Continuar al contenido" : "Comenzar"}
-        >
-          {firstLessonIdUnlocked ? "Continuar" : "Comenzar"}
-          <ChevronRight className="w-4 h-4" aria-hidden />
-        </PrimaryButton>
-      </PageSection>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Mi curso</h1>
+        <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>{data.course.description ?? data.course.title}</p>
+      </div>
 
-      <div
-        className="rounded-[16px] p-1 bg-[var(--neu-bg)] border-none flex gap-1 w-fit"
-        style={{ boxShadow: "var(--neu-shadow-in-sm)" }}
-        role="tablist"
-      >
+      <div style={{ display: "flex", gap: 8, marginBottom: 20 }} role="tablist">
         <button
           type="button"
           role="tab"
           aria-selected={view === "modulos"}
           onClick={() => setView("modulos")}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            view === "modulos" ? "bg-[var(--surface)] text-[var(--azul)]" : "text-[var(--ink)] hover:bg-[var(--surface-soft)]"
-          }`}
-          style={view === "modulos" ? { boxShadow: "var(--neu-shadow-out-sm)" } : undefined}
+          style={{
+            padding: "10px 18px",
+            borderRadius: 12,
+            border: "none",
+            cursor: "pointer",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 13,
+            fontWeight: 600,
+            background: view === "modulos" ? "#e8eaf0" : "#e8eaf0",
+            color: view === "modulos" ? "#0a0f8a" : "#8892b0",
+            boxShadow: view === "modulos" ? "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff" : "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+          }}
         >
-          <List className="w-4 h-4" aria-hidden />
           Módulos y lecciones
         </button>
         <button
@@ -261,92 +221,150 @@ export default function CursoPage() {
           role="tab"
           aria-selected={view === "programa"}
           onClick={() => setView("programa")}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            view === "programa" ? "bg-[var(--surface)] text-[var(--azul)]" : "text-[var(--ink)] hover:bg-[var(--surface-soft)]"
-          }`}
-          style={view === "programa" ? { boxShadow: "var(--neu-shadow-out-sm)" } : undefined}
+          style={{
+            padding: "10px 18px",
+            borderRadius: 12,
+            border: "none",
+            cursor: "pointer",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 13,
+            fontWeight: 600,
+            background: "#e8eaf0",
+            color: view === "programa" ? "#0a0f8a" : "#8892b0",
+            boxShadow: view === "programa" ? "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff" : "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+          }}
         >
-          <LayoutList className="w-4 h-4" aria-hidden />
           Programa completo
         </button>
       </div>
 
       {view === "modulos" && (
-      <PageSection id="modulos" title="Módulos y lecciones">
-        <div className="space-y-4">
-          {data.modules.map((mod, modIndex) => {
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {data.modules.map((mod, i) => {
             if (mod.lessonCount === 0) return null;
-            if (useModuleCards) {
-              return (
-                <ModuleCard
-                  key={mod.id}
-                  module={mod}
-                  accessStatus={moduleAccess[mod.id] ?? "available"}
-                  courseId={data.course!.id}
-                  firstLessonId={mod.lessons[0]?.id ?? null}
-                  lockReason={moduleLockReasons[mod.id]}
-                />
-              );
-            }
-            const moduleLabel = `Módulo ${modIndex + 1}: ${mod.title}`;
+            const done = mod.lessons.filter((l) => completedLessonIds.includes(l.id)).length;
+            const completado = mod.lessonCount ? Math.round((done / mod.lessonCount) * 100) : 0;
+            const isLocked = moduleAccess[mod.id] === "locked";
+
             return (
-              <SurfaceCard key={mod.id} padding="md" clickable={false}>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <h3 className="font-semibold text-[var(--ink)]">{moduleLabel}</h3>
-                  <span className="text-xs text-[var(--ink-muted)]">
-                    {(() => {
-                      const done = mod.lessons.filter((l) => completedLessonIds.includes(l.id)).length;
-                      return `${done}/${mod.lessonCount} completadas`;
-                    })()}
-                  </span>
+              <div
+                key={mod.id}
+                style={{
+                  background: "#e8eaf0",
+                  borderRadius: 20,
+                  padding: 24,
+                  marginBottom: 0,
+                  boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+                  <div>
+                    <p style={{ fontSize: 10, color: "#1428d4", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 4 }}>
+                      Módulo {i + 1}
+                    </p>
+                    <h3 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a" }}>{mod.title}</h3>
+                  </div>
+                  <div
+                    style={{
+                      width: 52,
+                      height: 52,
+                      borderRadius: "50%",
+                      background: "#e8eaf0",
+                      boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#1428d4", fontFamily: "'Space Mono', monospace" }}>{completado}%</span>
+                  </div>
                 </div>
-                <ul className="space-y-2" role="list">
-                  {mod.lessons.map((l) => {
-                    const meta = lessonById.get(l.id);
-                    const durationLabel = meta?.estimated_minutes != null && meta.estimated_minutes > 0
-                      ? `~${meta.estimated_minutes} min`
-                      : null;
-                    const isCommunity = (l as { source_community?: boolean }).source_community ?? meta?.source_community;
-                    const subtitleParts = [durationLabel, isCommunity ? "Comunidad" : null].filter(Boolean);
-                    return (
-                      <li key={l.id}>
-                        <ListRow
-                          href={`/curso/lecciones/${l.id}`}
-                          title={l.title}
-                          subtitle={subtitleParts.length > 0 ? subtitleParts.join(" · ") : undefined}
-                          badge={
-                            completedLessonIds.includes(l.id)
-                              ? { variant: "completado", label: "Completado" }
-                              : { variant: "pendiente", label: "Pendiente" }
-                          }
-                          className="min-h-[48px] rounded-xl"
-                        />
-                      </li>
-                    );
-                  })}
-                </ul>
-              </SurfaceCard>
+
+                {mod.lessons.map((leccion) => {
+                  const completada = completedLessonIds.includes(leccion.id);
+                  const meta = lessonById.get(leccion.id);
+                  const duration = meta?.estimated_minutes != null && meta.estimated_minutes > 0 ? `${meta.estimated_minutes} min` : "—";
+
+                  return (
+                    <div
+                      key={leccion.id}
+                      role="button"
+                      tabIndex={isLocked ? undefined : 0}
+                      onClick={() => { if (!isLocked) router.push(`/curso/lecciones/${leccion.id}`); }}
+                      onKeyDown={(e) => { if (!isLocked && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); router.push(`/curso/lecciones/${leccion.id}`); } }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        padding: "10px 14px",
+                        borderRadius: 12,
+                        marginBottom: 8,
+                        background: "#e8eaf0",
+                        cursor: isLocked ? "default" : "pointer",
+                        boxShadow: completada
+                          ? "inset 2px 2px 6px #c2c8d6, inset -2px -2px 6px #ffffff"
+                          : "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: "50%",
+                          flexShrink: 0,
+                          background: completada ? "rgba(0,229,160,0.2)" : "#e8eaf0",
+                          boxShadow: completada ? "none" : "3px 3px 7px #c2c8d6, -3px -3px 7px #ffffff",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {completada ? (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00b87d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        ) : (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8892b0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 8 12 12 14 14" />
+                          </svg>
+                        )}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: "#0a0f8a" }}>{leccion.title}</p>
+                        <p style={{ fontSize: 11, color: "#8892b0", marginTop: 2 }}>{duration}</p>
+                      </div>
+                      {!isLocked && (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8892b0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             );
           })}
         </div>
-      </PageSection>
       )}
 
       {view === "programa" && (
-        <div className="max-w-2xl">
+        <div style={{ maxWidth: 720 }}>
           {programaLoading ? (
-            <div className="space-y-3 animate-pulse">
-              <div className="h-6 w-40 rounded bg-[var(--surface-soft)]" />
-              <div className="h-24 rounded-[16px] bg-[var(--surface-soft)]" />
-              <div className="h-24 rounded-[16px] bg-[var(--surface-soft)]" />
+            <div style={{ background: "#e8eaf0", borderRadius: 16, padding: 24, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+              <div style={{ height: 20, width: "40%", background: "#e8eaf0", borderRadius: 8, boxShadow: "inset 2px 2px 5px #c2c8d6", marginBottom: 16 }} />
+              <div style={{ height: 60, background: "#e8eaf0", borderRadius: 12, boxShadow: "inset 2px 2px 5px #c2c8d6" }} />
             </div>
           ) : programaData?.modules && programaData.modules.length > 0 ? (
-            <ModuleProgramView
-              modules={programaData.modules}
-              onModuleClick={(id) => router.push(`/curso/modulos/${id}`)}
-            />
+            <div style={{ background: "#e8eaf0", borderRadius: 20, padding: 24, boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff" }}>
+              <ModuleProgramView
+                modules={programaData.modules}
+                onModuleClick={(id) => router.push(`/curso/modulos/${id}`)}
+              />
+            </div>
           ) : (
-            <p className="text-sm text-[var(--texto-sub)]">No hay módulos en el programa.</p>
+            <p style={{ fontSize: 13, color: "#8892b0" }}>No hay módulos en el programa.</p>
           )}
         </div>
       )}

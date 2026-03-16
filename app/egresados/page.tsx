@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { SurfaceCard } from "@/components/ui";
 import { AlumniDirectory } from "@/components/community/AlumniDirectory";
-import { ChevronLeft, Award } from "lucide-react";
 
 interface AlumniEntry {
   userId: string;
@@ -59,25 +57,23 @@ export default function EgresadosPage() {
   }, [filters, fetchAlumni]);
 
   return (
-    <div className="max-w-2xl w-full space-y-6">
-      <nav className="text-sm text-[var(--ink-muted)]">
-        <Link href="/inicio" className="hover:text-[var(--primary)] rounded">Inicio</Link>
-        {" · "}
-        <span className="text-[var(--ink)] font-medium">Egresados</span>
-      </nav>
-      <Link href="/inicio" className="inline-flex items-center gap-2 text-[var(--ink-muted)] hover:text-[var(--ink)] text-sm font-medium">
-        <ChevronLeft className="w-4 h-4" /> Volver
-      </Link>
-      <SurfaceCard padding="lg" clickable={false}>
-        <h1 className="text-xl font-semibold text-[var(--ink)] mb-2 flex items-center gap-2">
-          <Award className="w-6 h-6 text-[var(--primary)]" />
-          Red de egresados
-        </h1>
-        <p className="text-sm text-[var(--ink-muted)] mb-6">
-          Directorio de quienes completaron Política Digital. Filtra por institución, región o grupo. Los egresados llevan el badge &quot;Egresado Política Digital&quot;.
-        </p>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ marginBottom: 24 }}>
+        <Link href="/inicio" style={{ fontSize: 13, color: "#8892b0", marginBottom: 8, display: "inline-block" }}>← Inicio</Link>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Egresados</h1>
+        <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>Red de quienes completaron Política Digital. Filtra por institución, región o grupo.</p>
+      </div>
+
+      <div
+        style={{
+          background: "#e8eaf0",
+          borderRadius: 20,
+          padding: 24,
+          boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
+        }}
+      >
         {loading ? (
-          <p className="text-[var(--ink-muted)]">Cargando…</p>
+          <p style={{ fontSize: 13, color: "#8892b0" }}>Cargando…</p>
         ) : (
           <AlumniDirectory
             alumni={alumni}
@@ -87,7 +83,24 @@ export default function EgresadosPage() {
             cohortOptions={cohortOptions}
           />
         )}
-      </SurfaceCard>
+      </div>
+
+      {!loading && alumni.length === 0 && suggested.length === 0 && (
+        <div
+          style={{
+            background: "#e8eaf0",
+            borderRadius: 16,
+            padding: 24,
+            marginTop: 16,
+            textAlign: "center",
+            boxShadow: "5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff",
+          }}
+        >
+          <div style={{ fontSize: 48, marginBottom: 12 }}>🎓</div>
+          <p style={{ fontSize: 15, fontWeight: 700, color: "#0a0f8a" }}>Los egresados del programa aparecerán aquí</p>
+          <p style={{ fontSize: 13, color: "#8892b0", marginTop: 6 }}>Cuando haya egresados podrás ver el directorio.</p>
+        </div>
+      )}
     </div>
   );
 }

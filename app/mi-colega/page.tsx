@@ -2,10 +2,18 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { SurfaceCard } from "@/components/ui";
 import { FindColleague } from "@/components/community/FindColleague";
 import { PairChat } from "@/components/community/PairChat";
-import { ChevronLeft, CheckCircle, Loader2 } from "lucide-react";
+
+interface Pair {
+  id: string;
+  userA: string;
+  userB: string;
+  moduleId: string;
+  status: string;
+  partnerId?: string;
+  partnerName?: string;
+}
 
 function CompletePairButton({ pairId, onCompleted }: { pairId: string; onCompleted: () => void }) {
   const [loading, setLoading] = useState(false);
@@ -19,21 +27,29 @@ function CompletePairButton({ pairId, onCompleted }: { pairId: string; onComplet
     }
   };
   return (
-    <button type="button" onClick={handleComplete} disabled={loading} className="btn-primary text-sm flex items-center gap-2 disabled:opacity-50">
-      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-      Marcar módulo completado en equipo
+    <button
+      type="button"
+      onClick={handleComplete}
+      disabled={loading}
+      style={{
+        padding: "10px 18px",
+        borderRadius: 12,
+        border: "none",
+        cursor: loading ? "wait" : "pointer",
+        fontFamily: "'Syne', sans-serif",
+        fontSize: 12,
+        fontWeight: 700,
+        background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+        color: "white",
+        boxShadow: "4px 4px 10px rgba(10,15,138,0.3)",
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+      }}
+    >
+      {loading ? "Guardando…" : "Marcar módulo completado en equipo"}
     </button>
   );
-}
-
-interface Pair {
-  id: string;
-  userA: string;
-  userB: string;
-  moduleId: string;
-  status: string;
-  partnerId?: string;
-  partnerName?: string;
 }
 
 export default function MiColegaPage() {
@@ -61,56 +77,88 @@ export default function MiColegaPage() {
   }, []);
 
   return (
-    <div className="max-w-2xl w-full space-y-6">
-      <nav className="text-sm text-[var(--ink-muted)]" aria-label="Breadcrumb">
-        <Link href="/inicio" className="hover:text-[var(--primary)] focus-visible:ring-2 focus-visible:ring-[var(--primary)] rounded">
-          Inicio
-        </Link>
-        {" · "}
-        <span className="text-[var(--ink)] font-medium">Mi colega</span>
-      </nav>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ marginBottom: 24 }}>
+        <Link href="/inicio" style={{ fontSize: 13, color: "#8892b0", marginBottom: 8, display: "inline-block" }}>← Inicio</Link>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Mi colega</h1>
+        <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>Aprende en pareja con otro participante del programa</p>
+      </div>
 
-      <Link
-        href="/inicio"
-        className="inline-flex items-center gap-2 text-[var(--ink-muted)] hover:text-[var(--ink)] text-sm font-medium"
+      <div
+        style={{
+          background: "#e8eaf0",
+          borderRadius: 20,
+          padding: 24,
+          boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
+        }}
       >
-        <ChevronLeft className="w-4 h-4" aria-hidden />
-        Volver
-      </Link>
-
-      <SurfaceCard padding="lg" clickable={false}>
-        <h1 className="text-xl font-semibold text-[var(--ink)] mb-2">Aprendo con un colega</h1>
-        <p className="text-sm text-[var(--ink-muted)] mb-6">
-          Activa la búsqueda para que te emparejemos con otro alumno y completen un módulo juntos. Tienen 7 días y un chat privado para coordinarse.
-        </p>
-
-        <FindColleague onMatched={(p) => setPair(p)} />
+        {!loading && !pair && (
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <p style={{ fontSize: 14, color: "#4a5580", marginBottom: 20 }}>
+              Activa la búsqueda para que te emparejemos con otro alumno y completen un módulo juntos.
+            </p>
+            <FindColleague onMatched={(p) => setPair(p)} />
+          </div>
+        )}
 
         {!loading && pair && pair.status === "active" && userId && (
-          <div className="mt-6 space-y-4">
+          <>
+            <div style={{ marginBottom: 16 }}>
+              <p style={{ fontSize: 12, color: "#1428d4", fontFamily: "'Space Mono', monospace", marginBottom: 4 }}>Tu pareja de aprendizaje</p>
+              <p style={{ fontSize: 15, fontWeight: 700, color: "#0a0f8a" }}>{pair.partnerName ?? "Compañero asignado"}</p>
+            </div>
             <PairChat pairId={pair.id} currentUserId={userId} pollIntervalMs={30000} />
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 20, alignItems: "center" }}>
               <Link
                 href={`/curso/modulos/${pair.moduleId}/recursos`}
-                className="text-sm text-[var(--primary)] font-medium hover:underline"
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#1428d4",
+                  textDecoration: "none",
+                }}
               >
                 Ir al módulo asignado →
               </Link>
               <CompletePairButton pairId={pair.id} onCompleted={() => setPair((p) => (p ? { ...p, status: "completed" } : null))} />
             </div>
-          </div>
+          </>
         )}
 
         {!loading && pair && pair.status === "completed" && (
-          <div className="mt-6 p-4 rounded-xl border border-green-200 bg-green-50/50 flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-green-600 shrink-0" />
+          <div
+            style={{
+              background: "rgba(0,184,125,0.1)",
+              borderRadius: 14,
+              padding: 20,
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+            }}
+          >
+            <span style={{ fontSize: 28 }}>✓</span>
             <div>
-              <p className="font-medium text-[var(--ink)]">Módulo completado en equipo</p>
-              <p className="text-sm text-[var(--ink-muted)]">Ambos recibieron el badge &quot;Aprendí en equipo&quot;.</p>
+              <p style={{ fontSize: 15, fontWeight: 700, color: "#0a0f8a" }}>Módulo completado en equipo</p>
+              <p style={{ fontSize: 13, color: "#4a5580", marginTop: 4 }}>Ambos recibieron el logro &quot;Aprendí en equipo&quot;.</p>
             </div>
           </div>
         )}
-      </SurfaceCard>
+      </div>
+
+      {!loading && !pair && (
+        <div
+          style={{
+            background: "#e8eaf0",
+            borderRadius: 16,
+            padding: 24,
+            marginTop: 16,
+            textAlign: "center",
+            boxShadow: "5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff",
+          }}
+        >
+          <p style={{ fontSize: 13, color: "#8892b0" }}>Tu colega de aprendizaje aparecerá aquí cuando te emparejemos.</p>
+        </div>
+      )}
     </div>
   );
 }
