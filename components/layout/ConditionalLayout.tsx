@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { AppShell } from "./AppShell";
 import { AdminShell } from "@/components/admin/AdminShell";
 
-const STANDALONE_PATHS = ["/login", "/registro", "/no-inscrito", "/inicio", "/mi-perfil", "/portafolio", "/conocimiento", "/retos", "/privacidad", "/laboratorio/escape"];
+const STANDALONE_PATHS = ["/login", "/registro", "/no-inscrito", "/inicio", "/mi-perfil", "/pendientes", "/portafolio", "/conocimiento", "/retos", "/privacidad", "/laboratorio/escape"];
 
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

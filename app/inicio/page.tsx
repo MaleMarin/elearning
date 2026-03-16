@@ -15,11 +15,6 @@ import { useTheme } from '@/lib/hooks/useTheme'
 type MoodValue = 'bien' | 'regular' | 'dificil' | 'excelente' | null
 type NavKey = 'inicio' | 'curso' | 'tareas' | 'comunidad' | 'perfil'
 
-interface NavItem {
-  href: string
-  label: string
-  icon: React.ReactNode
-}
 
 interface LessonItem {
   id: string
@@ -123,17 +118,17 @@ const IcoHelp = () => <svg {...svgAria} width="13" height="13" viewBox="0 0 24 2
 const IcoPortfolio = () => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
 const IcoKnowledge = () => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/><path d="M12 5a7 7 0 0 0-7 7c0 2.5 1.5 4 3 5l4-4 4 4c1.5-1 3-2.5 3-5a7 7 0 0 0-7-7z"/></svg>
 const IcoRetos = () => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-const NAV_ITEMS: NavItem[] = [
-  { href: '/inicio', label: 'Inicio', icon: <IcoGrid /> },
-  { href: '/curso', label: 'Mi Curso', icon: <IcoBook /> },
-  { href: '/sesiones-en-vivo', label: 'Sesiones', icon: <IcoCalendar /> },
-  { href: '/tareas', label: 'Tareas', icon: <IcoCheck /> },
-  { href: '/comunidad', label: 'Comunidad', icon: <IcoUsers /> },
-  { href: '/mi-colega', label: 'Mi Colega', icon: <IcoMsg /> },
-  { href: '/laboratorio', label: 'Laboratorio', icon: <IcoLab /> },
-  { href: '/portafolio', label: 'Portafolio', icon: <IcoPortfolio /> },
-  { href: '/conocimiento', label: 'Conocimiento', icon: <IcoKnowledge /> },
-  { href: '/retos', label: 'Retos', icon: <IcoRetos /> },
+const NAV_ITEMS: { href: string; label: string; tooltip: string; icon: React.ReactNode }[] = [
+  { href: '/inicio', label: 'Inicio', tooltip: 'Dashboard', icon: <IcoGrid /> },
+  { href: '/curso', label: 'Mi Curso', tooltip: 'Mi curso', icon: <IcoBook /> },
+  { href: '/sesiones-en-vivo', label: 'Sesiones', tooltip: 'Sesiones en vivo', icon: <IcoCalendar /> },
+  { href: '/tareas', label: 'Tareas', tooltip: 'Tareas', icon: <IcoCheck /> },
+  { href: '/comunidad', label: 'Comunidad', tooltip: 'Comunidad', icon: <IcoUsers /> },
+  { href: '/mi-colega', label: 'Mi Colega', tooltip: 'Mi colega', icon: <IcoMsg /> },
+  { href: '/laboratorio', label: 'Laboratorio', tooltip: 'El Laboratorio', icon: <IcoLab /> },
+  { href: '/portafolio', label: 'Portafolio', tooltip: 'Portafolio', icon: <IcoPortfolio /> },
+  { href: '/conocimiento', label: 'Conocimiento', tooltip: 'Conocimiento', icon: <IcoKnowledge /> },
+  { href: '/retos', label: 'Retos', tooltip: 'Retos', icon: <IcoRetos /> },
 ]
 
 // ─── Datos estáticos (TODO: conectar con Firebase hooks) ──────────────────────
@@ -158,11 +153,11 @@ const ACTIVITY: ActivityItem[] = [
   { color: '#ffc107', title: 'Logro desbloqueado', description: 'Defensor Digital',         time: 'Lun' },
 ]
 
-const NOTIFS: NotifItem[] = [
-  { icon: '📋', iconBg: 'rgba(0,229,160,0.15)',   title: 'Quiz disponible',    sub: 'Módulo 3 · Hoy 16:00',      isNew: true },
-  { icon: '🎙️', iconBg: 'rgba(20,40,212,0.12)',   title: 'Sesión en vivo',     sub: 'Mañana 10:00 AM',            isNew: true },
-  { icon: '⭐',  iconBg: 'rgba(255,186,0,0.14)',   title: 'Logro cerca',        sub: 'Completa 1 lección más',     isNew: false },
-  { icon: '📝',  iconBg: 'rgba(229,57,53,0.1)',    title: 'Tarea pendiente',    sub: 'Vence el 18 Mar',            isNew: true },
+const NOTIFS: (NotifItem & { href: string })[] = [
+  { icon: '📋', iconBg: 'rgba(0,229,160,0.15)',   title: 'Quiz disponible',    sub: 'Módulo 3 · Hoy 16:00',      isNew: true,  href: '/curso#quiz' },
+  { icon: '🎙️', iconBg: 'rgba(20,40,212,0.12)',   title: 'Sesión en vivo',     sub: 'Mañana 10:00 AM',            isNew: true,  href: '/sesiones-en-vivo' },
+  { icon: '⭐',  iconBg: 'rgba(255,186,0,0.14)',   title: 'Logro cerca',        sub: 'Completa 1 lección más',     isNew: false, href: '/mi-perfil#logros' },
+  { icon: '📝',  iconBg: 'rgba(229,57,53,0.1)',    title: 'Tarea pendiente',    sub: 'Vence el 18 Mar',            isNew: true,  href: '/curso#tareas' },
 ]
 
 // Días con evento en el calendario (ej. entrega, sesión)
@@ -176,6 +171,7 @@ export default function DashboardAlumno() {
   const isDark = theme === 'dark'
   const NM = isDark ? NM_DARK : NM_LIGHT
   const [selectedMood, setSelectedMood] = useState<MoodValue>(null)
+  const [hovered, setHovered] = useState<string | null>(null)
 
   const handleCerrarSesion = async () => {
     await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
@@ -306,36 +302,84 @@ export default function DashboardAlumno() {
           {NAV_ITEMS.map((item) => {
             const active = pathname === item.href || (item.href !== '/inicio' && pathname?.startsWith(item.href))
             return (
-              <SidebarNavSquare
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                icon={item.icon}
-                active={active}
-                theme={NM}
-              />
+              <div key={item.href} style={{ position: 'relative' }} onMouseEnter={() => setHovered(item.href)} onMouseLeave={() => setHovered(null)}>
+                <SidebarNavSquare href={item.href} label={item.label} icon={item.icon} active={active} theme={NM} />
+                {hovered === item.href && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 58,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: '#e8eaf0',
+                      borderRadius: 10,
+                      padding: '6px 12px',
+                      boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff',
+                      whiteSpace: 'nowrap',
+                      zIndex: 100,
+                      fontFamily: "'Syne', sans-serif",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: '#0a0f8a',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {item.tooltip}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: -6,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: 0,
+                        height: 0,
+                        borderTop: '5px solid transparent',
+                        borderBottom: '5px solid transparent',
+                        borderRight: '6px solid #e8eaf0',
+                        filter: 'drop-shadow(-2px 0 2px #c2c8d6)',
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             )
           })}
         </nav>
         <div className="flex-1" />
         <div className="flex flex-col gap-2 w-full items-center">
-          <SidebarNavSquare href="/mi-perfil" label="Mi perfil" icon={<IcoUser />} active={pathname === '/mi-perfil' || pathname?.startsWith('/mi-perfil')} theme={NM} />
-          <button
-            type="button"
-            onClick={handleCerrarSesion}
-            title="Cerrar sesión"
-            aria-label="Cerrar sesión"
-            className="flex items-center justify-center flex-shrink-0"
-            style={{
-              width: 46, height: 46, borderRadius: 13,
-              border: 'none', cursor: 'pointer',
-              background: NM.bg, color: NM.muted,
-              boxShadow: NM.elevatedSm,
-              transition: 'all 0.18s ease',
-            }}
-          >
-            <IcoLogout />
-          </button>
+          <div style={{ position: 'relative' }} onMouseEnter={() => setHovered('perfil')} onMouseLeave={() => setHovered(null)}>
+            <SidebarNavSquare href="/mi-perfil" label="Mi perfil" icon={<IcoUser />} active={pathname === '/mi-perfil' || pathname?.startsWith('/mi-perfil')} theme={NM} />
+            {hovered === 'perfil' && (
+              <div style={{ position: 'absolute', left: 58, top: '50%', transform: 'translateY(-50%)', background: '#e8eaf0', borderRadius: 10, padding: '6px 12px', boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff', whiteSpace: 'nowrap', zIndex: 100, fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 600, color: '#0a0f8a', pointerEvents: 'none' }}>
+                Mi perfil
+                <div style={{ position: 'absolute', left: -6, top: '50%', transform: 'translateY(-50%)', width: 0, height: 0, borderTop: '5px solid transparent', borderBottom: '5px solid transparent', borderRight: '6px solid #e8eaf0', filter: 'drop-shadow(-2px 0 2px #c2c8d6)' }} />
+              </div>
+            )}
+          </div>
+          <div style={{ position: 'relative' }} onMouseEnter={() => setHovered('logout')} onMouseLeave={() => setHovered(null)}>
+            <button
+              type="button"
+              onClick={handleCerrarSesion}
+              title="Cerrar sesión"
+              aria-label="Cerrar sesión"
+              className="flex items-center justify-center flex-shrink-0"
+              style={{
+                width: 46, height: 46, borderRadius: 13,
+                border: 'none', cursor: 'pointer',
+                background: NM.bg, color: NM.muted,
+                boxShadow: NM.elevatedSm,
+                transition: 'all 0.18s ease',
+              }}
+            >
+              <IcoLogout />
+            </button>
+            {hovered === 'logout' && (
+              <div style={{ position: 'absolute', left: 58, top: '50%', transform: 'translateY(-50%)', background: '#e8eaf0', borderRadius: 10, padding: '6px 12px', boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff', whiteSpace: 'nowrap', zIndex: 100, fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 600, color: '#0a0f8a', pointerEvents: 'none' }}>
+                Cerrar sesión
+                <div style={{ position: 'absolute', left: -6, top: '50%', transform: 'translateY(-50%)', width: 0, height: 0, borderTop: '5px solid transparent', borderBottom: '5px solid transparent', borderRight: '6px solid #e8eaf0', filter: 'drop-shadow(-2px 0 2px #c2c8d6)' }} />
+              </div>
+            )}
+          </div>
         </div>
       </aside>
 
@@ -543,17 +587,40 @@ export default function DashboardAlumno() {
           </section>
           {/* Notificaciones */}
           <section style={{ background: NM.bg, borderRadius: 16, padding: 16, boxShadow: NM.elevated }} aria-labelledby="notificaciones-heading">
-            <h3 id="notificaciones-heading" style={{ fontSize: f(11), fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
-              Notificaciones
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 id="notificaciones-heading" style={{ fontSize: f(11), fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: "'Space Mono', monospace", margin: 0 }}>
+                Notificaciones
+              </h3>
+              <Link href="/pendientes" style={{ fontSize: f(10), fontWeight: 600, color: '#1428d4', fontFamily: "var(--font-heading)", textDecoration: 'none' }}>Ver todos</Link>
+            </div>
             {NOTIFS.map((n, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 0', borderBottom: i < NOTIFS.length - 1 ? `1px solid ${NM.border}` : 'none' }}>
+              <div
+                key={i}
+                role="button"
+                tabIndex={0}
+                onClick={() => router.push(n.href)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(n.href) } }}
+                style={{
+                  cursor: 'pointer',
+                  padding: '12px 14px',
+                  borderRadius: 14,
+                  background: NM.bg,
+                  boxShadow: '4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff',
+                  marginBottom: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff' }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff' }}
+              >
                 <div style={{ width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, background: n.iconBg, flexShrink: 0, boxShadow: NM.insetSm }}>{n.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: f(12), fontWeight: 600, color: NM.text, marginBottom: 1, lineHeight: 1.3 }}>{n.title}</p>
                   <p style={{ fontSize: f(10), color: NM.muted, fontFamily: "'Space Mono', monospace" }}>{n.sub}</p>
                 </div>
-                {n.isNew && <span style={{ width: 6, height: 6, background: '#00e5a0', borderRadius: '50%', display: 'block', flexShrink: 0, marginTop: 4 }} />}
+                {n.isNew && <span style={{ width: 6, height: 6, background: '#00e5a0', borderRadius: '50%', display: 'block', flexShrink: 0 }} />}
               </div>
             ))}
           </section>
