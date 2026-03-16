@@ -23,6 +23,12 @@ interface LessonItem {
   duration: string
   status: 'done' | 'current' | 'locked'
 }
+/** Para UI: completada | en_curso | pendiente */
+function lessonEstado(s: LessonItem['status']): 'completada' | 'en_curso' | 'pendiente' {
+  if (s === 'done') return 'completada'
+  if (s === 'current') return 'en_curso'
+  return 'pendiente'
+}
 
 interface LogroItem {
   icon: string
@@ -32,10 +38,12 @@ interface LogroItem {
 }
 
 interface ActivityItem {
+  tipo: string
   color: string
   title: string
   description: string
   time: string
+  puntos?: number
 }
 
 interface NotifItem {
@@ -44,6 +52,7 @@ interface NotifItem {
   title: string
   sub: string
   isNew: boolean
+  tipo: string
 }
 
 // ─── Escala de tipografía (más grande) ────────────────────────────────────────
@@ -148,20 +157,41 @@ const LOGROS: LogroItem[] = [
 ]
 
 const ACTIVITY: ActivityItem[] = [
-  { color: '#00e5a0', title: 'Quiz completado',    description: 'Módulo 2: 92/100 puntos',  time: 'Hace 2h' },
-  { color: '#1428d4', title: 'Lección terminada',  description: 'Cifrado E2E y protocolos', time: 'Ayer' },
-  { color: '#ffc107', title: 'Logro desbloqueado', description: 'Defensor Digital',         time: 'Lun' },
+  { tipo: 'quiz',   color: '#c89000', title: 'Quiz completado',    description: 'Módulo 2: 92/100 puntos',  time: 'Hace 2h', puntos: 92 },
+  { tipo: 'lesson', color: '#1428d4', title: 'Lección terminada',  description: 'Cifrado E2E y protocolos', time: 'Ayer' },
+  { tipo: 'logro',  color: '#00b87d', title: 'Logro desbloqueado', description: 'Defensor Digital',         time: 'Lun' },
 ]
 
 const NOTIFS: (NotifItem & { href: string })[] = [
-  { icon: '📋', iconBg: 'rgba(0,229,160,0.15)',   title: 'Quiz disponible',    sub: 'Módulo 3 · Hoy 16:00',      isNew: true,  href: '/curso#quiz' },
-  { icon: '🎙️', iconBg: 'rgba(20,40,212,0.12)',   title: 'Sesión en vivo',     sub: 'Mañana 10:00 AM',            isNew: true,  href: '/sesiones-en-vivo' },
-  { icon: '⭐',  iconBg: 'rgba(255,186,0,0.14)',   title: 'Logro cerca',        sub: 'Completa 1 lección más',     isNew: false, href: '/mi-perfil#logros' },
-  { icon: '📝',  iconBg: 'rgba(229,57,53,0.1)',    title: 'Tarea pendiente',    sub: 'Vence el 18 Mar',            isNew: true,  href: '/curso#tareas' },
+  { icon: '📋', iconBg: 'rgba(0,229,160,0.15)',   title: 'Quiz disponible',    sub: 'Módulo 3 · Hoy 16:00',      isNew: true,  href: '/curso#quiz',    tipo: 'quiz' },
+  { icon: '🎙️', iconBg: 'rgba(20,40,212,0.12)',   title: 'Sesión en vivo',     sub: 'Mañana 10:00 AM',            isNew: true,  href: '/sesiones-en-vivo', tipo: 'sesion' },
+  { icon: '⭐',  iconBg: 'rgba(255,186,0,0.14)',   title: 'Logro cerca',        sub: 'Completa 1 lección más',     isNew: false, href: '/mi-perfil#logros', tipo: 'logro' },
+  { icon: '📝',  iconBg: 'rgba(229,57,53,0.1)',    title: 'Tarea pendiente',    sub: 'Vence el 18 Mar',            isNew: true,  href: '/curso#tareas',  tipo: 'tarea' },
 ]
 
 // Días con evento en el calendario (ej. entrega, sesión)
 const CAL_EVENTS = [10, 15, 18, 22, 25]
+
+const ESTADOS = [
+  { id: 'bien', emoji: '😊', label: 'Bien', color: '#00b87d', bg: 'rgba(0,184,125,0.12)' },
+  { id: 'regular', emoji: '😐', label: 'Regular', color: '#c89000', bg: 'rgba(200,144,0,0.12)' },
+  { id: 'dificil', emoji: '😓', label: 'Difícil', color: '#d84040', bg: 'rgba(216,64,64,0.12)' },
+  { id: 'excelente', emoji: '💪', label: 'Excelente', color: '#1428d4', bg: 'rgba(20,40,212,0.12)' },
+] as const
+
+function getPrioridad(tipo: string) {
+  if (tipo === 'tarea' || tipo === 'quiz') return { color: '#d84040', bg: 'rgba(216,64,64,0.12)', dot: '#d84040' }
+  if (tipo === 'sesion') return { color: '#1428d4', bg: 'rgba(20,40,212,0.08)', dot: '#1428d4' }
+  if (tipo === 'logro') return { color: '#00b87d', bg: 'rgba(0,184,125,0.1)', dot: '#00e5a0' }
+  return { color: '#8892b0', bg: 'transparent', dot: '#00e5a0' }
+}
+
+const TIPO_CONFIG: Record<string, { color: string; emoji: string }> = {
+  quiz:   { color: '#c89000', emoji: '🎯' },
+  lesson: { color: '#1428d4', emoji: '📖' },
+  logro:  { color: '#00b87d', emoji: '⭐' },
+  tarea:  { color: '#d84040', emoji: '📝' },
+}
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 export default function DashboardAlumno() {
@@ -171,6 +201,7 @@ export default function DashboardAlumno() {
   const isDark = theme === 'dark'
   const NM = isDark ? NM_DARK : NM_LIGHT
   const [selectedMood, setSelectedMood] = useState<MoodValue>(null)
+  const [checkinSelected, setCheckinSelected] = useState<string | null>(null)
   const [hovered, setHovered] = useState<string | null>(null)
 
   const handleCerrarSesion = async () => {
@@ -386,12 +417,12 @@ export default function DashboardAlumno() {
       {/* ── MAIN CONTENT ─────────────────────────────────────────────── */}
       <main
         className="main-content flex-1 overflow-y-auto min-w-0"
-        style={{ padding: '18px 16px' }}
+        style={{ padding: '20px 20px', display: 'flex', flexDirection: 'column', gap: 28 }}
         role="main"
         aria-label="Dashboard del alumno"
       >
         {/* Top bar */}
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between" style={{ marginBottom: 28 }}>
           <div>
             <h1 style={{ fontSize: f(20), fontWeight: 800, color: NM.text, letterSpacing: '-0.4px', lineHeight: 1 }}>
               Política Digital
@@ -463,8 +494,8 @@ export default function DashboardAlumno() {
 
         {/* Security strip */}
         <div
-          className="flex items-center gap-2 mb-4"
-          style={{ background: NM.bg, borderRadius: 11, padding: '8px 13px', boxShadow: NM.inset }}
+          className="flex items-center gap-2"
+          style={{ background: NM.bg, borderRadius: 11, padding: '8px 13px', boxShadow: NM.inset, marginBottom: 20 }}
           role="status"
           aria-label="Conexión segura"
         >
@@ -478,180 +509,425 @@ export default function DashboardAlumno() {
 
         {/* Hero */}
         <section
-          className="relative overflow-hidden mb-4"
+          className="relative overflow-hidden"
           style={{
             background: 'linear-gradient(135deg, #0a0f8a 0%, #1428d4 65%, #1a3ee8 100%)',
             borderRadius: 18,
-            padding: 'clamp(16px, 4vw, 22px) clamp(16px, 4vw, 24px)',
+            padding: 24,
             boxShadow: '7px 7px 18px rgba(10,15,138,0.35), -4px -4px 12px rgba(255,255,255,0.6)',
           }}
           aria-label="Bienvenida y progreso"
         >
           <div style={{ position: 'absolute', top: -30, right: -30, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} aria-hidden />
-          <div style={{ position: 'absolute', bottom: -20, right: 40, width: 90, height: 90, borderRadius: '50%', background: 'rgba(0,229,160,0.12)' }} aria-hidden />
-          <p style={{ fontSize: f(11), color: 'rgba(255,255,255,0.5)', fontFamily: "'Space Mono', monospace", textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 4 }}>
-            Buenas tardes
-          </p>
-          <h2 style={{ fontSize: 'clamp(15px, 4vw, 20px)', fontWeight: 800, color: 'white', marginBottom: 3, letterSpacing: '-0.3px' }}>
-            María Antonia Flores
-          </h2>
-          <p style={{ fontSize: f(12), color: 'rgba(255,255,255,0.6)', marginBottom: 16 }}>
-            Ciberseguridad para Gobierno Digital · La innovación no es un destino, es una forma de caminar.
-          </p>
-          <div className="flex justify-between mb-2">
-            <span style={{ fontSize: f(12), color: 'rgba(255,255,255,0.5)', fontFamily: "'Space Mono', monospace" }}>Progreso del curso</span>
-            <span style={{ fontSize: f(14), fontWeight: 700, color: '#00e5a0', fontFamily: "'Space Mono', monospace" }}>68%</span>
-          </div>
-          <div
-            role="progressbar"
-            aria-valuenow={68}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Progreso del curso: 68%"
-            style={{ height: 5, background: 'rgba(255,255,255,0.15)', borderRadius: 3, position: 'relative' }}
-          >
-            <div style={{ height: '100%', width: '68%', background: 'linear-gradient(90deg, #00e5a0, #00c98a)', borderRadius: 3, position: 'relative' }}>
-              <span style={{ position: 'absolute', right: -4, top: -4, width: 13, height: 13, background: '#00e5a0', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', boxShadow: '0 0 8px rgba(0,229,160,0.9)', display: 'block' }} aria-hidden />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 20, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: f(11), color: 'rgba(255,255,255,0.5)', fontFamily: "'Space Mono', monospace", textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 4 }}>
+                Buenas tardes
+              </p>
+              <h2 style={{ fontSize: 'clamp(15px, 4vw, 20px)', fontWeight: 800, color: 'white', marginBottom: 3, letterSpacing: '-0.3px' }}>
+                María Antonia Flores
+              </h2>
+              <p style={{ fontSize: f(12), color: 'rgba(255,255,255,0.6)', marginBottom: 16 }}>
+                Ciberseguridad para Gobierno Digital · La innovación no es un destino, es una forma de caminar.
+              </p>
+              <div className="flex justify-between mb-2">
+                <span style={{ fontSize: f(12), color: 'rgba(255,255,255,0.5)', fontFamily: "'Space Mono', monospace" }}>Progreso del curso</span>
+                <span style={{ fontSize: f(14), fontWeight: 700, color: '#00e5a0', fontFamily: "'Space Mono', monospace" }}>68%</span>
+              </div>
+              <div
+                role="progressbar"
+                aria-valuenow={68}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Progreso del curso: 68%"
+                style={{ height: 5, background: 'rgba(255,255,255,0.15)', borderRadius: 3, position: 'relative' }}
+              >
+                <div style={{ height: '100%', width: '68%', background: 'linear-gradient(90deg, #00e5a0, #00c98a)', borderRadius: 3, position: 'relative' }}>
+                  <span style={{ position: 'absolute', right: -4, top: -4, width: 13, height: 13, background: '#00e5a0', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', boxShadow: '0 0 8px rgba(0,229,160,0.9)', display: 'block' }} aria-hidden />
+                </div>
+              </div>
+              {completionPrediction && (
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 8, fontFamily: "'Space Mono', monospace" }}>
+                  📅 A este ritmo terminas el {completionPrediction.date}
+                </p>
+              )}
+              <div className="flex gap-2 mt-4">
+                <button type="button" aria-label="Continuar con la lección 2: Autenticación" style={{ padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(14), fontWeight: 700, background: '#ffffff', color: '#0a0f8a', boxShadow: '3px 3px 8px rgba(0,0,0,0.15)' }}>
+                  Continuar →
+                </button>
+                <button type="button" aria-label="Ver programa del curso" style={{ padding: '10px 20px', borderRadius: 10, border: '2px solid rgba(255,255,255,0.4)', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(14), fontWeight: 600, background: 'transparent', color: '#ffffff' }}>
+                  Ver programa
+                </button>
+              </div>
             </div>
-          </div>
-          {completionPrediction && (
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 8, fontFamily: "'Space Mono', monospace" }}>
-              📅 A este ritmo terminas el {completionPrediction.date}
-            </p>
-          )}
-          <div className="flex gap-2 mt-4">
-            <button type="button" aria-label="Continuar con la lección 2: Autenticación" style={{ padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(14), fontWeight: 700, background: '#ffffff', color: '#0a0f8a', boxShadow: '3px 3px 8px rgba(0,0,0,0.15)' }}>
-              Continuar →
-            </button>
-            <button type="button" aria-label="Ver programa del curso" style={{ padding: '10px 20px', borderRadius: 10, border: '2px solid rgba(255,255,255,0.4)', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(14), fontWeight: 600, background: 'transparent', color: '#ffffff' }}>
-              Ver programa
-            </button>
+            <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
+              <svg width="80" height="80" viewBox="0 0 80 80" aria-hidden>
+                <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="6" />
+                <circle
+                  cx="40"
+                  cy="40"
+                  r="32"
+                  fill="none"
+                  stroke="#00e5a0"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={2 * Math.PI * 32}
+                  strokeDashoffset={2 * Math.PI * 32 * (1 - 68 / 100)}
+                  transform="rotate(-90 40 40)"
+                  style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
+                />
+                <text x="40" y="38" textAnchor="middle" fill="white" fontSize="16" fontWeight="800" fontFamily="Space Mono, monospace">68%</text>
+                <text x="40" y="52" textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize="9" fontFamily="Syne, sans-serif">progreso</text>
+              </svg>
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontFamily: "'Space Mono', monospace", textAlign: 'center', marginTop: 4 }}>
+                {completionPrediction ? Math.ceil((new Date(completionPrediction.date).getTime() - Date.now()) / (24 * 60 * 60 * 1000)) : 14} días restantes
+              </p>
+            </div>
           </div>
         </section>
 
         {/* Check-in */}
-        <section style={{ background: NM.bg, borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: NM.elevated }} aria-label="Check-in de bienestar">
+        <section style={{ background: NM.bg, borderRadius: 16, padding: 24, boxShadow: NM.elevated }} aria-label="Check-in de bienestar">
           <fieldset style={{ border: 'none', margin: 0, padding: 0 }}>
             <legend className="sr-only">¿Cómo llegaste hoy?</legend>
             <p style={{ fontSize: f(11), fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
               Check-in · ¿Cómo llegaste hoy?
             </p>
             <div className="checkin-grid flex gap-2" role="radiogroup" aria-label="Estado de ánimo">
-              {(['😊 Bien', '😐 Regular', '😓 Difícil', '💪 Excelente'] as const).map((label, i) => {
-                const val = (['bien', 'regular', 'dificil', 'excelente'] as MoodValue[])[i]
-                const ariaLabel = label === '😊 Bien' ? 'Bien' : label === '😐 Regular' ? 'Regular' : label === '😓 Difícil' ? 'Difícil' : 'Excelente'
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    role="radio"
-                    aria-checked={selectedMood === val}
-                    aria-label={ariaLabel}
-                    onClick={() => setSelectedMood(val)}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedMood(val) } }}
-                    style={{
-                      flex: 1, padding: '10px 6px', minHeight: 44, border: 'none', borderRadius: 11, cursor: 'pointer',
-                      fontFamily: "var(--font-heading)", fontSize: f(13), fontWeight: 600,
-                      background: selectedMood === val ? 'rgba(20,40,212,0.05)' : NM.bg,
-                      color: selectedMood === val ? '#1428d4' : NM.muted2,
-                      boxShadow: selectedMood === val ? NM.insetSm : NM.elevatedSm,
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    {label}
-                  </button>
-                )
-              })}
+              {ESTADOS.map((estado) => (
+                <button
+                  key={estado.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={checkinSelected === estado.id}
+                  aria-label={estado.label}
+                  onClick={() => {
+                    setCheckinSelected(estado.id)
+                    setSelectedMood(estado.id as MoodValue)
+                    fetch('/api/checkin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ mood: estado.id }) }).catch(() => {})
+                  }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCheckinSelected(estado.id); setSelectedMood(estado.id as MoodValue) } }}
+                  style={{
+                    flex: 1,
+                    padding: '14px 8px',
+                    borderRadius: 16,
+                    border: checkinSelected === estado.id ? `2px solid ${estado.color}` : '2px solid transparent',
+                    cursor: 'pointer',
+                    fontFamily: "'Syne', sans-serif",
+                    fontSize: 13,
+                    fontWeight: checkinSelected === estado.id ? 800 : 600,
+                    background: checkinSelected === estado.id ? estado.bg : NM.bg,
+                    color: checkinSelected === estado.id ? estado.color : '#8892b0',
+                    boxShadow: checkinSelected === estado.id
+                      ? 'inset 3px 3px 8px rgba(0,0,0,0.08), inset -3px -3px 8px rgba(255,255,255,0.8)'
+                      : checkinSelected !== null
+                        ? '2px 2px 5px #c2c8d6, -2px -2px 5px #ffffff'
+                        : '4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff',
+                    opacity: checkinSelected !== null && checkinSelected !== estado.id ? 0.5 : 1,
+                    transform: checkinSelected === estado.id ? 'scale(1.03)' : 'scale(1)',
+                    transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <span style={{ fontSize: 22 }}>{estado.emoji}</span>
+                  <span>{estado.label}</span>
+                  {checkinSelected === estado.id && (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={estado.color} strokeWidth="3" strokeLinecap="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </button>
+              ))}
             </div>
           </fieldset>
-          <div aria-live="polite" aria-atomic={true} className="sr-only">
-            {selectedMood ? `Seleccionaste: ${selectedMood === 'bien' ? 'Bien' : selectedMood === 'regular' ? 'Regular' : selectedMood === 'dificil' ? 'Difícil' : 'Excelente'}` : ''}
+          {checkinSelected && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: '10px 16px',
+                borderRadius: 12,
+                background: NM.bg,
+                boxShadow: 'inset 2px 2px 6px #c2c8d6, inset -2px -2px 6px #ffffff',
+                textAlign: 'center',
+                animation: 'fadeIn 0.3s ease',
+              }}
+            >
+              <p style={{ fontSize: 12, color: '#4a5580', fontFamily: "'Syne', sans-serif" }}>
+                ✓ Check-in registrado. ¡Gracias!
+              </p>
+            </div>
+          )}
+          <div aria-live="polite" aria-atomic className="sr-only">
+            {checkinSelected ? `Seleccionaste: ${ESTADOS.find(e => e.id === checkinSelected)?.label ?? checkinSelected}` : ''}
           </div>
         </section>
 
         {/* Lecciones + Notificaciones */}
-        <div className="lessons-notifs-grid grid grid-cols-2 gap-3 mb-4">
+        <div className="lessons-notifs-grid grid grid-cols-2 gap-3">
           {/* Lecciones */}
-          <section style={{ background: NM.bg, borderRadius: 16, padding: 16, boxShadow: NM.elevated }} aria-labelledby="lecciones-heading">
+          <section style={{ background: NM.bg, borderRadius: 16, padding: 24, boxShadow: NM.elevated }} aria-labelledby="lecciones-heading">
             <h3 id="lecciones-heading" style={{ fontSize: f(11), fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
               Módulo 3 · Lecciones
             </h3>
-            {LESSONS.map((lesson) => (
-              <LessonRow
-                key={lesson.id}
-                lesson={lesson}
-                theme={NM}
-                onLessonClick={lesson.status !== 'locked' ? handleOpenLesson : undefined}
-              />
-            ))}
+            {LESSONS.map((leccion, i) => {
+              const estado = lessonEstado(leccion.status)
+              const primeraPendiente = LESSONS.findIndex((l) => l.status === 'current') >= 0 ? LESSONS.findIndex((l) => l.status === 'current') : LESSONS.findIndex((l) => l.status === 'locked')
+              const estaActiva = estado === 'en_curso' || (estado === 'pendiente' && i === primeraPendiente)
+              const estaCompleta = estado === 'completada'
+              return (
+                <div
+                  key={leccion.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => leccion.status !== 'locked' && handleOpenLesson(leccion.id, leccion.title)}
+                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && leccion.status !== 'locked') { e.preventDefault(); handleOpenLesson(leccion.id, leccion.title) } }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '12px 16px',
+                    borderRadius: 14,
+                    marginBottom: 8,
+                    cursor: leccion.status !== 'locked' ? 'pointer' : 'default',
+                    transition: 'all 0.2s ease',
+                    background: NM.bg,
+                    borderLeft: estaActiva ? '3px solid #1428d4' : estaCompleta ? '3px solid #00e5a0' : '3px solid transparent',
+                    boxShadow: estaActiva ? '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff' : estaCompleta ? 'inset 2px 2px 6px #c2c8d6, inset -2px -2px 6px #ffffff' : '3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff',
+                    opacity: estaCompleta ? 0.7 : 1,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      flexShrink: 0,
+                      background: estaActiva ? 'rgba(20,40,212,0.12)' : estaCompleta ? 'rgba(0,229,160,0.15)' : NM.bg,
+                      boxShadow: !estaActiva && !estaCompleta ? '3px 3px 7px #c2c8d6, -3px -3px 7px #ffffff' : 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
+                    }}
+                  >
+                    {estaActiva && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: '50%',
+                          border: '2px solid #1428d4',
+                          animation: 'pulse-ring 1.5s ease-in-out infinite',
+                        }}
+                        aria-hidden
+                      />
+                    )}
+                    {estaCompleta ? (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00b87d" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : estaActiva ? (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1428d4" strokeWidth="2">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
+                    ) : (
+                      <span style={{ fontSize: 11, fontWeight: 700, color: NM.muted, fontFamily: "'Space Mono', monospace" }}>{i + 1}</span>
+                    )}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: 13, fontWeight: estaActiva ? 700 : 600, color: estaActiva ? NM.text : estaCompleta ? NM.muted : NM.muted2 }}>
+                      {leccion.title}
+                    </p>
+                    <p style={{ fontSize: 11, color: NM.muted, marginTop: 2, fontFamily: "'Space Mono', monospace" }}>
+                      {leccion.duration} · <span style={{ color: estaActiva ? '#1428d4' : estaCompleta ? '#00b87d' : NM.muted, marginLeft: 4 }}>{estaCompleta ? 'Completada' : estaActiva ? 'En curso' : 'Pendiente'}</span>
+                    </p>
+                  </div>
+                  {estaActiva && (
+                    <span style={{ fontSize: 10, fontWeight: 700, color: '#1428d4', fontFamily: "'Space Mono', monospace", background: 'rgba(20,40,212,0.08)', padding: '2px 8px', borderRadius: 20 }}>
+                      Siguiente →
+                    </span>
+                  )}
+                </div>
+              )
+            })}
           </section>
           {/* Notificaciones */}
-          <section style={{ background: NM.bg, borderRadius: 16, padding: 16, boxShadow: NM.elevated }} aria-labelledby="notificaciones-heading">
+          <section style={{ background: NM.bg, borderRadius: 16, padding: 24, boxShadow: NM.elevated }} aria-labelledby="notificaciones-heading">
             <div className="flex items-center justify-between mb-3">
               <h3 id="notificaciones-heading" style={{ fontSize: f(11), fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: "'Space Mono', monospace", margin: 0 }}>
                 Notificaciones
               </h3>
               <Link href="/pendientes" style={{ fontSize: f(10), fontWeight: 600, color: '#1428d4', fontFamily: "var(--font-heading)", textDecoration: 'none' }}>Ver todos</Link>
             </div>
-            {NOTIFS.map((n, i) => (
-              <div
-                key={i}
-                role="button"
-                tabIndex={0}
-                onClick={() => router.push(n.href)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(n.href) } }}
-                style={{
-                  cursor: 'pointer',
-                  padding: '12px 14px',
-                  borderRadius: 14,
-                  background: NM.bg,
-                  boxShadow: '4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff',
-                  marginBottom: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  transition: 'all 0.15s ease',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff' }}
-                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff' }}
-              >
-                <div style={{ width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, background: n.iconBg, flexShrink: 0, boxShadow: NM.insetSm }}>{n.icon}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: f(12), fontWeight: 600, color: NM.text, marginBottom: 1, lineHeight: 1.3 }}>{n.title}</p>
-                  <p style={{ fontSize: f(10), color: NM.muted, fontFamily: "'Space Mono', monospace" }}>{n.sub}</p>
+            {NOTIFS.map((notif, i) => {
+              const prioridad = getPrioridad(notif.tipo)
+              return (
+                <div
+                  key={i}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => router.push(notif.href)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(notif.href) } }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '11px 14px',
+                    borderRadius: 12,
+                    marginBottom: 6,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    background: NM.bg,
+                    boxShadow: '4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff',
+                    borderLeft: `3px solid ${prioridad.color}`,
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff' }}
+                >
+                  <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: prioridad.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: 16 }}>{notif.icon}</span>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: NM.text }}>{notif.title}</p>
+                    <p style={{ fontSize: 11, color: NM.muted, marginTop: 2, fontFamily: "'Space Mono', monospace" }}>{notif.sub}</p>
+                  </div>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: prioridad.dot, boxShadow: `0 0 0 3px ${prioridad.dot}33` }} />
                 </div>
-                {n.isNew && <span style={{ width: 6, height: 6, background: '#00e5a0', borderRadius: '50%', display: 'block', flexShrink: 0 }} />}
-              </div>
-            ))}
+              )
+            })}
           </section>
         </div>
 
-        {/* Actividad */}
-        <section style={{ background: NM.bg, borderRadius: 16, padding: 16, marginBottom: 14, boxShadow: NM.elevated }} aria-labelledby="actividad-heading">
-          <h3 id="actividad-heading" style={{ fontSize: f(11), fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
+        {/* Actividad reciente — línea de tiempo */}
+        <section style={{ background: NM.bg, borderRadius: 18, padding: 24, boxShadow: NM.elevated }} aria-labelledby="actividad-heading">
+          <p id="actividad-heading" style={{ fontSize: 10, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: "'Space Mono', monospace", marginBottom: 20 }}>
             Actividad reciente
-          </h3>
-          {ACTIVITY.map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: i < ACTIVITY.length - 1 ? `1px solid ${NM.border2}` : 'none' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: item.color, flexShrink: 0, display: 'block' }} />
-              <p style={{ flex: 1, fontSize: f(12), color: NM.muted2, lineHeight: 1.4 }}>
-                <strong style={{ color: NM.text, fontWeight: 600 }}>{item.title}</strong>{' — '}{item.description}
-              </p>
-              <span style={{ fontSize: f(11), color: NM.muted, fontFamily: "'Space Mono', monospace", flexShrink: 0 }}>{item.time}</span>
-            </div>
-          ))}
+          </p>
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                position: 'absolute',
+                left: 15,
+                top: 8,
+                bottom: 8,
+                width: 2,
+                background: NM.bg,
+                boxShadow: 'inset 1px 1px 3px #c2c8d6, inset -1px -1px 3px #ffffff',
+              }}
+              aria-hidden
+            />
+            {ACTIVITY.map((act, i) => {
+              const cfg = TIPO_CONFIG[act.tipo] ?? { color: NM.muted, emoji: '•' }
+              return (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 14,
+                    marginBottom: 16,
+                    position: 'relative',
+                    cursor: 'pointer',
+                    transition: 'transform 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateX(3px)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateX(0)' }}
+                >
+                  <div
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: '50%',
+                      flexShrink: 0,
+                      background: NM.bg,
+                      boxShadow: '3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff',
+                      border: `2px solid ${cfg.color}22`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 1,
+                      fontSize: 14,
+                    }}
+                  >
+                    {cfg.emoji}
+                  </div>
+                  <div style={{ flex: 1, paddingTop: 2 }}>
+                    <p style={{ fontSize: 13, color: NM.text, fontWeight: 600 }}>
+                      <span style={{ color: cfg.color }}>{act.title}</span>
+                      {' — '}{act.description}
+                    </p>
+                    <p style={{ fontSize: 10, color: NM.muted, marginTop: 3, fontFamily: "'Space Mono', monospace" }}>
+                      {act.time}
+                    </p>
+                  </div>
+                  {act.puntos != null && (
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: cfg.color,
+                        fontFamily: "'Space Mono', monospace",
+                        background: `${cfg.color}15`,
+                        padding: '2px 8px',
+                        borderRadius: 20,
+                        marginTop: 4,
+                        flexShrink: 0,
+                      }}
+                    >
+                      +{act.puntos}pts
+                    </span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </section>
 
-        {/* CTAs */}
-        <button
-          type="button"
-          className="w-full flex items-center justify-center gap-2 mb-3"
-          aria-label="Continuar con la lección 2: Autenticación"
-          style={{ padding: 14, minHeight: 44, borderRadius: 13, border: 'none', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(14), fontWeight: 700, background: 'linear-gradient(135deg, #1428d4, #0a0f8a)', color: 'white', boxShadow: '5px 5px 12px rgba(10,15,138,0.35), -3px -3px 8px rgba(255,255,255,0.7)' }}
+        {/* Botón Continuar sticky */}
+        <div
+          style={{
+            position: 'sticky',
+            bottom: 16,
+            zIndex: 10,
+            padding: '0 4px',
+            marginTop: 20,
+          }}
         >
-          <IcoPlay />
-          Continuar — Lección 2: Autenticación
-        </button>
+          <button
+            type="button"
+            className="w-full flex items-center justify-center gap-2"
+            aria-label="Continuar con la lección 2: Autenticación"
+            onClick={() => router.push('/curso/lecciones/mod3-leccion-2')}
+            style={{
+              width: '100%',
+              padding: 16,
+              borderRadius: 16,
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: "'Syne', sans-serif",
+              fontSize: 14,
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, #1428d4, #0a0f8a)',
+              color: 'white',
+              letterSpacing: '-0.3px',
+              boxShadow: '0 8px 24px rgba(10,15,138,0.45), 0 2px 8px rgba(10,15,138,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+            Continuar — {LESSONS.find((l) => l.status === 'current')?.title ?? 'siguiente lección'}
+          </button>
+        </div>
         <button
           type="button"
           className="w-full"
@@ -662,22 +938,35 @@ export default function DashboardAlumno() {
         </button>
       </main>
 
-      {/* ── PANEL DERECHO (neumorfismo) ───────────────────────────────── */}
+      {/* ── PANEL DERECHO (cards separadas, 240px) ─────────────────────── */}
       <aside
         className={`panel-right flex-shrink-0 overflow-y-auto ${showRightPanel ? 'open' : ''}`}
         style={{
-          width: 360,
-          marginTop: 16,
-          padding: '18px 16px',
+          width: 240,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+          padding: '20px 14px',
           background: NM.bg,
-          borderRadius: 20,
-          boxShadow: isDark ? '8px 8px 18px rgba(0,0,0,0.4), -8px -8px 18px rgba(255,255,255,0.03)' : '8px 8px 18px #c2c8d6, -8px -8px 18px #ffffff, -2px 0 12px rgba(194,200,214,0.4)',
+          boxShadow: '-4px 0 14px #c2c8d6, -1px 0 4px #ffffff',
         }}
         role="complementary"
         aria-label="Información del alumno"
       >
-        {/* Perfil */}
-        <section style={{ background: NM.bg, borderRadius: 16, padding: 16, marginBottom: 12, boxShadow: NM.elevated, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }} aria-labelledby="perfil-stats-heading">
+        {/* CARD 1: Perfil */}
+        <div
+          style={{
+            background: NM.bg,
+            borderRadius: 18,
+            padding: '18px 14px',
+            boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+          }}
+          aria-labelledby="perfil-stats-heading"
+        >
           <div role="img" aria-label="Avatar de María A. Flores" style={{ width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(135deg, #1428d4, #0a0f8a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: f(18), fontWeight: 800, color: 'white', marginBottom: 10, boxShadow: NM.elevatedSm }}>
             MA
           </div>
@@ -691,31 +980,40 @@ export default function DashboardAlumno() {
               </div>
             ))}
           </dl>
-        </section>
+        </div>
 
-        {/* Notas (privadas: solo el alumno las ve; guardadas en users/{uid}/notas) */}
-        <div style={{ background: NM.bg, borderRadius: 16, padding: 14, marginBottom: 12, boxShadow: NM.elevated }}>
-          <SectionTitle theme={NM}>Mis notas</SectionTitle>
-          <p
-            style={{
-              fontSize: 10,
-              color: '#8892b0',
-              fontFamily: "'Space Mono', monospace",
-              marginBottom: 10,
-            }}
-          >
-            Solo tú puedes ver tus notas
+        {/* CARD 2: Mis Notas */}
+        <div
+          style={{
+            background: NM.bg,
+            borderRadius: 18,
+            padding: '16px 14px',
+            boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff',
+          }}
+        >
+          <p style={{ fontSize: 10, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: "'Space Mono', monospace", marginBottom: 10 }}>
+            Mis notas
           </p>
+          <p style={{ fontSize: 9, color: '#b0b8c8', marginBottom: 8 }}>Solo tú puedes ver tus notas</p>
           <textarea
             value={nota}
             onChange={(e) => setNota(e.target.value)}
             placeholder="Escribe aquí tus notas y guárdalas."
             aria-label="Campo de notas personales"
             style={{
-              width: '100%', border: 'none', background: NM.bg, borderRadius: 10, padding: 12,
-              fontFamily: "var(--font-body)", fontSize: f(13), color: NM.muted2,
-              resize: 'none', outline: 'none', boxShadow: NM.inset,
-              lineHeight: 1.5, minHeight: 90,
+              width: '100%',
+              border: 'none',
+              background: NM.bg,
+              borderRadius: 10,
+              padding: 12,
+              fontFamily: "var(--font-body)",
+              fontSize: f(13),
+              color: NM.muted2,
+              resize: 'none',
+              outline: 'none',
+              boxShadow: NM.inset,
+              lineHeight: 1.5,
+              minHeight: 90,
             }}
           />
           <button
@@ -724,48 +1022,64 @@ export default function DashboardAlumno() {
             disabled={notaLoading}
             aria-label={notaGuardada ? 'Nota guardada' : 'Guardar nota'}
             style={{
-              width: '100%', marginTop: 8, padding: '10px', minHeight: 44, borderRadius: 9, border: 'none', cursor: notaLoading ? 'wait' : 'pointer',
-              fontFamily: "var(--font-heading)", fontSize: f(12), fontWeight: 700,
-              background: NM.bg, color: notaGuardada ? '#00b87d' : '#1428d4',
+              width: '100%',
+              marginTop: 8,
+              padding: '10px',
+              minHeight: 44,
+              borderRadius: 9,
+              border: 'none',
+              cursor: notaLoading ? 'wait' : 'pointer',
+              fontFamily: "var(--font-heading)",
+              fontSize: f(12),
+              fontWeight: 700,
+              background: NM.bg,
+              color: notaGuardada ? '#00b87d' : '#1428d4',
               boxShadow: NM.elevatedSm,
             }}
           >
             {notaLoading ? 'Guardando…' : notaGuardada ? '✓ Guardado' : 'Guardar nota'}
           </button>
-          <div aria-live="polite" aria-atomic={true} className="sr-only">
+          <div aria-live="polite" aria-atomic className="sr-only">
             {notaGuardada ? 'Nota guardada exitosamente' : ''}
           </div>
         </div>
 
-        {/* Logros */}
-        <section style={{ background: NM.bg, borderRadius: 16, padding: 14, marginBottom: 12, boxShadow: NM.elevated }} aria-labelledby="logros-heading">
-          <h3 id="logros-heading" style={{ fontSize: f(11), fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
+        {/* CARD 3: Mis Logros */}
+        <div
+          style={{
+            background: NM.bg,
+            borderRadius: 18,
+            padding: '16px 14px',
+            boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff',
+          }}
+          aria-labelledby="logros-heading"
+        >
+          <p id="logros-heading" style={{ fontSize: 10, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: "'Space Mono', monospace", marginBottom: 12 }}>
             Mis logros
-          </h3>
-          <div className="grid grid-cols-3 gap-2">
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {LOGROS.map((logro, i) => (
               <div
                 key={i}
                 style={{
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                  padding: '10px 6px', borderRadius: 10, cursor: 'pointer',
-                  opacity: logro.earned ? 1 : 0.35,
-                  boxShadow: logro.earned ? NM.elevatedSm : NM.insetSm,
+                  background: NM.bg,
+                  borderRadius: 12,
+                  padding: '10px 6px',
+                  boxShadow: logro.earned ? '3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff' : 'inset 2px 2px 5px #c2c8d6, inset -2px -2px 5px #ffffff',
+                  textAlign: 'center',
+                  opacity: logro.earned ? 1 : 0.4,
+                  cursor: logro.earned ? 'pointer' : 'default',
                 }}
               >
-                <div style={{ width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, background: logro.bg }}>
-                  {logro.icon}
-                </div>
-                <p style={{ fontSize: f(8), textAlign: 'center', color: NM.muted2, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', lineHeight: 1.2 }}>
-                  {logro.name}
-                </p>
+                <div style={{ fontSize: 22, marginBottom: 4 }}>{logro.icon}</div>
+                <p style={{ fontSize: 8, fontWeight: 700, color: NM.text, textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.2 }}>{logro.name}</p>
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
-        {/* Calendario */}
-        <div style={{ background: NM.bg, borderRadius: 12, padding: 10, marginBottom: 12, boxShadow: NM.elevated, maxWidth: 200 }}>
+        {/* CARD 4: Calendario */}
+        <div style={{ background: NM.bg, borderRadius: 18, padding: '16px 14px', boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff', maxWidth: 200 }}>
           <div className="flex justify-between items-center mb-1">
             <span style={{ fontSize: f(11), fontWeight: 700, color: NM.text }}>{calMonthLabel}</span>
             <div className="flex gap-0.5">
@@ -916,28 +1230,3 @@ function SectionTitle({ children, theme }: { children: React.ReactNode; theme?: 
   )
 }
 
-function LessonRow({ lesson, theme, onLessonClick }: { lesson: LessonItem; theme?: DashboardTheme; onLessonClick?: (lessonId: string, lessonTitle: string) => void }) {
-  const t = theme ?? NM_LIGHT
-  const numStyle: Record<LessonItem['status'], React.CSSProperties> = {
-    done:    { background: 'rgba(0,229,160,0.15)', color: '#00b87d', boxShadow: 'inset 2px 2px 4px rgba(0,229,160,0.2), inset -2px -2px 4px rgba(255,255,255,0.8)' },
-    current: { background: '#1428d4', color: 'white', boxShadow: '3px 3px 7px rgba(20,40,212,0.4), -2px -2px 5px rgba(255,255,255,0.6)' },
-    locked:  { background: 'rgba(136,146,176,0.12)', color: t.muted, boxShadow: t.insetSm },
-  }
-  return (
-    <div
-      role={onLessonClick ? 'button' : undefined}
-      tabIndex={onLessonClick ? 0 : undefined}
-      onClick={onLessonClick ? () => onLessonClick(lesson.id, lesson.title) : undefined}
-      onKeyDown={onLessonClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onLessonClick(lesson.id, lesson.title) } } : undefined}
-      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 10px', borderRadius: 10, marginBottom: 8, cursor: onLessonClick ? 'pointer' : 'default', background: lesson.status === 'current' ? 'rgba(20,40,212,0.04)' : 'transparent', boxShadow: lesson.status === 'current' ? t.insetSm : t.elevatedSm }}
-    >
-      <div style={{ width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: f(11), fontWeight: 700, fontFamily: "'Space Mono', monospace", flexShrink: 0, ...numStyle[lesson.status] }}>
-        {lesson.status === 'done' ? '✓' : lesson.num}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: f(13), fontWeight: 600, color: t.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 2 }}>{lesson.title}</p>
-        <p style={{ fontSize: f(11), color: t.muted, fontFamily: "'Space Mono', monospace" }}>{lesson.duration} · {lesson.status === 'done' ? 'Completado' : lesson.status === 'current' ? 'En curso' : 'Pendiente'}</p>
-      </div>
-    </div>
-  )
-}
