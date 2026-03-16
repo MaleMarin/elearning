@@ -45,7 +45,7 @@ export default function LessonComplete({
           transform: visible ? "scale(1)" : "scale(0.8)",
           opacity: visible ? 1 : 0,
           transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
         }}
       >
         <div
@@ -111,7 +111,7 @@ export default function LessonComplete({
             borderRadius: 14,
             border: "none",
             cursor: "pointer",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 14,
             fontWeight: 700,
             background: "linear-gradient(135deg, #1428d4, #0a0f8a)",

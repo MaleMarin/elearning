@@ -21,7 +21,7 @@ const MODULOS_DEMO = [
 
 export function PortafolioTimeline({ entradas, onNuevaEntrada }: PortafolioTimelineProps) {
   return (
-    <div style={{ display: "flex", gap: 24, fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ display: "flex", gap: 24, fontFamily: "var(--font-heading)" }}>
       {/* Línea lateral */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
         {entradas.length > 0 ? (
@@ -73,7 +73,7 @@ export function PortafolioTimeline({ entradas, onNuevaEntrada }: PortafolioTimel
                   borderRadius: 14,
                   border: "none",
                   cursor: "pointer",
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: 12,
                   fontWeight: 600,
                   background: NM.bg,

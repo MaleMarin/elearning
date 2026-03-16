@@ -32,7 +32,7 @@ export function SidebarNavItem({ href, label, icon, active, title, "data-tooltip
         padding: "12px 16px",
         borderRadius: 12,
         minHeight: 48,
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
         fontSize: 13,
         fontWeight: 600,
         textDecoration: "none",

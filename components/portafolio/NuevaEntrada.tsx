@@ -89,7 +89,7 @@ export function NuevaEntrada({ moduloId, moduloTitulo, onSave, onClose }: NuevaE
           width: "100%",
           maxWidth: 480,
           boxShadow: NM.elevatedLg,
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
@@ -135,7 +135,7 @@ export function NuevaEntrada({ moduloId, moduloTitulo, onSave, onClose }: NuevaE
                 border: "none",
                 background: NM.bg,
                 boxShadow: NM.inset,
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 13,
                 color: "#0a0f8a",
               }}
@@ -159,7 +159,7 @@ export function NuevaEntrada({ moduloId, moduloTitulo, onSave, onClose }: NuevaE
                 border: "none",
                 background: NM.bg,
                 boxShadow: NM.inset,
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 13,
                 color: "#0a0f8a",
                 resize: "vertical",
@@ -184,7 +184,7 @@ export function NuevaEntrada({ moduloId, moduloTitulo, onSave, onClose }: NuevaE
                 border: "none",
                 background: NM.bg,
                 boxShadow: NM.inset,
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 13,
                 color: "#0a0f8a",
                 resize: "vertical",
@@ -207,7 +207,7 @@ export function NuevaEntrada({ moduloId, moduloTitulo, onSave, onClose }: NuevaE
                     borderRadius: 14,
                     border: "none",
                     cursor: "pointer",
-                    fontFamily: "'Syne', sans-serif",
+                    fontFamily: "var(--font-heading)",
                     fontSize: 13,
                     fontWeight: 600,
                     background: mood === opt.value ? "rgba(20,40,212,0.06)" : NM.bg,
@@ -230,7 +230,7 @@ export function NuevaEntrada({ moduloId, moduloTitulo, onSave, onClose }: NuevaE
               borderRadius: 14,
               border: "none",
               cursor: saving ? "not-allowed" : "pointer",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 700,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",

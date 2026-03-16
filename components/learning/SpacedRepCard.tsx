@@ -74,7 +74,7 @@ export default function SpacedRepCard() {
           fontWeight: 700,
           color: "#0a0f8a",
           marginBottom: 16,
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
         }}
       >
         ¿Recuerdas qué es: <span style={{ color: "#1428d4" }}>{review.conceptTitle}</span>?
@@ -90,7 +90,7 @@ export default function SpacedRepCard() {
               borderRadius: 12,
               border: "none",
               cursor: "pointer",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 12,
               fontWeight: 600,
               background: "#e8eaf0",
@@ -109,7 +109,7 @@ export default function SpacedRepCard() {
               borderRadius: 12,
               border: "none",
               cursor: "pointer",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 12,
               fontWeight: 700,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",

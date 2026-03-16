@@ -9,8 +9,12 @@ Cursor debe leerlo ANTES de crear o modificar cualquier componente.
 
 - **Nombre:** Política Digital · Innovación Pública · México
 - **Estilo:** Neumorfismo moderno — superficies que flotan o se hunden
-- **Tipografía:** Plus Jakarta Sans (Google Fonts) — pesos 300, 400, 500, 600
-- **NO usar:** Inter, Roboto, Arial, ni ninguna fuente serif en el dashboard
+- **Tipografía:**
+  - **Raleway** (400, 600, 700, 800) — títulos, headers, labels, navegación, botones
+  - **Source Sans Pro** (400, 600, 700) — párrafos, contenido, descripciones, inputs
+  - **Space Mono** (400, 700) — datos, código, métricas (mantener)
+- **Variables CSS:** `--font-heading` (Raleway), `--font-body` (Source Sans 3), Space Mono donde aplique
+- **NO usar:** Inter, Roboto, Arial, Syne, Plus Jakarta Sans, ni ninguna fuente serif en el dashboard
 
 ---
 
@@ -146,7 +150,7 @@ El certificado mantiene su diseño editorial (#faf8f3 + azul + verde menta). Es 
   border: none;
   border-radius: 50px;
   font-weight: 600;
-  font-family: var(--font);
+  font-family: var(--font-heading);
   box-shadow: var(--neu-shadow-out-sm);
   transition: box-shadow 0.15s, transform 0.1s;
 }
@@ -181,7 +185,7 @@ input, textarea, select {
   border-radius: 12px;
   box-shadow: var(--neu-shadow-in);
   color: var(--azul);
-  font-family: var(--font);
+  font-family: var(--font-body);
   outline: none;
 }
 input:focus, textarea:focus {

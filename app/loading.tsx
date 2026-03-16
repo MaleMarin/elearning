@@ -5,7 +5,7 @@ export default function Loading() {
         display: "flex",
         height: "100vh",
         background: "#e8eaf0",
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
       }}
     >
       {/* Sidebar skeleton */}

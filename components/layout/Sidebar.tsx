@@ -204,7 +204,7 @@ export function Sidebar() {
             style={{
               background: "#e8eaf0",
               color: "#4a5580",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 600,
               boxShadow: "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
@@ -241,7 +241,7 @@ export function Sidebar() {
               type="button"
               onClick={handleSignOut}
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1428d4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#e8eaf0]"
-              style={{ color: "#b91c1c", fontFamily: "'Syne', sans-serif" }}
+              style={{ color: "#b91c1c", fontFamily: "var(--font-heading)" }}
             >
               <LogOut className="w-5 h-5 shrink-0" style={{ fill: "#b91c1c" }} stroke="#b91c1c" />
               Cerrar sesión

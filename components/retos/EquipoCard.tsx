@@ -36,7 +36,7 @@ export default function EquipoCard({
     borderRadius: 16,
     padding: 20,
     boxShadow: '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff',
-    fontFamily: "'Syne', sans-serif",
+    fontFamily: "var(--font-heading)",
   }
 
   if (!tieneEquipo) {
@@ -54,7 +54,7 @@ export default function EquipoCard({
               borderRadius: 50,
               border: 'none',
               cursor: 'pointer',
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 600,
               background: '#e8eaf0',
@@ -72,7 +72,7 @@ export default function EquipoCard({
               borderRadius: 50,
               border: 'none',
               cursor: 'pointer',
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 600,
               background: 'linear-gradient(135deg, #1428d4, #2b4fff)',

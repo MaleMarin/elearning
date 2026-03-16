@@ -5,7 +5,7 @@ export default function PrivacidadPage() {
         maxWidth: 800,
         margin: "0 auto",
         padding: "48px 24px",
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
         background: "#e8eaf0",
         minHeight: "100vh",
       }}

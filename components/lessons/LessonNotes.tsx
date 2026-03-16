@@ -67,7 +67,7 @@ export default function LessonNotes({ lessonId }: { lessonId: string }) {
         padding: 18,
         marginTop: 20,
         boxShadow: "5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff",
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
       }}
     >
       <p
@@ -120,7 +120,7 @@ export default function LessonNotes({ lessonId }: { lessonId: string }) {
           background: "#e8eaf0",
           borderRadius: 10,
           padding: "10px 14px",
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           fontSize: 12,
           color: "#4a5580",
           resize: "none",
@@ -140,7 +140,7 @@ export default function LessonNotes({ lessonId }: { lessonId: string }) {
           borderRadius: 10,
           border: "none",
           cursor: saving ? "not-allowed" : "pointer",
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           fontSize: 12,
           fontWeight: 700,
           background: newNote.trim()

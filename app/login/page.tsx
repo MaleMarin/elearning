@@ -239,14 +239,14 @@ export default function LoginPage() {
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#e8eaf0", padding: 24 }}>
         <div style={{ background: "#e8eaf0", borderRadius: 24, boxShadow: "8px 8px 24px #c2c8d6, -8px -8px 24px #ffffff", padding: 40, maxWidth: 400, width: "100%" }}>
           <p style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, color: "#1428d4", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 8 }}>Verificación en dos pasos</p>
-          <h1 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 26, color: "#0a0f8a", marginBottom: 8 }}>Código de verificación</h1>
+          <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: 26, color: "#0a0f8a", marginBottom: 8 }}>Código de verificación</h1>
           <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 16 }}>Ingresa el código de tu aplicación de autenticación</p>
           {error && <p style={{ fontSize: 13, color: "#b91c1c", marginBottom: 12 }} role="alert">{error}</p>}
           <MFAChallenge resolver={mfaResolver} onSuccess={handleMfaSuccess} onError={setError} />
           <button
             type="button"
             onClick={() => setMfaResolver(null)}
-            style={{ marginTop: 20, background: "transparent", border: "1.5px solid #c2c8d6", borderRadius: 12, padding: "10px 20px", fontFamily: "'Syne', sans-serif", fontSize: 13, color: "#0a0f8a", cursor: "pointer" }}
+            style={{ marginTop: 20, background: "transparent", border: "1.5px solid #c2c8d6", borderRadius: 12, padding: "10px 20px", fontFamily: "var(--font-heading)", fontSize: 13, color: "#0a0f8a", cursor: "pointer" }}
           >
             Volver a correo y contraseña
           </button>
@@ -313,7 +313,7 @@ export default function LoginPage() {
             <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", color: "#1428d4" }}>
               {LOGO_PD}
             </div>
-            <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 800, color: "#ffffff", textAlign: "center", margin: 0 }}>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 28, fontWeight: 800, color: "#ffffff", textAlign: "center", margin: 0 }}>
               ¿Primera vez aquí?
             </h2>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "center", margin: 0, maxWidth: 260 }}>
@@ -326,7 +326,7 @@ export default function LoginPage() {
                 borderRadius: 50,
                 color: "#ffffff",
                 padding: "10px 28px",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 13,
                 fontWeight: 700,
                 background: "transparent",
@@ -379,7 +379,7 @@ export default function LoginPage() {
                 <p style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, color: "#1428d4", letterSpacing: "2px", textTransform: "uppercase", margin: 0 }}>
                   BIENVENIDO DE VUELTA
                 </p>
-                <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 26, fontWeight: 800, color: "#0a0f8a", margin: "4px 0 0 0" }}>
+                <h1 style={{ fontFamily: "var(--font-heading)", fontSize: 26, fontWeight: 800, color: "#0a0f8a", margin: "4px 0 0 0" }}>
                   Ingresa a tu cuenta
                 </h1>
               </div>
@@ -400,7 +400,7 @@ export default function LoginPage() {
                 color: "#0a0f8a",
                 borderRadius: 50,
                 padding: "11px 20px",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 13,
                 fontWeight: 800,
                 boxShadow: "4px 4px 12px rgba(0,229,160,0.4), -3px -3px 8px #ffffff",
@@ -429,7 +429,7 @@ export default function LoginPage() {
                   borderRadius: 12,
                   padding: 10,
                   boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: 12,
                   fontWeight: 600,
                   color: "#4a5580",
@@ -458,7 +458,7 @@ export default function LoginPage() {
                   borderRadius: 12,
                   padding: 10,
                   boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: 12,
                   fontWeight: 600,
                   color: "#4a5580",
@@ -505,7 +505,7 @@ export default function LoginPage() {
                     border: "none",
                     borderRadius: 12,
                     padding: "12px 16px",
-                    fontFamily: "'Syne', sans-serif",
+                    fontFamily: "var(--font-heading)",
                     fontSize: 13,
                     color: "#0a0f8a",
                     outline: "none",
@@ -539,7 +539,7 @@ export default function LoginPage() {
                     border: "none",
                     borderRadius: 12,
                     padding: "12px 16px",
-                    fontFamily: "'Syne', sans-serif",
+                    fontFamily: "var(--font-heading)",
                     fontSize: 13,
                     color: "#0a0f8a",
                     outline: "none",
@@ -570,7 +570,7 @@ export default function LoginPage() {
                   border: "none",
                   borderRadius: 14,
                   padding: 13,
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: 14,
                   fontWeight: 800,
                   boxShadow: "5px 5px 14px rgba(10,15,138,0.4), -3px -3px 9px rgba(255,255,255,0.7)",

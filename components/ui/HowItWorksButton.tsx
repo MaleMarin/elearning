@@ -79,7 +79,7 @@ export default function HowItWorksButton() {
           fontSize: "12px",
           fontWeight: 600,
           color: "#1428d4",
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontFamily: "var(--font-heading)",
           cursor: "pointer",
           boxShadow:
             "4px 4px 10px rgba(174,183,194,0.6), -4px -4px 10px rgba(255,255,255,0.85)",

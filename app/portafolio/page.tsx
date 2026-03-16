@@ -67,7 +67,7 @@ export default function PortafolioPage() {
 
   return (
     <PortafolioShell>
-      <div style={{ maxWidth: 720, margin: "0 auto", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ maxWidth: 720, margin: "0 auto", fontFamily: "var(--font-heading)" }}>
         <header style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 16, marginBottom: 24 }}>
           <div>
             <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4, letterSpacing: "-0.3px" }}>
@@ -86,7 +86,7 @@ export default function PortafolioPage() {
               borderRadius: 12,
               border: "none",
               cursor: exporting ? "not-allowed" : "pointer",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 12,
               fontWeight: 700,
               background: exporting
@@ -142,7 +142,7 @@ export default function PortafolioPage() {
                 borderRadius: 14,
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 13,
                 fontWeight: 700,
                 background: "linear-gradient(135deg, #1428d4, #0a0f8a)",

@@ -281,7 +281,7 @@ export default function DashboardAlumno() {
   return (
     <div
       className="flex h-screen overflow-hidden"
-      style={{ background: NM.bg, fontFamily: "'Syne', sans-serif", color: NM.text }}
+      style={{ background: NM.bg, fontFamily: "var(--font-heading)", color: NM.text }}
     >
       <OfflineBanner />
       {/* ── FRANJA IZQUIERDA: cuadrados neumórficos ────────────────────── */}
@@ -365,7 +365,7 @@ export default function DashboardAlumno() {
               aria-label={isDark ? 'Usar modo claro' : 'Usar modo oscuro'}
               style={{
                 padding: '6px 10px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                fontFamily: "'Syne', sans-serif", fontSize: f(10), fontWeight: 700,
+                fontFamily: "var(--font-heading)", fontSize: f(10), fontWeight: 700,
                 background: NM.bg, color: NM.muted2, boxShadow: NM.insetSm,
                 display: 'flex', alignItems: 'center', gap: 5,
               }}
@@ -378,7 +378,7 @@ export default function DashboardAlumno() {
               aria-label="¿Cómo funciona?"
               style={{
                 padding: '6px 10px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                fontFamily: "'Syne', sans-serif", fontSize: f(10), fontWeight: 700,
+                fontFamily: "var(--font-heading)", fontSize: f(10), fontWeight: 700,
                 background: NM.bg, color: NM.muted2, boxShadow: NM.insetSm,
                 display: 'flex', alignItems: 'center', gap: 5,
               }}
@@ -476,10 +476,10 @@ export default function DashboardAlumno() {
             </p>
           )}
           <div className="flex gap-2 mt-4">
-            <button type="button" aria-label="Continuar con la lección 2: Autenticación" style={{ padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: "'Syne', sans-serif", fontSize: f(14), fontWeight: 700, background: '#ffffff', color: '#0a0f8a', boxShadow: '3px 3px 8px rgba(0,0,0,0.15)' }}>
+            <button type="button" aria-label="Continuar con la lección 2: Autenticación" style={{ padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(14), fontWeight: 700, background: '#ffffff', color: '#0a0f8a', boxShadow: '3px 3px 8px rgba(0,0,0,0.15)' }}>
               Continuar →
             </button>
-            <button type="button" aria-label="Ver programa del curso" style={{ padding: '10px 20px', borderRadius: 10, border: '2px solid rgba(255,255,255,0.4)', cursor: 'pointer', fontFamily: "'Syne', sans-serif", fontSize: f(14), fontWeight: 600, background: 'transparent', color: '#ffffff' }}>
+            <button type="button" aria-label="Ver programa del curso" style={{ padding: '10px 20px', borderRadius: 10, border: '2px solid rgba(255,255,255,0.4)', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(14), fontWeight: 600, background: 'transparent', color: '#ffffff' }}>
               Ver programa
             </button>
           </div>
@@ -507,7 +507,7 @@ export default function DashboardAlumno() {
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedMood(val) } }}
                     style={{
                       flex: 1, padding: '10px 6px', minHeight: 44, border: 'none', borderRadius: 11, cursor: 'pointer',
-                      fontFamily: "'Syne', sans-serif", fontSize: f(13), fontWeight: 600,
+                      fontFamily: "var(--font-heading)", fontSize: f(13), fontWeight: 600,
                       background: selectedMood === val ? 'rgba(20,40,212,0.05)' : NM.bg,
                       color: selectedMood === val ? '#1428d4' : NM.muted2,
                       boxShadow: selectedMood === val ? NM.insetSm : NM.elevatedSm,
@@ -580,7 +580,7 @@ export default function DashboardAlumno() {
           type="button"
           className="w-full flex items-center justify-center gap-2 mb-3"
           aria-label="Continuar con la lección 2: Autenticación"
-          style={{ padding: 14, minHeight: 44, borderRadius: 13, border: 'none', cursor: 'pointer', fontFamily: "'Syne', sans-serif", fontSize: f(14), fontWeight: 700, background: 'linear-gradient(135deg, #1428d4, #0a0f8a)', color: 'white', boxShadow: '5px 5px 12px rgba(10,15,138,0.35), -3px -3px 8px rgba(255,255,255,0.7)' }}
+          style={{ padding: 14, minHeight: 44, borderRadius: 13, border: 'none', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(14), fontWeight: 700, background: 'linear-gradient(135deg, #1428d4, #0a0f8a)', color: 'white', boxShadow: '5px 5px 12px rgba(10,15,138,0.35), -3px -3px 8px rgba(255,255,255,0.7)' }}
         >
           <IcoPlay />
           Continuar — Lección 2: Autenticación
@@ -589,7 +589,7 @@ export default function DashboardAlumno() {
           type="button"
           className="w-full"
           aria-label="Ir al Laboratorio de Simulación"
-          style={{ padding: 12, minHeight: 44, borderRadius: 13, border: 'none', cursor: 'pointer', fontFamily: "'Syne', sans-serif", fontSize: f(13), fontWeight: 600, background: NM.bg, color: '#1428d4', boxShadow: NM.elevatedSm }}
+          style={{ padding: 12, minHeight: 44, borderRadius: 13, border: 'none', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(13), fontWeight: 600, background: NM.bg, color: '#1428d4', boxShadow: NM.elevatedSm }}
         >
           Ir al Laboratorio de Simulación
         </button>
@@ -646,7 +646,7 @@ export default function DashboardAlumno() {
             aria-label="Campo de notas personales"
             style={{
               width: '100%', border: 'none', background: NM.bg, borderRadius: 10, padding: 12,
-              fontFamily: "'Syne', sans-serif", fontSize: f(13), color: NM.muted2,
+              fontFamily: "var(--font-body)", fontSize: f(13), color: NM.muted2,
               resize: 'none', outline: 'none', boxShadow: NM.inset,
               lineHeight: 1.5, minHeight: 90,
             }}
@@ -658,7 +658,7 @@ export default function DashboardAlumno() {
             aria-label={notaGuardada ? 'Nota guardada' : 'Guardar nota'}
             style={{
               width: '100%', marginTop: 8, padding: '10px', minHeight: 44, borderRadius: 9, border: 'none', cursor: notaLoading ? 'wait' : 'pointer',
-              fontFamily: "'Syne', sans-serif", fontSize: f(12), fontWeight: 700,
+              fontFamily: "var(--font-heading)", fontSize: f(12), fontWeight: 700,
               background: NM.bg, color: notaGuardada ? '#00b87d' : '#1428d4',
               boxShadow: NM.elevatedSm,
             }}
@@ -796,7 +796,7 @@ function BottomNav({ active, onChange }: { active: NavKey; onChange: (k: NavKey)
           style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center',
             gap: 3, padding: '6px 14px', borderRadius: 12, border: 'none',
-            cursor: 'pointer', fontFamily: "'Syne', sans-serif",
+            cursor: 'pointer', fontFamily: "var(--font-heading)",
             background: active === item.key ? 'rgba(20,40,212,0.06)' : 'transparent',
             color: active === item.key ? '#1428d4' : '#8892b0',
             boxShadow: active === item.key

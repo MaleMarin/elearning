@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import nextDynamic from "next/dynamic";
-import { Plus_Jakarta_Sans, Syne, Space_Mono } from "next/font/google";
+import { Raleway, Source_Sans_3, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ConditionalLayout } from "@/components/layout/ConditionalLayout";
 import { AssistantProvider } from "@/contexts/AssistantContext";
@@ -16,16 +16,17 @@ const AxeDev = nextDynamic(
 
 export const dynamic = "force-dynamic";
 
-const plusJakarta = Plus_Jakarta_Sans({
+const raleway = Raleway({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-raleway",
   display: "swap",
 });
 
-const syne = Syne({
+const sourceSans = Source_Sans_3({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  variable: "--font-syne",
+  weight: ["400", "600", "700"],
+  variable: "--font-source-sans",
   display: "swap",
 });
 
@@ -71,7 +72,7 @@ const criticalCss = `
   }
   html, body, #__next, #main-content, .main-content, main {
     background: #f0f2f5 !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-family: var(--font-body) !important;
   }
   html { font-size: 18px; box-sizing: border-box; }
   *, *::before, *::after { box-sizing: inherit; }
@@ -82,7 +83,7 @@ const criticalCss = `
     font-weight: 300;
     color: var(--ink);
     background: #f0f2f5 !important;
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-family: var(--font-body) !important;
   }
   a { color: inherit; text-decoration: none; }
   .flex { display: flex; }
@@ -144,8 +145,8 @@ export default async function RootLayout({
       : "";
 
   return (
-    <html lang="es" data-tenant={tenant?.tenantId ?? undefined}>
-      <body className={`${plusJakarta.className} ${syne.variable} ${spaceMono.variable} min-h-screen text-[var(--ink)] antialiased`} style={{ background: "#f0f2f5" }}>
+    <html lang="es" data-tenant={tenant?.tenantId ?? undefined} className={`${raleway.variable} ${sourceSans.variable} ${spaceMono.variable}`}>
+      <body className="min-h-screen text-[var(--ink)] antialiased" style={{ background: "#f0f2f5" }}>
         <style dangerouslySetInnerHTML={{ __html: criticalCss + tenantCss }} />
         <a
           href="#main-content"

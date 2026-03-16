@@ -39,7 +39,7 @@ export default function OfflineBanner() {
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
       }}
     >
       <span

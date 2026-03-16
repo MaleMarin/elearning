@@ -59,7 +59,7 @@ export default function DeleteAccountSection() {
           fontWeight: 700,
           color: "#d84040",
           marginBottom: 8,
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
         }}
       >
         Eliminar mi cuenta
@@ -70,7 +70,7 @@ export default function DeleteAccountSection() {
           color: "#4a5580",
           marginBottom: 16,
           lineHeight: 1.6,
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
         }}
       >
         Esta acción es irreversible. Se eliminarán todos tus datos: progreso, portafolio, diario,
@@ -86,7 +86,7 @@ export default function DeleteAccountSection() {
             borderRadius: 10,
             border: "1px solid rgba(216,64,64,0.4)",
             cursor: "pointer",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 12,
             fontWeight: 600,
             background: "#e8eaf0",
@@ -142,7 +142,7 @@ export default function DeleteAccountSection() {
                 borderRadius: 10,
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 12,
                 fontWeight: 600,
                 background: "#e8eaf0",
@@ -162,7 +162,7 @@ export default function DeleteAccountSection() {
                 borderRadius: 10,
                 border: "none",
                 cursor: confirmText === "ELIMINAR" ? "pointer" : "not-allowed",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 12,
                 fontWeight: 700,
                 background: confirmText === "ELIMINAR" ? "#d84040" : "#e8eaf0",

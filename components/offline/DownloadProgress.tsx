@@ -39,7 +39,7 @@ export default function DownloadProgress({
         borderRadius: 12,
         padding: '12px 20px',
         boxShadow: '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff',
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
         minWidth: 280,
       }}
     >

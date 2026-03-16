@@ -259,7 +259,7 @@ export default function AdminLoginPage() {
 
 const adminLoginStyles = `
   .admin-login-page {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--font-heading);
     background: #f0f2f5 !important;
     min-height: 100vh;
     display: flex;
@@ -330,7 +330,7 @@ const adminLoginStyles = `
     box-shadow: inset 4px 4px 10px rgba(174,183,194,0.55), inset -4px -4px 10px rgba(255,255,255,0.85);
     padding: 0 16px;
     font-size: 13px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--font-heading);
     color: #1428d4;
     outline: none;
   }
@@ -355,7 +355,7 @@ const adminLoginStyles = `
     box-shadow: 4px 4px 10px rgba(174,183,194,0.6), -4px -4px 10px rgba(255,255,255,0.85);
     font-size: 13px;
     font-weight: 600;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--font-heading);
     color: #1428d4;
     cursor: pointer;
     display: flex;

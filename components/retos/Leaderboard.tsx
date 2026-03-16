@@ -23,7 +23,7 @@ export default function Leaderboard({ entries }: LeaderboardProps) {
         borderRadius: 16,
         padding: 20,
         boxShadow: '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff',
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
         overflowX: 'auto',
       }}
     >

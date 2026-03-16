@@ -137,7 +137,7 @@ export default function CognitiveCheckin({
         background: NM.bg, borderRadius: 24, padding: 32,
         width: '100%', maxWidth: 480,
         boxShadow: NM.elevatedLg,
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
       }}>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
@@ -181,7 +181,7 @@ export default function CognitiveCheckin({
               style={{
                 display: 'flex', alignItems: 'center', gap: 14,
                 padding: '12px 16px', borderRadius: 14, border: 'none',
-                cursor: 'pointer', fontFamily: "'Syne', sans-serif",
+                cursor: 'pointer', fontFamily: "var(--font-heading)",
                 background: selected === opt.value ? 'rgba(20,40,212,0.06)' : NM.bg,
                 boxShadow: selected === opt.value ? NM.inset : NM.elevated,
                 transition: 'all 0.15s ease',
@@ -206,7 +206,7 @@ export default function CognitiveCheckin({
           style={{
             width: '100%', padding: 14, borderRadius: 14, border: 'none',
             cursor: selected !== null ? 'pointer' : 'not-allowed',
-            fontFamily: "'Syne', sans-serif", fontSize: 13, fontWeight: 700,
+            fontFamily: "var(--font-heading)", fontSize: 13, fontWeight: 700,
             background: selected !== null ? 'linear-gradient(135deg, #1428d4, #0a0f8a)' : NM.bg,
             color: selected !== null ? 'white' : '#8892b0',
             boxShadow: selected !== null ? '5px 5px 12px rgba(10,15,138,0.35), -3px -3px 8px rgba(255,255,255,0.7)' : NM.inset,

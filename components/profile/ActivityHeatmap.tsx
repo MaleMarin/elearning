@@ -47,7 +47,7 @@ export default function ActivityHeatmap({ userId }: { userId: string }) {
   };
 
   return (
-    <div style={{ fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ fontFamily: "var(--font-heading)" }}>
       <p
         style={{
           fontSize: 10,

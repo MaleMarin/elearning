@@ -60,7 +60,7 @@ export default function CognitiveResult({ level, scores, questions, onContinue }
         background: NM.bg, borderRadius: 24, padding: 32,
         width: '100%', maxWidth: 480,
         boxShadow: '8px 8px 20px #c2c8d6, -8px -8px 20px #ffffff',
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
       }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{ width: 72, height: 72, borderRadius: 22, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, margin: '0 auto 16px', boxShadow: NM.elevated }}>
@@ -89,7 +89,7 @@ export default function CognitiveResult({ level, scores, questions, onContinue }
           onClick={onContinue}
           style={{
             width: '100%', padding: 14, borderRadius: 14, border: 'none',
-            cursor: 'pointer', fontFamily: "'Syne', sans-serif",
+            cursor: 'pointer', fontFamily: "var(--font-heading)",
             fontSize: 13, fontWeight: 700,
             background: 'linear-gradient(135deg, #1428d4, #0a0f8a)',
             color: 'white',

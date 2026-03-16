@@ -31,7 +31,7 @@ export default function ConocimientoPage() {
           display: 'flex',
           flexDirection: 'column',
           gap: 20,
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           flex: 1,
           minHeight: 0,
         }}

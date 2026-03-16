@@ -89,7 +89,7 @@ export default function EscapeRoomPage() {
 
   return (
     <DashboardShell subtitle="// Simulador de crisis · Ciberseguridad">
-      <div style={{ maxWidth: 680, margin: "0 auto", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ maxWidth: 680, margin: "0 auto", fontFamily: "var(--font-heading)" }}>
         <div
           style={{
             background: "linear-gradient(135deg, #0a0f8a, #1428d4)",
@@ -147,7 +147,7 @@ export default function EscapeRoomPage() {
                   border: "none",
                   cursor: "pointer",
                   textAlign: "left",
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: 14,
                   fontWeight: 600,
                   background: "#e8eaf0",
@@ -187,7 +187,7 @@ export default function EscapeRoomPage() {
                 borderRadius: 14,
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 13,
                 fontWeight: 700,
                 background: "linear-gradient(135deg, #1428d4, #0a0f8a)",

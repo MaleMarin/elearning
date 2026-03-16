@@ -147,7 +147,7 @@ export function DashboardShell({ children, rightPanel, subtitle }: DashboardShel
       className="flex h-screen overflow-hidden"
       style={{
         background: NM.bg,
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
         color: NM.text,
       }}
     >
@@ -257,7 +257,7 @@ export function DashboardShell({ children, rightPanel, subtitle }: DashboardShel
                 borderRadius: 10,
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: f(10),
                 fontWeight: 700,
                 background: NM.bg,
@@ -277,7 +277,7 @@ export function DashboardShell({ children, rightPanel, subtitle }: DashboardShel
                 borderRadius: 10,
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: f(10),
                 fontWeight: 700,
                 background: NM.bg,

@@ -53,7 +53,7 @@ export default function InactivityGuard() {
         padding: "16px 20px",
         boxShadow: "8px 8px 18px #c2c8d6, -8px -8px 18px #ffffff",
         maxWidth: 320,
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
       }}
     >
       <p style={{ fontSize: 13, fontWeight: 700, color: "#0a0f8a", marginBottom: 6 }}>
@@ -71,7 +71,7 @@ export default function InactivityGuard() {
           borderRadius: 10,
           border: "none",
           cursor: "pointer",
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           fontSize: 12,
           fontWeight: 700,
           background: "linear-gradient(135deg, #1428d4, #0a0f8a)",

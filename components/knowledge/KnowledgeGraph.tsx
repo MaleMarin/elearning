@@ -160,7 +160,7 @@ export default function KnowledgeGraph({ nodes, links, onNodeSelect, selectedId 
           borderRadius: '12px',
           padding: '8px 12px',
           boxShadow: '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff',
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           fontSize: '12px',
           color: '#0a0f8a',
           fontWeight: '600',

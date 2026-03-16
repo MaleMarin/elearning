@@ -117,7 +117,7 @@ export default function CursoPage() {
             boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
             maxWidth: 500,
             margin: "40px auto",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
           }}
         >
           <div style={{ fontSize: 48, marginBottom: 16 }}>📚</div>
@@ -135,7 +135,7 @@ export default function CursoPage() {
               borderRadius: 14,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
               color: "white",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 700,
               textDecoration: "none",
@@ -166,7 +166,7 @@ export default function CursoPage() {
             boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
             maxWidth: 500,
             margin: "40px auto",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
           }}
         >
           <div style={{ fontSize: 48, marginBottom: 16 }}>📚</div>
@@ -184,7 +184,7 @@ export default function CursoPage() {
               borderRadius: 14,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
               color: "white",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 700,
               textDecoration: "none",

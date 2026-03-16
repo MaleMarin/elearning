@@ -43,7 +43,7 @@ export default function RetosPage() {
     borderRadius: 12,
     border: 'none',
     cursor: 'pointer',
-    fontFamily: "'Syne', sans-serif",
+    fontFamily: "var(--font-heading)",
     fontSize: 13,
     fontWeight: 600,
     background: '#e8eaf0',
@@ -53,7 +53,7 @@ export default function RetosPage() {
 
   return (
     <RetosShell>
-      <div style={{ fontFamily: "'Syne', sans-serif", display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ fontFamily: "var(--font-heading)", display: 'flex', flexDirection: 'column', gap: 20 }}>
         <div role="tablist" aria-label="Secciones de retos" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {TABS.map((t) => (
             <button

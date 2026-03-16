@@ -32,7 +32,7 @@ export default function AuditPage() {
         padding: 24,
         background: "#e8eaf0",
         minHeight: "100vh",
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
       }}
     >
       <div style={{ marginBottom: 20 }}>

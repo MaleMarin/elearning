@@ -28,7 +28,7 @@ export default function NodeDetail({ node, onClose, getLessonHref }: NodeDetailP
         borderRadius: 16,
         padding: 20,
         boxShadow: 'inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff',
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
         display: 'flex',
         flexDirection: 'column',
         gap: 16,

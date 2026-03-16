@@ -44,7 +44,7 @@ export default function ModuleNPS({ moduloId, moduloTitulo, onComplete }: Module
         style={{
           textAlign: "center",
           padding: 32,
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
         }}
       >
         <div style={{ fontSize: 48, marginBottom: 12 }}>🙏</div>
@@ -65,7 +65,7 @@ export default function ModuleNPS({ moduloId, moduloTitulo, onComplete }: Module
         borderRadius: 20,
         padding: 32,
         boxShadow: "8px 8px 18px #c2c8d6, -8px -8px 18px #ffffff",
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
         maxWidth: 500,
         margin: "0 auto",
       }}
@@ -144,7 +144,7 @@ export default function ModuleNPS({ moduloId, moduloTitulo, onComplete }: Module
           borderRadius: 14,
           border: "none",
           cursor: score !== null ? "pointer" : "not-allowed",
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           fontSize: 13,
           fontWeight: 700,
           background:

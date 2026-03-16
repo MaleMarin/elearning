@@ -6,7 +6,7 @@
 @keyframes neu-reg-spin { to { transform: rotate(360deg); } }
 
 .neu-reg-page {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: var(--font-body);
   background: #f0f2f5 !important;
   min-height: 100vh;
   display: flex;
@@ -61,7 +61,7 @@
   border: none;
   border-radius: 12px;
   box-shadow: inset 4px 4px 10px rgba(174,183,194,0.55), inset -4px -4px 10px rgba(255,255,255,0.85);
-  padding: 0 16px; font-size: 13px; font-family: "Plus Jakarta Sans", sans-serif;
+  padding: 0 16px; font-size: 13px; font-family: var(--font-body);
   color: #1428d4; outline: none; transition: box-shadow 0.2s;
 }
 .neu-reg-input:focus {
@@ -74,7 +74,7 @@
 .neu-reg-btn {
   width: 100%; height: 46px; background: #f0f2f5; border: none; border-radius: 12px;
   box-shadow: 4px 4px 10px rgba(174,183,194,0.6), -4px -4px 10px rgba(255,255,255,0.85);
-  font-size: 13px; font-weight: 600; font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 13px; font-weight: 600; font-family: var(--font-body);
   color: #1428d4; cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   transition: box-shadow 0.15s, transform 0.1s;
@@ -105,6 +105,6 @@
 }
 .neu-reg-footer a {
   font-size: 13px; color: #1428d4; text-decoration: none;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: var(--font-body);
 }
 .neu-reg-footer a:hover { text-decoration: underline; }

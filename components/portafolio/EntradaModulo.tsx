@@ -39,7 +39,7 @@ export function EntradaModulo({ entrada }: { entrada: Entrada }) {
         padding: 24,
         boxShadow: NM.elevated,
         marginBottom: 16,
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
       }}
     >
       <div

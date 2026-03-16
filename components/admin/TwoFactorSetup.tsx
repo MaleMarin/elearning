@@ -46,7 +46,7 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
         maxWidth: 400,
         margin: "0 auto",
         boxShadow: "8px 8px 20px #c2c8d6, -8px -8px 20px #ffffff",
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
       }}
     >
       <h2
@@ -117,7 +117,7 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
           borderRadius: 13,
           border: "none",
           cursor: loading ? "not-allowed" : "pointer",
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           fontSize: 13,
           fontWeight: 700,
           background:

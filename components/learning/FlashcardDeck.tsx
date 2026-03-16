@@ -27,7 +27,7 @@ export default function FlashcardDeck({ cards }: { cards: Flashcard[] }) {
 
   if (cards.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: 32, fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ textAlign: "center", padding: 32, fontFamily: "var(--font-heading)" }}>
         <p style={{ fontSize: 14, color: "#4a5580" }}>No hay tarjetas para esta lección.</p>
       </div>
     );
@@ -35,7 +35,7 @@ export default function FlashcardDeck({ cards }: { cards: Flashcard[] }) {
 
   if (done.length === cards.length) {
     return (
-      <div style={{ textAlign: "center", padding: 32, fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ textAlign: "center", padding: 32, fontFamily: "var(--font-heading)" }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>
           ¡Completaste todas las tarjetas!
@@ -53,7 +53,7 @@ export default function FlashcardDeck({ cards }: { cards: Flashcard[] }) {
             borderRadius: 12,
             border: "none",
             cursor: "pointer",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 13,
             fontWeight: 700,
             background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
@@ -68,7 +68,7 @@ export default function FlashcardDeck({ cards }: { cards: Flashcard[] }) {
   }
 
   return (
-    <div style={{ fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ fontFamily: "var(--font-heading)" }}>
       <p
         style={{
           fontSize: 10,
@@ -139,7 +139,7 @@ export default function FlashcardDeck({ cards }: { cards: Flashcard[] }) {
               borderRadius: 14,
               border: "none",
               cursor: "pointer",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 600,
               background: "#e8eaf0",
@@ -158,7 +158,7 @@ export default function FlashcardDeck({ cards }: { cards: Flashcard[] }) {
               borderRadius: 14,
               border: "none",
               cursor: "pointer",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 700,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
