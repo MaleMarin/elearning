@@ -57,7 +57,7 @@ export default function EgresadosPage() {
   }, [filters, fetchAlumni]);
 
   return (
-    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <div style={{ marginBottom: 24 }}>
         <Link href="/inicio" style={{ fontSize: 13, color: "#8892b0", marginBottom: 8, display: "inline-block" }}>← Inicio</Link>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Egresados</h1>

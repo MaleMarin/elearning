@@ -222,7 +222,7 @@ export default function AdminEvaluacionesPage() {
               borderRadius: 12,
               border: "none",
               cursor: "pointer",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 12,
               fontWeight: 700,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",

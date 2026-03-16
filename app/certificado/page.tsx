@@ -43,7 +43,7 @@ export default function CertificadoPage() {
 
   if (loading) {
     return (
-      <div style={{ flex: 1, padding: "20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ flex: 1, padding: "20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4 }}>Certificado</h1>
         <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>Cargando…</p>
       </div>
@@ -51,7 +51,7 @@ export default function CertificadoPage() {
   }
 
   return (
-    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4 }}>Certificado</h1>
       <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>
         {certificates.length > 0 ? "Descarga tu certificado y compártelo." : "Completa el programa para obtener tu certificado."}
@@ -77,7 +77,7 @@ export default function CertificadoPage() {
               </div>
             ))}
           </div>
-          <Link href="/curso" style={{ display: "inline-block", padding: "12px 28px", borderRadius: 14, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", fontFamily: "'Syne', sans-serif", fontSize: 13, fontWeight: 700, textDecoration: "none", boxShadow: "5px 5px 12px rgba(10,15,138,0.35)" }}>Continuar aprendiendo</Link>
+          <Link href="/curso" style={{ display: "inline-block", padding: "12px 28px", borderRadius: 14, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", fontFamily: "var(--font-heading)", fontSize: 13, fontWeight: 700, textDecoration: "none", boxShadow: "5px 5px 12px rgba(10,15,138,0.35)" }}>Continuar aprendiendo</Link>
           <p style={{ marginTop: 16 }}>
             <Link href="/soporte?tema=certificado" style={{ fontSize: 13, color: "#1428d4", fontWeight: 600 }}>Solicitar al administrador</Link>
           </p>

@@ -9,7 +9,7 @@
     "nextjs": "App Router (Latest features)",
     "style": "Tailwind CSS 4 (Modern JIT)",
     "rigor": "Nunca usar placeholders (//... rest of code). Escribir SIEMPRE el código completo.",
-    "typography": "Raleway (400,600,700,800) para títulos/UI; Source Sans Pro (400,600,700) para contenido; Space Mono (400,700) para datos/código (mantener)."
+    "typography": "Raleway (400,600,700,800) → títulos, UI, botones, labels, navegación. Source Sans 3 (400,600,700) → párrafos, contenido, inputs, texto largo. Space Mono (400,700) → datos, métricas, código, fechas (no cambiar)."
   },
   "rules": [
     "DESIGN_SYSTEM: Antes de crear o modificar cualquier componente UI, leer docs/DESIGN_SYSTEM.md. Es la fuente de verdad visual (colores, neumorfismo, tipografía, íconos, layout).",

@@ -85,7 +85,7 @@ export default function ModeracionPage() {
   const bansActivos = bans.filter((b) => b.activo);
 
   return (
-    <div style={{ flex: 1, padding: "18px 16px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "18px 16px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <div style={{ marginBottom: 20 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Moderación</h1>
         <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>Gestiona reportes, contenido y usuarios sancionados</p>
@@ -105,7 +105,7 @@ export default function ModeracionPage() {
               borderRadius: 12,
               border: "none",
               cursor: "pointer",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 600,
               background: tab === t.id ? "linear-gradient(135deg, #1428d4, #0a0f8a)" : "#e8eaf0",
@@ -223,7 +223,7 @@ export default function ModeracionPage() {
                   borderRadius: 12,
                   border: "none",
                   cursor: "pointer",
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: 12,
                   fontWeight: 700,
                   background: "#d84040",
@@ -275,7 +275,7 @@ export default function ModeracionPage() {
                   borderRadius: 10,
                   border: "none",
                   cursor: "pointer",
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: 11,
                   fontWeight: 600,
                   background: "#e8eaf0",
@@ -342,7 +342,7 @@ function ReporteCard({
                 borderRadius: 10,
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 12,
                 fontWeight: 600,
                 background: "#e8eaf0",
@@ -360,7 +360,7 @@ function ReporteCard({
                 borderRadius: 10,
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 12,
                 fontWeight: 700,
                 background: "#d84040",
@@ -382,7 +382,7 @@ function ReporteCard({
               borderRadius: 10,
               border: "none",
               cursor: "pointer",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 12,
               fontWeight: 700,
               background: "linear-gradient(135deg, #00b87d, #00a06c)",
@@ -400,7 +400,7 @@ function ReporteCard({
               borderRadius: 10,
               border: "none",
               cursor: "pointer",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 12,
               fontWeight: 700,
               background: "#e8eaf0",

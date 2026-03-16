@@ -25,7 +25,7 @@ export function CheckinHistoryCard() {
   if (loading) {
     return (
       <div>
-        <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "'Syne', sans-serif" }}>Mi historial de energía</p>
+        <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "var(--font-heading)" }}>Mi historial de energía</p>
         <p style={{ fontSize: 12, color: "#8892b0" }}>Cargando historial…</p>
       </div>
     );
@@ -34,7 +34,7 @@ export function CheckinHistoryCard() {
   if (checkins.length === 0) {
     return (
       <div>
-        <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "'Syne', sans-serif" }}>Mi historial de energía</p>
+        <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "var(--font-heading)" }}>Mi historial de energía</p>
         <p style={{ fontSize: 13, color: "#8892b0", lineHeight: 1.5 }}>
           Completa el check-in diario en Inicio para ver tu historial.
         </p>
@@ -44,7 +44,7 @@ export function CheckinHistoryCard() {
 
   return (
     <div>
-      <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "'Syne', sans-serif" }}>Mi historial de energía</p>
+      <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "var(--font-heading)" }}>Mi historial de energía</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {last7.map((c) => {
           const total = c.energia + c.foco;

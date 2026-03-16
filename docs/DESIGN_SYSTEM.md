@@ -9,12 +9,28 @@ Cursor debe leerlo ANTES de crear o modificar cualquier componente.
 
 - **Nombre:** Política Digital · Innovación Pública · México
 - **Estilo:** Neumorfismo moderno — superficies que flotan o se hunden
-- **Tipografía:**
-  - **Raleway** (400, 600, 700, 800) — títulos, headers, labels, navegación, botones
-  - **Source Sans Pro** (400, 600, 700) — párrafos, contenido, descripciones, inputs
-  - **Space Mono** (400, 700) — datos, código, métricas (mantener)
+- **Tipografía:** Raleway (títulos/UI), Source Sans 3 (contenido), Space Mono (datos). Ver sección Tipografía abajo.
 - **Variables CSS:** `--font-heading` (Raleway), `--font-body` (Source Sans 3), Space Mono donde aplique
 - **NO usar:** Inter, Roboto, Arial, Syne, Plus Jakarta Sans, ni ninguna fuente serif en el dashboard
+
+---
+
+## Tipografía
+
+### Raleway — Títulos y UI
+Usar para: h1, h2, h3, labels, botones, navegación, nombres de secciones
+Pesos: 400 (normal), 600 (semibold), 700 (bold), 800 (extrabold)
+Ejemplo: `fontFamily: "var(--font-heading)"`
+
+### Source Sans 3 — Contenido
+Usar para: párrafos, descripciones, instrucciones, inputs, texto corrido
+Pesos: 400 (normal), 600 (semibold), 700 (bold)
+Ejemplo: `fontFamily: "var(--font-body)"`
+
+### Space Mono — Datos
+Usar para: métricas numéricas, fechas, código, porcentajes, IDs
+Pesos: 400, 700
+Ejemplo: `fontFamily: "'Space Mono', monospace"`
 
 ---
 

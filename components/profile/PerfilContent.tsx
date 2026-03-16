@@ -30,7 +30,7 @@ const INPUT_STYLE = {
   border: "none",
   borderRadius: 12,
   padding: "12px 16px",
-  fontFamily: "'Syne', sans-serif",
+  fontFamily: "var(--font-heading)",
   fontSize: 13,
   color: "#0a0f8a",
   outline: "none",
@@ -136,7 +136,7 @@ export function PerfilContent() {
 
   if (loading) {
     return (
-      <div style={{ padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
         <p style={{ fontSize: 13, color: "#8892b0" }}>Cargando…</p>
       </div>
     );
@@ -157,7 +157,7 @@ export function PerfilContent() {
   const position = (profileData.position as string) ?? "";
 
   return (
-    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       {/* SECCIÓN 1 — HERO DEL PERFIL */}
       <div style={{ ...CARD_STYLE, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20, marginBottom: 24 }}>
         <div style={{ position: "relative" }}>
@@ -170,7 +170,7 @@ export function PerfilContent() {
           />
         </div>
         <div style={{ flex: 1, minWidth: 200 }}>
-          <h1 style={{ fontSize: 20, fontWeight: 800, color: "#0a0f8a", marginBottom: 4, fontFamily: "'Syne', sans-serif" }}>
+          <h1 style={{ fontSize: 20, fontWeight: 800, color: "#0a0f8a", marginBottom: 4, fontFamily: "var(--font-heading)" }}>
             {fullName || "Sin nombre"}
           </h1>
           <p style={{ fontSize: 12, color: "#8892b0", fontFamily: "'Space Mono', monospace", marginBottom: 2 }}>{email}</p>
@@ -187,7 +187,7 @@ export function PerfilContent() {
                 borderRadius: 12,
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 12,
                 fontWeight: 600,
                 background: "#e8eaf0",
@@ -292,7 +292,7 @@ export function PerfilContent() {
             borderRadius: 14,
             border: "none",
             cursor: channelsSaving ? "wait" : "pointer",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 13,
             fontWeight: 700,
             background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
@@ -306,7 +306,7 @@ export function PerfilContent() {
 
       {/* SECCIÓN 5 — COMPETENCIAS SPC */}
       <div style={{ ...CARD_STYLE, marginBottom: 24 }}>
-        <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "'Syne', sans-serif" }}>Competencias del Servicio Civil</p>
+        <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "var(--font-heading)" }}>Competencias del Servicio Civil</p>
         <Link
           href="/perfil/competencias"
           style={{
@@ -316,7 +316,7 @@ export function PerfilContent() {
             borderRadius: 12,
             background: "#e8eaf0",
             color: "#1428d4",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 12,
             fontWeight: 600,
             textDecoration: "none",

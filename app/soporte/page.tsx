@@ -17,7 +17,7 @@ export default function SoportePage() {
   }, []);
 
   return (
-    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4 }}>Soporte</h1>
       <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>Ayuda y preguntas frecuentes</p>
 
@@ -36,7 +36,7 @@ export default function SoportePage() {
           <button
             type="button"
             onClick={() => openDrawer({ mode: "support" })}
-            style={{ padding: "10px 18px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)" }}
+            style={{ padding: "10px 18px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "var(--font-heading)", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)" }}
           >
             Abrir chat de soporte
           </button>
@@ -56,7 +56,7 @@ export default function SoportePage() {
                   border: "none",
                   cursor: "pointer",
                   textAlign: "left",
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: 13,
                   fontWeight: 600,
                   color: "#0a0f8a",

@@ -68,7 +68,7 @@ export default function MentoresPage() {
   };
 
   return (
-    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <div style={{ marginBottom: 24 }}>
         <Link href="/inicio" style={{ fontSize: 13, color: "#8892b0", marginBottom: 8, display: "inline-block" }}>← Inicio</Link>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Mentores</h1>
@@ -104,8 +104,8 @@ export default function MentoresPage() {
               style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: "none", background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff", fontSize: 13, color: "#0a0f8a", outline: "none", marginBottom: 16 }}
             />
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-              <button type="button" onClick={() => setModal(null)} style={{ padding: "10px 18px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 600, background: "#e8eaf0", color: "#4a5580", boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff" }}>Cancelar</button>
-              <button type="button" onClick={handleSubmitRequest} disabled={submitting} style={{ padding: "10px 18px", borderRadius: 12, border: "none", cursor: submitting ? "wait" : "pointer", fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)" }}>{submitting ? "Enviando…" : "Enviar"}</button>
+              <button type="button" onClick={() => setModal(null)} style={{ padding: "10px 18px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "var(--font-heading)", fontSize: 12, fontWeight: 600, background: "#e8eaf0", color: "#4a5580", boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff" }}>Cancelar</button>
+              <button type="button" onClick={handleSubmitRequest} disabled={submitting} style={{ padding: "10px 18px", borderRadius: 12, border: "none", cursor: submitting ? "wait" : "pointer", fontFamily: "var(--font-heading)", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)" }}>{submitting ? "Enviando…" : "Enviar"}</button>
             </div>
           </div>
         </div>

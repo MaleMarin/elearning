@@ -67,7 +67,7 @@ export default function ApiKeysPage() {
   };
 
   return (
-    <div style={{ flex: 1, padding: "18px 16px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "18px 16px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <div style={{ marginBottom: 20 }}>
         <Link href="/admin" style={{ fontSize: 13, color: "#8892b0", marginBottom: 8, display: "inline-block" }}>← Admin</Link>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>API Keys</h1>
@@ -111,7 +111,7 @@ export default function ApiKeysPage() {
             type="button"
             onClick={handleCrear}
             disabled={creating || !institucion.trim()}
-            style={{ padding: "10px 20px", borderRadius: 12, border: "none", cursor: creating ? "not-allowed" : "pointer", fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)", opacity: creating || !institucion.trim() ? 0.7 : 1 }}
+            style={{ padding: "10px 20px", borderRadius: 12, border: "none", cursor: creating ? "not-allowed" : "pointer", fontFamily: "var(--font-heading)", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)", opacity: creating || !institucion.trim() ? 0.7 : 1 }}
           >
             {creating ? "Creando…" : "Crear key"}
           </button>

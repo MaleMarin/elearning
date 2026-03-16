@@ -301,7 +301,7 @@ export default function AdminConocimientoPage() {
                   borderRadius: 12,
                   border: "none",
                   cursor: "pointer",
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: 12,
                   fontWeight: 700,
                   background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
@@ -329,7 +329,7 @@ export default function AdminConocimientoPage() {
                       style={{ cursor: "pointer", background: selectedNode?.id === n.id ? "rgba(20,40,212,0.08)" : "transparent" }}
                       onClick={() => setSelectedNode(n)}
                     >
-                      <td style={{ padding: "10px 12px", color: "#0a0f8a", fontFamily: "'Syne', sans-serif" }}>{n.concepto}</td>
+                      <td style={{ padding: "10px 12px", color: "#0a0f8a", fontFamily: "var(--font-heading)" }}>{n.concepto}</td>
                       <td style={{ padding: "10px 12px", color: "#8892b0" }}>{n.modulo || "—"}</td>
                       <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'Space Mono', monospace", color: "#1428d4" }}>{n.usuariosQueLoDominan}</td>
                       <td style={{ padding: "10px 12px", textAlign: "right" }}>
@@ -366,16 +366,16 @@ export default function AdminConocimientoPage() {
                   placeholder="Concepto"
                   value={formConcepto}
                   onChange={(e) => setFormConcepto(e.target.value)}
-                  style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff", color: "#0a0f8a", fontFamily: "'Syne', sans-serif" }}
+                  style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff", color: "#0a0f8a", fontFamily: "var(--font-heading)" }}
                 />
                 <input
                   placeholder="Módulo"
                   value={formModulo}
                   onChange={(e) => setFormModulo(e.target.value)}
-                  style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff", color: "#0a0f8a", fontFamily: "'Syne', sans-serif" }}
+                  style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff", color: "#0a0f8a", fontFamily: "var(--font-heading)" }}
                 />
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button type="button" onClick={handleSaveNode} disabled={saving} style={{ padding: "10px 20px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)" }}>
+                  <button type="button" onClick={handleSaveNode} disabled={saving} style={{ padding: "10px 20px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "var(--font-heading)", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)" }}>
                     {saving ? "Guardando…" : "Guardar"}
                   </button>
                   <button type="button" onClick={() => { setShowNodeForm(false); setEditingNode(null); setFormConcepto(""); setFormModulo(""); }} style={{ padding: "10px 20px", borderRadius: 12, border: "none", cursor: "pointer", background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6", color: "#0a0f8a" }}>

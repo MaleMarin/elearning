@@ -51,7 +51,7 @@ export function AccessibilityPreferences({ initial, onSaveToProfile, demo }: Pro
   return (
     <div>
       <p style={{ fontSize: 11, fontWeight: 700, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>Accesibilidad</p>
-      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "'Syne', sans-serif" }}>Preferencias de accesibilidad</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "var(--font-heading)" }}>Preferencias de accesibilidad</h2>
 
       <div style={{ marginBottom: 16 }}>
         <span style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#0a0f8a", marginBottom: 8 }}>Tamaño de texto</span>
@@ -71,7 +71,7 @@ export function AccessibilityPreferences({ initial, onSaveToProfile, demo }: Pro
                   borderRadius: 12,
                   border: "none",
                   cursor: "pointer",
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: label === "AAA" ? 11 : 14,
                   fontWeight: 700,
                   color: isActive ? "#fff" : "#0a0f8a",
@@ -146,7 +146,7 @@ export function AccessibilityPreferences({ initial, onSaveToProfile, demo }: Pro
           borderRadius: 14,
           border: "none",
           cursor: saving ? "not-allowed" : "pointer",
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           fontSize: 13,
           fontWeight: 700,
           background: "linear-gradient(135deg, #1428d4, #0a0f8a)",

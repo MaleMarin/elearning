@@ -95,7 +95,7 @@ export function PushNotificationBlock({ demo }: { demo: boolean }) {
           borderRadius: 12,
           border: "none",
           cursor: status === "loading" || !vapidPublic ? "not-allowed" : "pointer",
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           fontSize: 12,
           fontWeight: 600,
           background: "#e8eaf0",

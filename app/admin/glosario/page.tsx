@@ -63,7 +63,7 @@ export default function GlosarioAdminPage() {
   };
 
   return (
-    <div style={{ flex: 1, padding: "18px 16px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "18px 16px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <div style={{ marginBottom: 20 }}>
         <Link href="/admin" style={{ fontSize: 13, color: "#8892b0", marginBottom: 8, display: "inline-block" }}>← Admin</Link>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Glosario por curso</h1>
@@ -116,7 +116,7 @@ export default function GlosarioAdminPage() {
               <button
                 type="button"
                 onClick={handleAgregar}
-                style={{ padding: "10px 20px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)", whiteSpace: "nowrap" }}
+                style={{ padding: "10px 20px", borderRadius: 12, border: "none", cursor: "pointer", fontFamily: "var(--font-heading)", fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg, #1428d4, #0a0f8a)", color: "white", boxShadow: "4px 4px 10px rgba(10,15,138,0.3)", whiteSpace: "nowrap" }}
               >
                 + Agregar
               </button>
@@ -153,7 +153,7 @@ export default function GlosarioAdminPage() {
                       borderRadius: 8,
                       border: "none",
                       cursor: "pointer",
-                      fontFamily: "'Syne', sans-serif",
+                      fontFamily: "var(--font-heading)",
                       fontSize: 11,
                       fontWeight: 600,
                       background: "#e8eaf0",

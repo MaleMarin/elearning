@@ -15,7 +15,7 @@ const INPUT_STYLE = {
   border: "none",
   borderRadius: 12,
   padding: "12px 16px",
-  fontFamily: "'Syne', sans-serif",
+  fontFamily: "var(--font-heading)",
   fontSize: 13,
   color: "#0a0f8a",
   outline: "none",
@@ -91,7 +91,7 @@ export function PersonalDataForm({
   return (
     <div style={CARD_STYLE}>
       <p style={{ fontSize: 11, fontWeight: 700, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>Datos personales</p>
-      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "'Syne', sans-serif" }}>Información de tu perfil</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "var(--font-heading)" }}>Información de tu perfil</h2>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -132,7 +132,7 @@ export function PersonalDataForm({
           borderRadius: 14,
           border: "none",
           cursor: saving || demo ? "not-allowed" : "pointer",
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           fontSize: 13,
           fontWeight: 700,
           background: "linear-gradient(135deg, #1428d4, #0a0f8a)",

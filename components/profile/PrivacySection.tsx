@@ -97,10 +97,10 @@ export function PrivacySection({ userId, demo }: PrivacySectionProps) {
   return (
     <div>
       <p style={{ fontSize: 11, fontWeight: 700, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>Privacidad</p>
-      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "'Syne', sans-serif" }}>Tu privacidad</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "var(--font-heading)" }}>Tu privacidad</h2>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: 16, borderRadius: 12, background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff", marginBottom: 16 }}>
         <span style={{ color: "#00b87d", flexShrink: 0 }}><LockIcon size={24} /></span>
-        <p style={{ margin: 0, fontSize: 13, color: "#0a0f8a", lineHeight: 1.5, fontFamily: "'Syne', sans-serif" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "#0a0f8a", lineHeight: 1.5, fontFamily: "var(--font-heading)" }}>
           Tu diario y carta al yo futuro están cifrados con AES-256. Ni el equipo de Política Digital puede leerlos.
         </p>
       </div>
@@ -117,7 +117,7 @@ export function PrivacySection({ userId, demo }: PrivacySectionProps) {
             borderRadius: 12,
             border: "none",
             cursor: exporting || !userId ? "not-allowed" : "pointer",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 12,
             fontWeight: 600,
             background: "#e8eaf0",
@@ -137,7 +137,7 @@ export function PrivacySection({ userId, demo }: PrivacySectionProps) {
             padding: "9px 18px",
             borderRadius: 12,
             border: "none",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 12,
             fontWeight: 600,
             background: "#e8eaf0",

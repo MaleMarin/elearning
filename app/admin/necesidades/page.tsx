@@ -38,7 +38,7 @@ function NecesidadesAgrupadas({ datos }: { datos: Need[] }) {
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-            <span style={{ fontSize: 13, color: "#0a0f8a", fontFamily: "'Syne', sans-serif" }}>{item.texto}</span>
+            <span style={{ fontSize: 13, color: "#0a0f8a", fontFamily: "var(--font-heading)" }}>{item.texto}</span>
             <span style={{ fontSize: 12, fontWeight: 700, color: "#1428d4", fontFamily: "'Space Mono', monospace" }}>
               {item.cantidad} alumno{item.cantidad !== 1 ? "s" : ""}
             </span>

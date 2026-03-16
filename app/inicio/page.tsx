@@ -348,7 +348,7 @@ export default function DashboardAlumno() {
                       boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff',
                       whiteSpace: 'nowrap',
                       zIndex: 100,
-                      fontFamily: "'Syne', sans-serif",
+                      fontFamily: "var(--font-heading)",
                       fontSize: 12,
                       fontWeight: 600,
                       color: '#0a0f8a',
@@ -381,7 +381,7 @@ export default function DashboardAlumno() {
           <div style={{ position: 'relative' }} onMouseEnter={() => setHovered('perfil')} onMouseLeave={() => setHovered(null)}>
             <SidebarNavSquare href="/mi-perfil" label="Mi perfil" icon={<IcoUser />} active={pathname === '/mi-perfil' || pathname?.startsWith('/mi-perfil')} theme={NM} />
             {hovered === 'perfil' && (
-              <div style={{ position: 'absolute', left: 58, top: '50%', transform: 'translateY(-50%)', background: '#e8eaf0', borderRadius: 10, padding: '6px 12px', boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff', whiteSpace: 'nowrap', zIndex: 100, fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 600, color: '#0a0f8a', pointerEvents: 'none' }}>
+              <div style={{ position: 'absolute', left: 58, top: '50%', transform: 'translateY(-50%)', background: '#e8eaf0', borderRadius: 10, padding: '6px 12px', boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff', whiteSpace: 'nowrap', zIndex: 100, fontFamily: "var(--font-heading)", fontSize: 12, fontWeight: 600, color: '#0a0f8a', pointerEvents: 'none' }}>
                 Mi perfil
                 <div style={{ position: 'absolute', left: -6, top: '50%', transform: 'translateY(-50%)', width: 0, height: 0, borderTop: '5px solid transparent', borderBottom: '5px solid transparent', borderRight: '6px solid #e8eaf0', filter: 'drop-shadow(-2px 0 2px #c2c8d6)' }} />
               </div>
@@ -405,7 +405,7 @@ export default function DashboardAlumno() {
               <IcoLogout />
             </button>
             {hovered === 'logout' && (
-              <div style={{ position: 'absolute', left: 58, top: '50%', transform: 'translateY(-50%)', background: '#e8eaf0', borderRadius: 10, padding: '6px 12px', boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff', whiteSpace: 'nowrap', zIndex: 100, fontFamily: "'Syne', sans-serif", fontSize: 12, fontWeight: 600, color: '#0a0f8a', pointerEvents: 'none' }}>
+              <div style={{ position: 'absolute', left: 58, top: '50%', transform: 'translateY(-50%)', background: '#e8eaf0', borderRadius: 10, padding: '6px 12px', boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff', whiteSpace: 'nowrap', zIndex: 100, fontFamily: "var(--font-heading)", fontSize: 12, fontWeight: 600, color: '#0a0f8a', pointerEvents: 'none' }}>
                 Cerrar sesión
                 <div style={{ position: 'absolute', left: -6, top: '50%', transform: 'translateY(-50%)', width: 0, height: 0, borderTop: '5px solid transparent', borderBottom: '5px solid transparent', borderRight: '6px solid #e8eaf0', filter: 'drop-shadow(-2px 0 2px #c2c8d6)' }} />
               </div>
@@ -577,7 +577,7 @@ export default function DashboardAlumno() {
                   style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
                 />
                 <text x="40" y="38" textAnchor="middle" fill="white" fontSize="16" fontWeight="800" fontFamily="Space Mono, monospace">68%</text>
-                <text x="40" y="52" textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize="9" fontFamily="Syne, sans-serif">progreso</text>
+                <text x="40" y="52" textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize="9" fontFamily="Raleway, sans-serif">progreso</text>
               </svg>
               <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontFamily: "'Space Mono', monospace", textAlign: 'center', marginTop: 4 }}>
                 {completionPrediction ? Math.ceil((new Date(completionPrediction.date).getTime() - Date.now()) / (24 * 60 * 60 * 1000)) : 14} días restantes
@@ -613,7 +613,7 @@ export default function DashboardAlumno() {
                     borderRadius: 16,
                     border: checkinSelected === estado.id ? `2px solid ${estado.color}` : '2px solid transparent',
                     cursor: 'pointer',
-                    fontFamily: "'Syne', sans-serif",
+                    fontFamily: "var(--font-heading)",
                     fontSize: 13,
                     fontWeight: checkinSelected === estado.id ? 800 : 600,
                     background: checkinSelected === estado.id ? estado.bg : NM.bg,
@@ -655,7 +655,7 @@ export default function DashboardAlumno() {
                 animation: 'fadeIn 0.3s ease',
               }}
             >
-              <p style={{ fontSize: 12, color: '#4a5580', fontFamily: "'Syne', sans-serif" }}>
+              <p style={{ fontSize: 12, color: '#4a5580', fontFamily: "var(--font-heading)" }}>
                 ✓ Check-in registrado. ¡Gracias!
               </p>
             </div>
@@ -908,7 +908,7 @@ export default function DashboardAlumno() {
               borderRadius: 16,
               border: 'none',
               cursor: 'pointer',
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 14,
               fontWeight: 800,
               background: 'linear-gradient(135deg, #1428d4, #0a0f8a)',
@@ -1006,7 +1006,7 @@ export default function DashboardAlumno() {
               background: NM.bg,
               borderRadius: 10,
               padding: 12,
-              fontFamily: "var(--font-body)",
+              fontFamily: "var(--font-heading)",
               fontSize: f(13),
               color: NM.muted2,
               resize: 'none',

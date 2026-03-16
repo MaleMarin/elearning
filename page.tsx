@@ -146,7 +146,7 @@ export default function DashboardAlumno() {
   const [selectedMood, setSelectedMood] = useState<MoodValue>(null)
 
   return (
-    <div className="flex min-h-screen" style={{ background: '#e8eaf0', fontFamily: "'Syne', sans-serif" }}>
+    <div className="flex min-h-screen" style={{ background: '#e8eaf0', fontFamily: "var(--font-heading)" }}>
 
       {/* ── SIDEBAR ─────────────────────────────────────────────────── */}
       <aside
@@ -201,7 +201,7 @@ export default function DashboardAlumno() {
             boxShadow: '4px 4px 10px #c2c8d6, -3px -3px 8px #ffffff',
             border: 'none',
             cursor: 'pointer',
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
           }}
         >
           MA
@@ -281,7 +281,7 @@ export default function DashboardAlumno() {
             borderRadius: 14,
             border: 'none',
             cursor: 'pointer',
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 13,
             fontWeight: 700,
             background: 'linear-gradient(135deg, #1428d4, #0a0f8a)',
@@ -300,7 +300,7 @@ export default function DashboardAlumno() {
             borderRadius: 14,
             border: 'none',
             cursor: 'pointer',
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 12,
             fontWeight: 600,
             background: '#e8eaf0',

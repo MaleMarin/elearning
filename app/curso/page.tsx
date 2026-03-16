@@ -68,7 +68,7 @@ export default function CursoPage() {
 
   if (loading) {
     return (
-      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
         <div style={{ marginBottom: 24 }}>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Mi curso</h1>
           <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>Cargando…</p>
@@ -82,7 +82,7 @@ export default function CursoPage() {
 
   if (!data) {
     return (
-      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
         <div style={{ background: "#e8eaf0", borderRadius: 20, padding: 40, textAlign: "center", maxWidth: 500, margin: "40px auto", boxShadow: "8px 8px 20px #c2c8d6, -8px -8px 20px #ffffff" }}>
           <div style={{ fontSize: 56, marginBottom: 16 }}>📚</div>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>Aún no tienes un curso asignado</h2>
@@ -98,7 +98,7 @@ export default function CursoPage() {
               borderRadius: 14,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
               color: "white",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 700,
               textDecoration: "none",
@@ -119,7 +119,7 @@ export default function CursoPage() {
 
   if (!data.course) {
     return (
-      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
         <div style={{ background: "#e8eaf0", borderRadius: 20, padding: 40, textAlign: "center", maxWidth: 500, margin: "40px auto", boxShadow: "8px 8px 20px #c2c8d6, -8px -8px 20px #ffffff" }}>
           <div style={{ fontSize: 56, marginBottom: 16 }}>📚</div>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>Aún no tienes un curso asignado</h2>
@@ -135,7 +135,7 @@ export default function CursoPage() {
               borderRadius: 14,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
               color: "white",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 700,
               textDecoration: "none",
@@ -152,7 +152,7 @@ export default function CursoPage() {
   const hasContent = data.modules.some((m) => m.lessonCount > 0);
   if (!hasContent) {
     return (
-      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
         <div style={{ marginBottom: 24 }}>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Mi curso</h1>
           <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>{data.course.title}</p>
@@ -171,7 +171,7 @@ export default function CursoPage() {
               borderRadius: 14,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
               color: "white",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 700,
               textDecoration: "none",
@@ -189,7 +189,7 @@ export default function CursoPage() {
   const lessonById = new Map(data.lessons.map((l) => [l.id, l]));
 
   return (
-    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Mi curso</h1>
         <p style={{ fontSize: 13, color: "#8892b0", marginTop: 4 }}>{data.course.description ?? data.course.title}</p>
@@ -206,7 +206,7 @@ export default function CursoPage() {
             borderRadius: 12,
             border: "none",
             cursor: "pointer",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 13,
             fontWeight: 600,
             background: view === "modulos" ? "#e8eaf0" : "#e8eaf0",
@@ -226,7 +226,7 @@ export default function CursoPage() {
             borderRadius: 12,
             border: "none",
             cursor: "pointer",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 13,
             fontWeight: 600,
             background: "#e8eaf0",

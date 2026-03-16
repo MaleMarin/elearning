@@ -69,7 +69,7 @@ export function AvatarUpload({
         color: "#ffffff",
         fontSize: 24,
         fontWeight: 800,
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
         boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
       }}
     >

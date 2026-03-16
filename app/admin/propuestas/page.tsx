@@ -57,7 +57,7 @@ export default function PropuestasPage() {
   const resueltas = propuestas.filter((p) => p.estado === "aprobada" || p.estado === "rechazada");
 
   return (
-    <div style={{ flex: 1, padding: "18px 16px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "18px 16px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <div style={{ marginBottom: 20 }}>
         <Link href="/admin" style={{ fontSize: 13, color: "#8892b0", marginBottom: 8, display: "inline-block" }}>← Admin</Link>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Propuestas UGC</h1>
@@ -142,14 +142,14 @@ export default function PropuestasPage() {
                             <button
                               type="button"
                               onClick={() => handleAprobar(p.id)}
-                              style={{ padding: "6px 14px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 11, fontWeight: 700, background: "linear-gradient(135deg, #00b87d, #00a06c)", color: "white" }}
+                              style={{ padding: "6px 14px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "var(--font-heading)", fontSize: 11, fontWeight: 700, background: "linear-gradient(135deg, #00b87d, #00a06c)", color: "white" }}
                             >
                               Aprobar
                             </button>
                             <button
                               type="button"
                               onClick={() => setRechazandoId(p.id)}
-                              style={{ padding: "6px 14px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontSize: 11, fontWeight: 600, background: "#e8eaf0", color: "#d84040", boxShadow: "2px 2px 5px #c2c8d6" }}
+                              style={{ padding: "6px 14px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "var(--font-heading)", fontSize: 11, fontWeight: 600, background: "#e8eaf0", color: "#d84040", boxShadow: "2px 2px 5px #c2c8d6" }}
                             >
                               Rechazar
                             </button>

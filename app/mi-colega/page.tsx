@@ -36,7 +36,7 @@ function CompletePairButton({ pairId, onCompleted }: { pairId: string; onComplet
         borderRadius: 12,
         border: "none",
         cursor: loading ? "wait" : "pointer",
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-heading)",
         fontSize: 12,
         fontWeight: 700,
         background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
@@ -77,7 +77,7 @@ export default function MiColegaPage() {
   }, []);
 
   return (
-    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <div style={{ marginBottom: 24 }}>
         <Link href="/inicio" style={{ fontSize: 13, color: "#8892b0", marginBottom: 8, display: "inline-block" }}>← Inicio</Link>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", letterSpacing: "-0.5px" }}>Mi colega</h1>

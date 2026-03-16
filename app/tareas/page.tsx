@@ -45,7 +45,7 @@ export default function TareasPage() {
 
   if (loading) {
     return (
-      <div style={{ flex: 1, padding: "20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ flex: 1, padding: "20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4 }}>Mis tareas</h1>
         <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>Cargando…</p>
       </div>
@@ -54,7 +54,7 @@ export default function TareasPage() {
 
   if (tasks.length === 0) {
     return (
-      <div style={{ flex: 1, padding: "20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      <div style={{ flex: 1, padding: "20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4 }}>Mis tareas</h1>
         <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>Actividades asignadas por tu facilitador</p>
         <div
@@ -81,7 +81,7 @@ export default function TareasPage() {
               borderRadius: 14,
               background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
               color: "white",
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 13,
               fontWeight: 700,
               textDecoration: "none",
@@ -96,7 +96,7 @@ export default function TareasPage() {
   }
 
   return (
-    <div style={{ flex: 1, padding: "20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+    <div style={{ flex: 1, padding: "20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "var(--font-heading)" }}>
       <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 4 }}>Mis tareas</h1>
       <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>Actividades asignadas por tu facilitador</p>
 
@@ -111,7 +111,7 @@ export default function TareasPage() {
             borderRadius: 12,
             border: "none",
             cursor: "pointer",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 13,
             fontWeight: 600,
             background: tab === "pendientes" ? "#e8eaf0" : "#e8eaf0",
@@ -131,7 +131,7 @@ export default function TareasPage() {
             borderRadius: 12,
             border: "none",
             cursor: "pointer",
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "var(--font-heading)",
             fontSize: 13,
             fontWeight: 600,
             background: "#e8eaf0",
@@ -182,7 +182,7 @@ export default function TareasPage() {
                 borderRadius: 12,
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 12,
                 fontWeight: 700,
                 background: "linear-gradient(135deg, #1428d4, #0a0f8a)",

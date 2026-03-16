@@ -63,7 +63,7 @@ export function SecuritySection({
   return (
     <div>
       <p style={{ fontSize: 11, fontWeight: 700, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>Seguridad</p>
-      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "'Syne', sans-serif" }}>Cuenta y acceso</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "var(--font-heading)" }}>Cuenta y acceso</h2>
 
       <div style={{ marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
@@ -99,7 +99,7 @@ export function SecuritySection({
           borderRadius: 12,
           border: "none",
           cursor: resetting || demo ? "not-allowed" : "pointer",
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-heading)",
           fontSize: 12,
           fontWeight: 600,
           background: "#e8eaf0",
