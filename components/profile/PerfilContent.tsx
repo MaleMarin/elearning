@@ -1,24 +1,42 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import type { PreferredChannel } from "@/lib/types/whatsapp";
 import { PersonalDataForm } from "@/components/profile/PersonalDataForm";
 import { LearningPreferences } from "@/components/profile/LearningPreferences";
-import { ProgressAndBadges } from "@/components/profile/ProgressAndBadges";
 import { AccessibilityPreferences } from "@/components/profile/AccessibilityPreferences";
 import { SecuritySection } from "@/components/profile/SecuritySection";
 import { PushNotificationBlock } from "@/components/profile/PushNotificationBlock";
 import { PrivacySection } from "@/components/profile/PrivacySection";
 import DeleteAccountSection from "@/components/profile/DeleteAccountSection";
 import { CheckinHistoryCard } from "@/components/profile/CheckinHistoryCard";
+import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import type { ProgressData } from "@/components/profile/ProgressAndBadges";
 import type { LastLoginData } from "@/components/profile/SecuritySection";
 
 const DEMO_MODE =
   typeof process !== "undefined" && process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
-/** Contenido completo del perfil del alumno (datos, preferencias, seguridad, competencias). Reutilizable en /perfil y /mi-perfil. */
+const CARD_STYLE = {
+  background: "#e8eaf0",
+  borderRadius: 20,
+  padding: 24,
+  boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
+} as const;
+
+const INPUT_STYLE = {
+  background: "#e8eaf0",
+  border: "none",
+  borderRadius: 12,
+  padding: "12px 16px",
+  fontFamily: "'Syne', sans-serif",
+  fontSize: 13,
+  color: "#0a0f8a",
+  outline: "none",
+  boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff",
+} as const;
+
 export function PerfilContent() {
   const [uid, setUid] = useState<string | null>(null);
   const [email, setEmail] = useState("");
@@ -34,6 +52,8 @@ export function PerfilContent() {
   const [loading, setLoading] = useState(true);
   const [channelsSaving, setChannelsSaving] = useState(false);
   const [channelsMessage, setChannelsMessage] = useState<string | null>(null);
+  const [competencias, setCompetencias] = useState<{ nombre: string; valueEntrada: number; valueSalida: number }[]>([]);
+  const sectionDatosRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     Promise.all([
@@ -63,6 +83,15 @@ export function PerfilContent() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/profile/competencias", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { competencias?: { nombre: string; valueEntrada: number; valueSalida: number }[] } | null) => {
+        if (d?.competencias && Array.isArray(d.competencias)) setCompetencias(d.competencias.slice(0, 3));
+      })
+      .catch(() => {});
   }, []);
 
   const saveProfile = async (data: Record<string, unknown>) => {
@@ -107,8 +136,8 @@ export function PerfilContent() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl">
-        <p className="text-[var(--text-muted)]">Cargando…</p>
+      <div style={{ padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+        <p style={{ fontSize: 13, color: "#8892b0" }}>Cargando…</p>
       </div>
     );
   }
@@ -123,155 +152,215 @@ export function PerfilContent() {
     region: (profileData.region as string) ?? "",
     linkedIn: (profileData.linkedIn as string) ?? "",
   };
+  const fullName = (profileData.fullName as string) ?? "";
+  const institution = (profileData.institution as string) ?? "";
+  const position = (profileData.position as string) ?? "";
 
   return (
-    <div className="max-w-4xl">
-      <header className="mb-5">
-        <h1 className="heading-hero text-[var(--ink)]">Mi perfil</h1>
-        <p className="text-[var(--text-muted)] text-sm mt-1.5 max-w-xl">
-          Completa tu perfil cuando quieras; así personalizamos tu experiencia y podemos acompañarte mejor en el curso.
-        </p>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="md:col-span-2">
-          <PersonalDataForm
-            initial={initialPersonal}
-            email={email}
-            onSave={saveProfile}
-            onAvatarUpload={saveAvatar}
-            demo={DEMO_MODE}
+    <div style={{ flex: 1, padding: "20px 20px", background: "#e8eaf0", minHeight: "100vh", fontFamily: "'Syne', sans-serif" }}>
+      {/* SECCIÓN 1 — HERO DEL PERFIL */}
+      <div style={{ ...CARD_STYLE, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20, marginBottom: 24 }}>
+        <div style={{ position: "relative" }}>
+          <AvatarUpload
+            photoURL={(profileData.photoURL as string) ?? null}
+            fullName={fullName || null}
+            email={email || null}
+            onUpload={saveAvatar}
+            uploading={false}
           />
         </div>
-
-        <div className="card-premium p-5 md:col-span-2">
-        <p className="section-label mb-1.5">Comunicación</p>
-        <h2 className="heading-section mb-3">WhatsApp y notificaciones</h2>
-        <p className="text-[var(--text-muted)] text-sm mb-3">
-          Indica tu número en formato internacional (E.164), por ejemplo +34912345678 o +56912345678.
-        </p>
-        <label className="block mb-4">
-          <span className="font-medium text-[var(--text)]">Teléfono (WhatsApp)</span>
-          <input
-            type="tel"
-            value={channels.phone}
-            onChange={(e) => setChannels((c) => ({ ...c, phone: e.target.value }))}
-            placeholder="+34 612 345 678"
-            className="mt-1 block w-full px-4 py-3 rounded-lg border border-[var(--line)] text-[var(--text)] bg-[var(--surface)] input-premium min-h-[48px]"
-          />
-        </label>
-        <label className="flex items-center gap-3 mb-4 min-h-[48px]">
-          <input
-            type="checkbox"
-            checked={channels.optIn}
-            onChange={(e) => setChannels((c) => ({ ...c, optIn: e.target.checked }))}
-            className="w-5 h-5 rounded border-[var(--line)]"
-          />
-          <span className="text-[var(--text)]">Acepto recibir recordatorios y avisos por WhatsApp</span>
-        </label>
-        <PushNotificationBlock demo={DEMO_MODE} />
-        <label className="block mb-4">
-          <span className="font-medium text-[var(--text)]">Canal preferido para notificaciones</span>
-          <select
-            value={channels.preferredChannel}
-            onChange={(e) =>
-              setChannels((c) => ({ ...c, preferredChannel: e.target.value as PreferredChannel }))
-            }
-            className="mt-1 block w-full max-w-xs px-4 py-3 rounded-lg border border-[var(--line)] bg-[var(--surface)] input-premium min-h-[48px]"
-          >
-            <option value="in_app">En la plataforma</option>
-            <option value="whatsapp">WhatsApp</option>
-            <option value="email">Correo electrónico</option>
-          </select>
-        </label>
-        {channelsMessage && (
-          <p
-            className={`text-sm mb-4 ${channelsMessage.startsWith("Error") ? "text-[var(--error)]" : "text-[var(--success)]"}`}
-            role="alert"
-          >
-            {channelsMessage}
-          </p>
-        )}
-        <button
-          type="button"
-          onClick={saveChannels}
-          disabled={channelsSaving}
-          className="btn-primary disabled:opacity-50"
-        >
-          {channelsSaving ? "Guardando…" : "Guardar preferencias"}
-        </button>
+        <div style={{ flex: 1, minWidth: 200 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 800, color: "#0a0f8a", marginBottom: 4, fontFamily: "'Syne', sans-serif" }}>
+            {fullName || "Sin nombre"}
+          </h1>
+          <p style={{ fontSize: 12, color: "#8892b0", fontFamily: "'Space Mono', monospace", marginBottom: 2 }}>{email}</p>
+          <p style={{ fontSize: 13, color: "#4a5580", marginBottom: 12 }}>{institution || "—"} {position ? `· ${position}` : ""}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#00b87d", padding: "4px 10px", borderRadius: 20, background: "rgba(0,184,125,0.15)", fontFamily: "'Space Mono', monospace" }}>
+              En línea
+            </span>
+            <button
+              type="button"
+              onClick={() => sectionDatosRef.current?.scrollIntoView({ behavior: "smooth" })}
+              style={{
+                padding: "8px 16px",
+                borderRadius: 12,
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 12,
+                fontWeight: 600,
+                background: "#e8eaf0",
+                color: "#1428d4",
+                boxShadow: "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+              }}
+            >
+              Editar perfil
+            </button>
+          </div>
+        </div>
       </div>
 
-        <div className="min-w-0">
+      {/* SECCIÓN 2 — DATOS PERSONALES */}
+      <div ref={sectionDatosRef} style={{ marginBottom: 24 }}>
+        <PersonalDataForm
+          initial={initialPersonal}
+          email={email}
+          onSave={saveProfile}
+          onAvatarUpload={saveAvatar}
+          demo={DEMO_MODE}
+        />
+      </div>
+
+      {/* SECCIÓN 3 — PREFERENCIAS (2 columnas) */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24, alignItems: "start" }}>
+        <div style={CARD_STYLE}>
           <LearningPreferences
             preferredLanguage={(profileData.preferredLanguage as "es" | "en") ?? "es"}
-            reminderFrequency={
-              (profileData.reminderFrequency as "daily" | "weekly" | "live_only" | "never") ?? "weekly"
-            }
+            reminderFrequency={(profileData.reminderFrequency as "daily" | "weekly" | "live_only" | "never") ?? "weekly"}
             contentMode={(profileData.contentMode as "leer" | "escuchar" | "ver") ?? "leer"}
             onSave={saveProfile}
             demo={DEMO_MODE}
           />
         </div>
-
-        <div className="min-w-0">
+        <div style={CARD_STYLE}>
           <AccessibilityPreferences
-        initial={{
-          fontSize: (profileData.accessibilityFontSize as "normal" | "large") ?? "normal",
-          reduceMotion: !!profileData.accessibilityReduceMotion,
-          highContrast: !!profileData.accessibilityHighContrast,
-        }}
-        onSaveToProfile={async (prefs) =>
-          saveProfile({
-            accessibilityFontSize: prefs.fontSize,
-            accessibilityReduceMotion: prefs.reduceMotion,
-            accessibilityHighContrast: prefs.highContrast,
-          })
-        }
-        demo={DEMO_MODE}
-      />
-        </div>
-
-        {progress && (
-          <div className="min-w-0">
-            <ProgressAndBadges data={progress} />
-          </div>
-        )}
-
-        <div className="min-w-0">
-          <CheckinHistoryCard />
-        </div>
-
-        <div className="min-w-0">
-          <PrivacySection userId={uid} demo={DEMO_MODE} />
-        </div>
-
-        <div className="card-premium p-5 min-w-0">
-          <p className="section-label mb-1.5">Servicio Profesional de Carrera</p>
-          <h2 className="heading-section mb-3">Competencias SPC</h2>
-          <p className="text-[var(--text-muted)] text-sm mb-3">
-            Consulta tu radar de competencias del catálogo SPC (nivel al entrar vs al salir del programa).
-          </p>
-          <Link href="/perfil/competencias" className="btn-primary inline-block no-underline text-sm">
-            Ver mis competencias
-          </Link>
-        </div>
-
-        <div className="min-w-0 md:col-span-2">
-          <SecuritySection
-            email={email}
-            mfaEnabled={mfaEnabled}
-            lastLogin={lastLogin}
+            initial={{
+              fontSize: (profileData.accessibilityFontSize as "normal" | "large") ?? "normal",
+              reduceMotion: !!profileData.accessibilityReduceMotion,
+              highContrast: !!profileData.accessibilityHighContrast,
+            }}
+            onSaveToProfile={async (prefs) =>
+              saveProfile({
+                accessibilityFontSize: prefs.fontSize,
+                accessibilityReduceMotion: prefs.reduceMotion,
+                accessibilityHighContrast: prefs.highContrast,
+              })
+            }
             demo={DEMO_MODE}
           />
         </div>
+      </div>
 
-        {!DEMO_MODE && (
-          <div className="mt-4 md:col-span-2">
-            <DeleteAccountSection />
+      {/* SECCIÓN 4 — COMUNICACIÓN */}
+      <div style={{ ...CARD_STYLE, marginBottom: 24 }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 12 }}>Comunicación</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "flex-end" }}>
+          <div style={{ flex: "1 1 200px" }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#0a0f8a", marginBottom: 6 }}>Teléfono (WhatsApp)</label>
+            <input
+              type="tel"
+              value={channels.phone}
+              onChange={(e) => setChannels((c) => ({ ...c, phone: e.target.value }))}
+              placeholder="+34 612 345 678"
+              style={{ ...INPUT_STYLE, width: "100%", maxWidth: 220 }}
+            />
+          </div>
+          <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={channels.optIn}
+              onChange={(e) => setChannels((c) => ({ ...c, optIn: e.target.checked }))}
+              style={{ width: 18, height: 18, accentColor: "#1428d4" }}
+            />
+            <span style={{ fontSize: 13, color: "#0a0f8a", fontWeight: 500 }}>Acepto notificaciones WhatsApp</span>
+          </label>
+          <div style={{ flex: "1 1 180px" }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#0a0f8a", marginBottom: 6 }}>Canal preferido</label>
+            <select
+              value={channels.preferredChannel}
+              onChange={(e) => setChannels((c) => ({ ...c, preferredChannel: e.target.value as PreferredChannel }))}
+              style={{ ...INPUT_STYLE, width: "100%", maxWidth: 200 }}
+            >
+              <option value="in_app">En la plataforma</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="email">Correo</option>
+            </select>
+          </div>
+          <PushNotificationBlock demo={DEMO_MODE} />
+        </div>
+        {channelsMessage && (
+          <p style={{ fontSize: 12, marginTop: 12, color: channelsMessage.startsWith("Error") ? "#d84040" : "#00b87d" }}>{channelsMessage}</p>
+        )}
+        <button
+          type="button"
+          onClick={saveChannels}
+          disabled={channelsSaving}
+          style={{
+            marginTop: 16,
+            padding: "11px 24px",
+            borderRadius: 14,
+            border: "none",
+            cursor: channelsSaving ? "wait" : "pointer",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 13,
+            fontWeight: 700,
+            background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+            color: "white",
+            boxShadow: "5px 5px 12px rgba(10,15,138,0.35)",
+          }}
+        >
+          {channelsSaving ? "Guardando…" : "Guardar preferencias"}
+        </button>
+      </div>
+
+      {/* SECCIÓN 5 — COMPETENCIAS SPC */}
+      <div style={{ ...CARD_STYLE, marginBottom: 24 }}>
+        <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "'Syne', sans-serif" }}>Competencias del Servicio Civil</p>
+        <Link
+          href="/perfil/competencias"
+          style={{
+            display: "inline-block",
+            marginBottom: 16,
+            padding: "9px 18px",
+            borderRadius: 12,
+            background: "#e8eaf0",
+            color: "#1428d4",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            textDecoration: "none",
+            boxShadow: "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+          }}
+        >
+          Ver mi radar de competencias
+        </Link>
+        {competencias.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {competencias.map((c, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "#0a0f8a", minWidth: 120 }}>{c.nombre}</span>
+                <div style={{ flex: 1, height: 8, background: "#e8eaf0", borderRadius: 4, boxShadow: "inset 2px 2px 5px #c2c8d6", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${Math.min(100, (c.valueSalida ?? 0) * 20)}%`, background: "linear-gradient(90deg, #1428d4, #2b4fff)", borderRadius: 4 }} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1428d4", fontFamily: "'Space Mono', monospace", minWidth: 36 }}>{Math.round((c.valueSalida ?? 0) * 20)}%</span>
+              </div>
+            ))}
           </div>
         )}
       </div>
+
+      {/* SECCIÓN 6 — ENERGÍA Y FOCO */}
+      <div style={{ ...CARD_STYLE, marginBottom: 24 }}>
+        <CheckinHistoryCard />
+      </div>
+
+      {/* SECCIÓN 7 — PRIVACIDAD Y SEGURIDAD (2 columnas) */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24, alignItems: "start" }}>
+        <div style={CARD_STYLE}>
+          <PrivacySection userId={uid} demo={DEMO_MODE} />
+        </div>
+        <div style={CARD_STYLE}>
+          <SecuritySection email={email} mfaEnabled={mfaEnabled} lastLogin={lastLogin} demo={DEMO_MODE} />
+        </div>
+      </div>
+
+      {/* SECCIÓN 8 — ZONA PELIGROSA */}
+      {!DEMO_MODE && (
+        <div style={{ ...CARD_STYLE, border: "1px solid rgba(216,64,64,0.2)", marginBottom: 24 }}>
+          <DeleteAccountSection />
+        </div>
+      )}
     </div>
   );
 }

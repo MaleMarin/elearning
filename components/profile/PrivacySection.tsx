@@ -1,8 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { decrypt } from "@/lib/crypto/encryption";
-import { Lock, Download, Trash2 } from "lucide-react";
+
+function LockIcon({ size = 24 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
+function DownloadIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+}
 
 interface PrivacySectionProps {
   userId: string | null;
@@ -11,7 +30,6 @@ interface PrivacySectionProps {
 
 export function PrivacySection({ userId, demo }: PrivacySectionProps) {
   const [exporting, setExporting] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const handleExport = async () => {
@@ -74,62 +92,64 @@ export function PrivacySection({ userId, demo }: PrivacySectionProps) {
     }
   };
 
-  const handleDelete = async () => {
-    if (!userId || demo) return;
-    if (!confirm("¿Borrar tu diario, carta al yo futuro, diagnóstico y encuesta de cierre? Esta acción no se puede deshacer.")) return;
-    setDeleting(true);
-    setMessage(null);
-    try {
-      const res = await fetch("/api/profile/delete-my-data", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Error al borrar");
-      setMessage("Tus datos sensibles han sido borrados.");
-    } catch {
-      setMessage("Error al borrar. Intenta de nuevo.");
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   if (demo) return null;
 
   return (
-    <div className="card-premium p-6">
-      <p className="section-label mb-2">Privacidad</p>
-      <h2 className="heading-section mb-4">Tu privacidad</h2>
-      <div className="flex items-start gap-3 p-4 rounded-xl bg-[var(--surface-soft)] border border-[var(--line-subtle)] mb-4">
-        <Lock className="w-6 h-6 text-[var(--success)] shrink-0 mt-0.5" aria-hidden />
-        <p className="text-[var(--ink)] text-sm">
-          Tu diario y carta al yo futuro están cifrados. Ni el equipo de Política Digital puede leerlos.
+    <div>
+      <p style={{ fontSize: 11, fontWeight: 700, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>Privacidad</p>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "'Syne', sans-serif" }}>Tu privacidad</h2>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: 16, borderRadius: 12, background: "#e8eaf0", boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff", marginBottom: 16 }}>
+        <span style={{ color: "#00b87d", flexShrink: 0 }}><LockIcon size={24} /></span>
+        <p style={{ margin: 0, fontSize: 13, color: "#0a0f8a", lineHeight: 1.5, fontFamily: "'Syne', sans-serif" }}>
+          Tu diario y carta al yo futuro están cifrados con AES-256. Ni el equipo de Política Digital puede leerlos.
         </p>
       </div>
-      <div className="flex flex-wrap gap-3">
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
         <button
           type="button"
           onClick={handleExport}
           disabled={exporting || !userId}
-          className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] hover:bg-[var(--surface-soft)] text-[var(--ink)] disabled:opacity-50 min-h-[48px]"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "9px 18px",
+            borderRadius: 12,
+            border: "none",
+            cursor: exporting || !userId ? "not-allowed" : "pointer",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            background: "#e8eaf0",
+            color: "#1428d4",
+            boxShadow: "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+          }}
         >
-          <Download className="w-5 h-5" aria-hidden />
+          <DownloadIcon size={18} />
           {exporting ? "Preparando…" : "Exportar mis datos"}
         </button>
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={deleting || !userId}
-          className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] hover:bg-[var(--surface-soft)] text-[var(--error)] disabled:opacity-50 min-h-[48px]"
+        <Link
+          href="/privacidad"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "9px 18px",
+            borderRadius: 12,
+            border: "none",
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 12,
+            fontWeight: 600,
+            background: "#e8eaf0",
+            color: "#1428d4",
+            textDecoration: "none",
+            boxShadow: "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+          }}
         >
-          <Trash2 className="w-5 h-5" aria-hidden />
-          {deleting ? "Borrando…" : "Borrar mis datos"}
-        </button>
+          Ver aviso de privacidad
+        </Link>
       </div>
-      {message && (
-        <p className="mt-3 text-sm text-[var(--muted)]" role="status">
-          {message}
-        </p>
-      )}
+      {message && <p style={{ marginTop: 12, fontSize: 12, color: "#8892b0" }} role="status">{message}</p>}
     </div>
   );
 }

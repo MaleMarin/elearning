@@ -13,6 +13,15 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return outputArray;
 }
 
+function BellIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
+
 export function PushNotificationBlock({ demo }: { demo: boolean }) {
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
@@ -73,26 +82,32 @@ export function PushNotificationBlock({ demo }: { demo: boolean }) {
   if (demo) return null;
 
   return (
-    <div className="mb-4">
-      <p className="font-medium text-[var(--text)] mb-2">Notificaciones en el navegador</p>
-      <p className="text-[var(--text-muted)] text-sm mb-3">
-        Activa las notificaciones push para recibir recordatorios de sesiones y tareas aunque no tengas la pestaña abierta.
-      </p>
+    <div>
       <button
         type="button"
         onClick={activarNotificaciones}
         disabled={status === "loading" || !vapidPublic}
-        className="btn-primary disabled:opacity-50"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "9px 18px",
+          borderRadius: 12,
+          border: "none",
+          cursor: status === "loading" || !vapidPublic ? "not-allowed" : "pointer",
+          fontFamily: "'Syne', sans-serif",
+          fontSize: 12,
+          fontWeight: 600,
+          background: "#e8eaf0",
+          color: "#1428d4",
+          boxShadow: "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+        }}
       >
+        <BellIcon size={18} />
         {status === "loading" ? "Activando…" : "Activar notificaciones push"}
       </button>
       {message && (
-        <p
-          className={`text-sm mt-2 ${status === "error" ? "text-[var(--error)]" : "text-[var(--success)]"}`}
-          role="alert"
-        >
-          {message}
-        </p>
+        <p style={{ marginTop: 8, fontSize: 12, color: status === "error" ? "#d84040" : "#00b87d" }} role="alert">{message}</p>
       )}
     </div>
   );

@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { useTheme } from "@/lib/hooks/useTheme";
 import type { ContentMode } from "@/lib/services/profile";
 
-const MODOS: { id: ContentMode; emoji: string; label: string; desc: string }[] = [
-  { id: "leer", emoji: "📖", label: "Prefiero leer", desc: "Texto y diagramas" },
-  { id: "escuchar", emoji: "🎧", label: "Prefiero escuchar", desc: "Audio de las lecciones" },
-  { id: "ver", emoji: "🎥", label: "Prefiero ver", desc: "Video explicativo" },
+const MODOS: { id: ContentMode; emoji: string; label: string }[] = [
+  { id: "leer", emoji: "📖", label: "Leer" },
+  { id: "escuchar", emoji: "🎧", label: "Escuchar" },
+  { id: "ver", emoji: "🎥", label: "Ver" },
 ];
 
 interface LearningPreferencesProps {
@@ -21,6 +21,20 @@ interface LearningPreferencesProps {
   }) => Promise<void>;
   demo?: boolean;
 }
+
+const INPUT_STYLE = {
+  background: "#e8eaf0",
+  border: "none",
+  borderRadius: 12,
+  padding: "12px 16px",
+  fontFamily: "'Syne', sans-serif",
+  fontSize: 13,
+  color: "#0a0f8a",
+  outline: "none",
+  boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff",
+  width: "100%",
+  maxWidth: 240,
+} as const;
 
 export function LearningPreferences({
   preferredLanguage: initialLang,
@@ -54,57 +68,58 @@ export function LearningPreferences({
   };
 
   const handleThemeToggle = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   return (
-    <div className="card-premium p-6">
-      <p className="section-label mb-2">Preferencias</p>
-      <h2 className="heading-section mb-4">Aprendizaje y notificaciones</h2>
+    <div>
+      <p style={{ fontSize: 11, fontWeight: 700, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>Aprendizaje</p>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "'Syne', sans-serif" }}>Modo de contenido y notificaciones</h2>
 
-      <div className="mb-4">
-        <span className="font-medium text-[var(--text)] block mb-2">Modo de contenido preferido</span>
-        <p className="text-sm text-[var(--muted)] mb-2">En las lecciones se priorizará tu opción preferida.</p>
-        <div className="flex flex-wrap gap-2">
+      <div style={{ marginBottom: 16 }}>
+        <span style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#0a0f8a", marginBottom: 8 }}>Modo de contenido preferido</span>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           {MODOS.map((m) => (
             <button
               key={m.id}
               type="button"
               onClick={() => setContentMode(m.id)}
               aria-pressed={contentMode === m.id}
-              className="px-4 py-2 rounded-lg border min-w-[140px] text-left transition-colors"
               style={{
-                borderColor: contentMode === m.id ? "var(--primary)" : "var(--line)",
-                background: contentMode === m.id ? "rgba(20, 40, 212, 0.08)" : "var(--surface)",
+                padding: "10px 16px",
+                borderRadius: 999,
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 13,
+                fontWeight: 600,
+                color: contentMode === m.id ? "#fff" : "#0a0f8a",
+                background: contentMode === m.id ? "linear-gradient(135deg, #1428d4, #0a0f8a)" : "#e8eaf0",
+                boxShadow: contentMode === m.id ? "inset 2px 2px 6px rgba(0,0,0,0.2)" : "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
               }}
             >
-              <span className="text-lg" aria-hidden>{m.emoji}</span>
-              <span className="block font-medium text-[var(--text)]">{m.label}</span>
-              <span className="block text-xs text-[var(--muted)]">{m.desc}</span>
+              {m.emoji} {m.label}
             </button>
           ))}
         </div>
       </div>
 
-      <label className="block mb-4">
-        <span className="font-medium text-[var(--text)]">Idioma preferido</span>
+      <div style={{ marginBottom: 16 }}>
+        <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#0a0f8a", marginBottom: 6 }}>Idioma preferido</label>
         <select
           value={preferredLanguage}
           onChange={(e) => setPreferredLanguage(e.target.value as "es" | "en")}
-          className="mt-1 block w-full max-w-xs px-4 py-3 rounded-lg border border-[var(--line)] text-[var(--text)] bg-[var(--surface)] input-premium min-h-[48px]"
+          style={INPUT_STYLE}
         >
           <option value="es">Español</option>
           <option value="en">Inglés</option>
         </select>
-      </label>
+      </div>
 
-      <div className="flex items-center justify-between gap-4 mb-4 py-2">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, padding: "8px 0" }}>
         <div>
-          <span className="font-medium text-[var(--text)] block">Modo de pantalla</span>
-          <span className="text-sm text-[var(--muted)]">
-            {theme === "dark" ? "Oscuro" : "Claro"}
-          </span>
+          <span style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#0a0f8a" }}>Modo de pantalla</span>
+          <span style={{ fontSize: 12, color: "#8892b0" }}>{theme === "dark" ? "Oscuro" : "Claro"}</span>
         </div>
         <button
           type="button"
@@ -112,40 +127,64 @@ export function LearningPreferences({
           aria-checked={theme === "dark"}
           aria-label="Cambiar a tema oscuro o claro"
           onClick={handleThemeToggle}
-          className="relative w-12 h-7 rounded-full bg-[var(--line)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] data-[state=checked]:bg-[var(--primary)]"
-          style={{ background: theme === "dark" ? "var(--primary)" : "var(--line)" }}
+          style={{
+            position: "relative",
+            width: 48,
+            height: 26,
+            borderRadius: 13,
+            border: "none",
+            cursor: "pointer",
+            background: "#e8eaf0",
+            boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff",
+          }}
         >
           <span
-            className="absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform"
-            style={{ transform: theme === "dark" ? "translateX(22px)" : "translateX(0)" }}
+            style={{
+              position: "absolute",
+              top: 3,
+              left: theme === "dark" ? 25 : 3,
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              background: theme === "dark" ? "linear-gradient(135deg, #1428d4, #0a0f8a)" : "#e8eaf0",
+              boxShadow: theme === "dark" ? "2px 2px 6px rgba(0,0,0,0.25)" : "4px 4px 8px #c2c8d6, -4px -4px 8px #ffffff",
+              transition: "left 0.2s ease",
+            }}
           />
         </button>
       </div>
 
-      <label className="block mb-4">
-        <span className="font-medium text-[var(--text)]">Frecuencia de recordatorios</span>
+      <div style={{ marginBottom: 16 }}>
+        <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#0a0f8a", marginBottom: 6 }}>Frecuencia de recordatorios</label>
         <select
           value={reminderFrequency}
           onChange={(e) => setReminderFrequency(e.target.value as LearningPreferencesProps["reminderFrequency"])}
-          className="mt-1 block w-full max-w-xs px-4 py-3 rounded-lg border border-[var(--line)] text-[var(--text)] bg-[var(--surface)] input-premium min-h-[48px]"
+          style={INPUT_STYLE}
         >
           <option value="daily">Diario</option>
           <option value="weekly">Semanal</option>
           <option value="live_only">Solo sesiones en vivo</option>
           <option value="never">Nunca</option>
         </select>
-      </label>
+      </div>
 
-      {toast && (
-        <p className="text-[var(--success)] text-sm mb-4" role="status">
-          {toast}
-        </p>
-      )}
+      {toast && <p style={{ fontSize: 12, marginBottom: 12, color: "#00b87d" }} role="status">{toast}</p>}
       <button
         type="button"
         onClick={handleSave}
         disabled={saving || demo}
-        className="btn-primary disabled:opacity-50"
+        style={{
+          padding: "11px 24px",
+          borderRadius: 14,
+          border: "none",
+          cursor: saving || demo ? "not-allowed" : "pointer",
+          fontFamily: "'Syne', sans-serif",
+          fontSize: 13,
+          fontWeight: 700,
+          background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+          color: "white",
+          boxShadow: "5px 5px 12px rgba(10,15,138,0.35)",
+        }}
       >
         {saving ? "Guardando…" : "Guardar preferencias"}
       </button>

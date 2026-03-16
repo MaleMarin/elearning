@@ -3,24 +3,21 @@
 import { useState, useEffect } from "react";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import type { AccessibilityPrefs } from "@/lib/services/profile";
-import { SurfaceCard } from "@/components/ui";
-import { PrimaryButton } from "@/components/ui";
-import { Alert } from "@/components/ui/Alert";
 
 type Props = {
-  /** Valores iniciales desde el perfil (servidor). */
   initial?: AccessibilityPrefs | null;
-  /** Al guardar, persistir también en el backend (PUT /api/profile). */
   onSaveToProfile?: (prefs: AccessibilityPrefs) => Promise<void>;
   demo?: boolean;
 };
+
+type FontSizeOption = "normal" | "large";
 
 export function AccessibilityPreferences({ initial, onSaveToProfile, demo }: Props) {
   const { prefs, setPrefs } = useAccessibility();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const fontSize = prefs.fontSize ?? initial?.fontSize ?? "normal";
+  const fontSize: FontSizeOption = (prefs.fontSize ?? initial?.fontSize ?? "normal") as FontSizeOption;
   const reduceMotion = prefs.reduceMotion ?? initial?.reduceMotion ?? false;
   const highContrast = prefs.highContrast ?? initial?.highContrast ?? false;
 
@@ -38,11 +35,7 @@ export function AccessibilityPreferences({ initial, onSaveToProfile, demo }: Pro
     setSaving(true);
     try {
       if (onSaveToProfile && !demo) {
-        await onSaveToProfile({
-          fontSize,
-          reduceMotion,
-          highContrast,
-        });
+        await onSaveToProfile({ fontSize, reduceMotion, highContrast });
       }
       setPrefs({ fontSize, reduceMotion, highContrast });
       setMessage("Preferencias de accesibilidad guardadas.");
@@ -53,59 +46,116 @@ export function AccessibilityPreferences({ initial, onSaveToProfile, demo }: Pro
     }
   };
 
+  const setFontSize = (v: FontSizeOption) => setPrefs({ ...prefs, fontSize: v });
+
   return (
-    <SurfaceCard padding="lg" clickable={false} className="space-y-4">
-      <p className="section-label mb-0 text-[var(--ink-muted)]">Accesibilidad</p>
-      <h2 className="heading-section mb-2 text-[var(--ink)]">Preferencias de accesibilidad</h2>
-      <p className="text-sm text-[var(--ink-muted)]">
-        Ajustes para mejorar la lectura y reducir barreras (cumplimiento de estándares de accesibilidad).
-      </p>
+    <div>
+      <p style={{ fontSize: 11, fontWeight: 700, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>Accesibilidad</p>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "'Syne', sans-serif" }}>Preferencias de accesibilidad</h2>
 
-      <label className="flex flex-col gap-1">
-        <span className="font-medium text-[var(--ink)]">Tamaño de texto</span>
-        <select
-          value={fontSize}
-          onChange={(e) => setPrefs({ ...prefs, fontSize: e.target.value as "normal" | "large" })}
-          className="w-full max-w-xs px-4 py-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] min-h-[48px]"
-          aria-describedby="a11y-font-desc"
+      <div style={{ marginBottom: 16 }}>
+        <span style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#0a0f8a", marginBottom: 8 }}>Tamaño de texto</span>
+        <div style={{ display: "flex", gap: 10 }}>
+          {(["A", "AA", "AAA"] as const).map((label, i) => {
+            const value: FontSizeOption = i === 0 ? "normal" : "large";
+            const isActive = fontSize === value || (label === "AAA" && fontSize === "large");
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => setFontSize(value)}
+                aria-pressed={isActive}
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: label === "AAA" ? 11 : 14,
+                  fontWeight: 700,
+                  color: isActive ? "#fff" : "#0a0f8a",
+                  background: isActive ? "linear-gradient(135deg, #1428d4, #0a0f8a)" : "#e8eaf0",
+                  boxShadow: isActive ? "inset 2px 2px 6px rgba(0,0,0,0.2)" : "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <label style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, cursor: "pointer" }}>
+        <button
+          type="button"
+          role="checkbox"
+          aria-checked={reduceMotion}
+          onClick={() => setPrefs({ ...prefs, reduceMotion: !reduceMotion })}
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: 8,
+            border: "none",
+            cursor: "pointer",
+            background: reduceMotion ? "#e8eaf0" : "#e8eaf0",
+            boxShadow: reduceMotion ? "inset 2px 2px 5px #c2c8d6" : "4px 4px 8px #c2c8d6, -4px -4px 8px #ffffff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          <option value="normal">Normal</option>
-          <option value="large">Grande</option>
-        </select>
-        <span id="a11y-font-desc" className="text-xs text-[var(--ink-muted)]">Recomendado para lectura prolongada.</span>
+          {reduceMotion && <span style={{ color: "#1428d4", fontWeight: 800, fontSize: 14 }}>✓</span>}
+        </button>
+        <span style={{ fontSize: 13, color: "#0a0f8a", fontWeight: 500 }}>Reducir animaciones</span>
       </label>
 
-      <label className="flex items-center gap-3 min-h-[48px] cursor-pointer">
-        <input
-          type="checkbox"
-          checked={reduceMotion}
-          onChange={(e) => setPrefs({ ...prefs, reduceMotion: e.target.checked })}
-          className="w-5 h-5 rounded border-[var(--line)]"
-          aria-describedby="a11y-motion-desc"
-        />
-        <span id="a11y-motion-desc" className="text-[var(--ink)]">Reducir animaciones y movimiento</span>
-      </label>
-
-      <label className="flex items-center gap-3 min-h-[48px] cursor-pointer">
-        <input
-          type="checkbox"
-          checked={highContrast}
-          onChange={(e) => setPrefs({ ...prefs, highContrast: e.target.checked })}
-          className="w-5 h-5 rounded border-[var(--line)]"
-          aria-describedby="a11y-contrast-desc"
-        />
-        <span id="a11y-contrast-desc" className="text-[var(--ink)]">Mayor contraste (texto y bordes)</span>
+      <label style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, cursor: "pointer" }}>
+        <button
+          type="button"
+          role="checkbox"
+          aria-checked={highContrast}
+          onClick={() => setPrefs({ ...prefs, highContrast: !highContrast })}
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: 8,
+            border: "none",
+            cursor: "pointer",
+            background: "#e8eaf0",
+            boxShadow: highContrast ? "inset 2px 2px 5px #c2c8d6" : "4px 4px 8px #c2c8d6, -4px -4px 8px #ffffff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {highContrast && <span style={{ color: "#1428d4", fontWeight: 800, fontSize: 14 }}>✓</span>}
+        </button>
+        <span style={{ fontSize: 13, color: "#0a0f8a", fontWeight: 500 }}>Mayor contraste</span>
       </label>
 
       {message && (
-        <Alert
-          message={message}
-          variant={message.startsWith("Error") ? "error" : "info"}
-        />
+        <p style={{ fontSize: 12, marginBottom: 12, color: message.startsWith("Error") ? "#d84040" : "#00b87d" }} role="alert">{message}</p>
       )}
-      <PrimaryButton onClick={handleSave} disabled={saving}>
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={saving}
+        style={{
+          padding: "11px 24px",
+          borderRadius: 14,
+          border: "none",
+          cursor: saving ? "not-allowed" : "pointer",
+          fontFamily: "'Syne', sans-serif",
+          fontSize: 13,
+          fontWeight: 700,
+          background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+          color: "white",
+          boxShadow: "5px 5px 12px rgba(10,15,138,0.35)",
+        }}
+      >
         {saving ? "Guardando…" : "Guardar preferencias"}
-      </PrimaryButton>
-    </SurfaceCard>
+      </button>
+    </div>
   );
 }

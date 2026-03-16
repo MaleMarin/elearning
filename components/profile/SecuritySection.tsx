@@ -61,41 +61,31 @@ export function SecuritySection({
     `${lastLoginData.device.browser} · ${lastLoginData.device.os}${lastLoginData.device.isMobile ? " (móvil)" : ""}`;
 
   return (
-    <div className="card-premium p-6">
-      <p className="section-label mb-2">Seguridad</p>
-      <h2 className="heading-section mb-4">Cuenta y acceso</h2>
+    <div>
+      <p style={{ fontSize: 11, fontWeight: 700, color: "#8892b0", fontFamily: "'Space Mono', monospace", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>Seguridad</p>
+      <h2 style={{ fontSize: 16, fontWeight: 800, color: "#0a0f8a", marginBottom: 16, fontFamily: "'Syne', sans-serif" }}>Cuenta y acceso</h2>
 
-      <div className="space-y-4 mb-4">
-        <div className="flex items-center gap-3">
-          <span className="font-medium text-[var(--text)]">Verificación en 2 pasos (MFA)</span>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#0a0f8a" }}>Verificación en 2 pasos</span>
           {mfaEnabled ? (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--success-soft)] text-[var(--success)]">
-              Activada
-            </span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#00b87d", padding: "4px 10px", borderRadius: 20, background: "rgba(0,184,125,0.15)", fontFamily: "'Space Mono', monospace" }}>Activa</span>
           ) : (
             <>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--coral-soft)] text-[var(--coral)]">
-                No activada
-              </span>
-              <Link
-                href="/admin/seguridad"
-                className="text-sm text-[var(--primary)] hover:underline"
-              >
-                Activar en Seguridad
-              </Link>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#d84040", padding: "4px 10px", borderRadius: 20, background: "rgba(216,64,64,0.12)", fontFamily: "'Space Mono', monospace" }}>No activada</span>
+              <Link href="/admin/seguridad" style={{ fontSize: 12, color: "#1428d4", fontWeight: 600, textDecoration: "underline" }}>Activar en Seguridad</Link>
             </>
           )}
         </div>
-
         <div>
-          <p className="font-medium text-[var(--text)] mb-1">Último acceso</p>
+          <p style={{ fontSize: 12, fontWeight: 600, color: "#0a0f8a", marginBottom: 4 }}>Último acceso</p>
           {lastLoginData?.timestamp ? (
-            <p className="text-sm text-[var(--muted)]">
+            <p style={{ fontSize: 12, color: "#8892b0", fontFamily: "'Space Mono', monospace" }}>
               {new Date(lastLoginData.timestamp).toLocaleString("es")}
               {deviceText && ` · ${deviceText}`}
             </p>
           ) : (
-            <p className="text-sm text-[var(--muted)]">No registrado</p>
+            <p style={{ fontSize: 12, color: "#8892b0" }}>No registrado</p>
           )}
         </div>
       </div>
@@ -104,17 +94,23 @@ export function SecuritySection({
         type="button"
         onClick={handleChangePassword}
         disabled={resetting || demo}
-        className="btn-coral disabled:opacity-50"
+        style={{
+          padding: "9px 18px",
+          borderRadius: 12,
+          border: "none",
+          cursor: resetting || demo ? "not-allowed" : "pointer",
+          fontFamily: "'Syne', sans-serif",
+          fontSize: 12,
+          fontWeight: 600,
+          background: "#e8eaf0",
+          color: "#1428d4",
+          boxShadow: "4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff",
+        }}
       >
         {resetting ? "Enviando…" : "Cambiar contraseña"}
       </button>
       {resetMessage && (
-        <p
-          className={`mt-3 text-sm ${resetMessage.startsWith("Revisa") ? "text-[var(--success)]" : "text-[var(--error)]"}`}
-          role="alert"
-        >
-          {resetMessage}
-        </p>
+        <p style={{ marginTop: 12, fontSize: 12, color: resetMessage.startsWith("Revisa") ? "#00b87d" : "#d84040" }} role="alert">{resetMessage}</p>
       )}
     </div>
   );

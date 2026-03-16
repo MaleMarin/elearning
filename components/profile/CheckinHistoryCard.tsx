@@ -1,41 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SurfaceCard } from "@/components/ui";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
 import type { Checkin } from "@/lib/services/checkin";
-
-function getBestDayInsight(checkins: Checkin[]): string | null {
-  if (checkins.length < 7) return null;
-  const byDay: Record<number, { sum: number; count: number }> = {};
-  for (let i = 0; i < 7; i++) byDay[i] = { sum: 0, count: 0 };
-  checkins.forEach((c) => {
-    const d = new Date(c.fecha).getDay();
-    byDay[d].sum += c.energia + c.foco;
-    byDay[d].count += 1;
-  });
-  let bestDay = 1;
-  let bestAvg = 0;
-  for (let i = 0; i < 7; i++) {
-    const avg = byDay[i].count > 0 ? byDay[i].sum / byDay[i].count : 0;
-    if (avg > bestAvg) {
-      bestAvg = avg;
-      bestDay = i;
-    }
-  }
-  if (bestAvg < 3) return null;
-  const dayNames = ["domingos", "lunes", "martes", "miércoles", "jueves", "viernes", "sábados"];
-  return `Aprendes mejor los ${dayNames[bestDay]} por la mañana.`;
-}
 
 export function CheckinHistoryCard() {
   const [checkins, setCheckins] = useState<Checkin[]>([]);
@@ -51,68 +17,49 @@ export function CheckinHistoryCard() {
       .finally(() => setLoading(false));
   }, []);
 
+  const last7 = [...checkins]
+    .sort((a, b) => b.fecha.localeCompare(a.fecha))
+    .slice(0, 7)
+    .reverse();
+
   if (loading) {
     return (
-      <SurfaceCard padding="lg" clickable={false}>
-        <p className="text-sm text-[var(--ink-muted)]">Cargando historial de check-ins…</p>
-      </SurfaceCard>
+      <div>
+        <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "'Syne', sans-serif" }}>Mi historial de energía</p>
+        <p style={{ fontSize: 12, color: "#8892b0" }}>Cargando historial…</p>
+      </div>
     );
   }
 
   if (checkins.length === 0) {
     return (
-      <SurfaceCard padding="lg" clickable={false}>
-        <p className="section-label mb-2">Energía y foco</p>
-        <h2 className="heading-section mb-4">Check-in cognitivo</h2>
-        <p className="text-[var(--ink-muted)] text-sm">
-          Cuando completes el check-in diario en Inicio, aquí verás tu historial de energía y concentración.
+      <div>
+        <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "'Syne', sans-serif" }}>Mi historial de energía</p>
+        <p style={{ fontSize: 13, color: "#8892b0", lineHeight: 1.5 }}>
+          Completa el check-in diario en Inicio para ver tu historial.
         </p>
-      </SurfaceCard>
+      </div>
     );
   }
 
-  const chartData = [...checkins]
-    .sort((a, b) => a.fecha.localeCompare(b.fecha))
-    .map((c) => ({
-      fecha: c.fecha.slice(5),
-      energia: c.energia,
-      foco: c.foco,
-      total: c.energia + c.foco,
-    }));
-
-  const insight = getBestDayInsight(checkins);
-
   return (
-    <SurfaceCard padding="lg" clickable={false}>
-      <p className="section-label mb-2">Energía y foco</p>
-      <h2 className="heading-section mb-4">Check-in cognitivo (últimas 4 semanas)</h2>
-      <div className="h-56 mb-4">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--line-subtle)" />
-            <XAxis dataKey="fecha" tick={{ fontSize: 10, fill: "var(--muted)" }} />
-            <YAxis domain={[0, 6]} tick={{ fontSize: 10, fill: "var(--muted)" }} />
-            <Tooltip
-              contentStyle={{
-                background: "var(--surface)",
-                border: "1px solid var(--line)",
-                borderRadius: "8px",
-              }}
-              labelStyle={{ color: "var(--ink)" }}
-              formatter={(value) => [Number(value ?? 0), ""]}
-              labelFormatter={(label) => `Fecha: ${label}`}
-            />
-            <Legend />
-            <Line type="monotone" dataKey="energia" name="Energía" stroke="var(--primary)" strokeWidth={2} dot={{ r: 2 }} />
-            <Line type="monotone" dataKey="foco" name="Foco" stroke="var(--acento)" strokeWidth={2} dot={{ r: 2 }} />
-          </LineChart>
-        </ResponsiveContainer>
+    <div>
+      <p style={{ fontSize: 14, fontWeight: 800, color: "#0a0f8a", marginBottom: 12, fontFamily: "'Syne', sans-serif" }}>Mi historial de energía</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {last7.map((c) => {
+          const total = c.energia + c.foco;
+          const pct = Math.round((total / 6) * 100);
+          return (
+            <div key={c.fecha} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 11, color: "#4a5580", fontFamily: "'Space Mono', monospace", minWidth: 56 }}>{c.fecha}</span>
+              <div style={{ flex: 1, height: 12, background: "#e8eaf0", borderRadius: 6, boxShadow: "inset 2px 2px 5px #c2c8d6", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg, #1428d4, #2b4fff)", borderRadius: 6 }} />
+              </div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1428d4", fontFamily: "'Space Mono', monospace", minWidth: 32 }}>{pct}%</span>
+            </div>
+          );
+        })}
       </div>
-      {insight && (
-        <p className="text-sm text-[var(--ink)] rounded-lg bg-[var(--surface-soft)] p-3 border border-[var(--line-subtle)]">
-          <strong>Insight:</strong> {insight}
-        </p>
-      )}
-    </SurfaceCard>
+    </div>
   );
 }
