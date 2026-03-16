@@ -511,6 +511,7 @@ export default function DashboardAlumno() {
         <section
           className="relative overflow-hidden"
           style={{
+            minHeight: 200,
             background: 'linear-gradient(135deg, #0a0f8a 0%, #1428d4 65%, #1a3ee8 100%)',
             borderRadius: 18,
             padding: 24,
@@ -519,15 +520,15 @@ export default function DashboardAlumno() {
           aria-label="Bienvenida y progreso"
         >
           <div style={{ position: 'absolute', top: -30, right: -30, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} aria-hidden />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 20, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 20, flexWrap: 'wrap', minHeight: 160 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: f(11), color: 'rgba(255,255,255,0.5)', fontFamily: "'Space Mono', monospace", textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 4 }}>
+              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontFamily: "'Space Mono', monospace", textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 4 }}>
                 Buenas tardes
               </p>
-              <h2 style={{ fontSize: 'clamp(15px, 4vw, 20px)', fontWeight: 800, color: 'white', marginBottom: 3, letterSpacing: '-0.3px' }}>
+              <h2 style={{ fontSize: 24, fontWeight: 800, color: 'white', marginBottom: 3, letterSpacing: '-0.3px', fontFamily: "var(--font-heading)" }}>
                 María Antonia Flores
               </h2>
-              <p style={{ fontSize: f(12), color: 'rgba(255,255,255,0.6)', marginBottom: 16 }}>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 16, fontFamily: "var(--font-body)" }}>
                 Ciberseguridad para Gobierno Digital · La innovación no es un destino, es una forma de caminar.
               </p>
               <div className="flex justify-between mb-2">
@@ -608,28 +609,26 @@ export default function DashboardAlumno() {
                   }}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCheckinSelected(estado.id); setSelectedMood(estado.id as MoodValue) } }}
                   style={{
-                    flex: 1,
-                    padding: '14px 8px',
-                    borderRadius: 16,
-                    border: checkinSelected === estado.id ? `2px solid ${estado.color}` : '2px solid transparent',
-                    cursor: 'pointer',
-                    fontFamily: "var(--font-heading)",
-                    fontSize: 13,
-                    fontWeight: checkinSelected === estado.id ? 800 : 600,
-                    background: checkinSelected === estado.id ? estado.bg : NM.bg,
-                    color: checkinSelected === estado.id ? estado.color : '#8892b0',
+                    background: '#e8eaf0',
                     boxShadow: checkinSelected === estado.id
-                      ? 'inset 3px 3px 8px rgba(0,0,0,0.08), inset -3px -3px 8px rgba(255,255,255,0.8)'
-                      : checkinSelected !== null
-                        ? '2px 2px 5px #c2c8d6, -2px -2px 5px #ffffff'
-                        : '4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff',
-                    opacity: checkinSelected !== null && checkinSelected !== estado.id ? 0.5 : 1,
-                    transform: checkinSelected === estado.id ? 'scale(1.03)' : 'scale(1)',
-                    transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      ? 'inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff'
+                      : '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff',
+                    border: 'none',
+                    borderRadius: 16,
+                    padding: '18px 8px',
+                    cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: 6,
+                    gap: 8,
+                    flex: 1,
+                    transition: 'all 0.2s ease',
+                    fontFamily: "var(--font-heading)",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: checkinSelected === estado.id ? estado.color : '#4a5580',
+                    opacity: checkinSelected !== null && checkinSelected !== estado.id ? 0.5 : 1,
+                    transform: checkinSelected === estado.id ? 'scale(1.03)' : 'scale(1)',
                   }}
                 >
                   <span style={{ fontSize: 22 }}>{estado.emoji}</span>
