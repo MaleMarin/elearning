@@ -3,9 +3,14 @@
 // siguientes (lib/offline/prefetch.ts). En datos móviles (navigator.connection.saveData o cellular)
 // solo se carga lo necesario. Runtime caching de APIs de curso para uso offline.
 const withSentryConfig = require("@sentry/nextjs").withSentryConfig;
+// Aceptar DISABLE_PWA o DISABLE_PMA (typo en Vercel) para desactivar PWA y evitar fallo de Terser
+const pwaDisabled =
+  process.env.NODE_ENV === "development" ||
+  process.env.DISABLE_PWA === "1" ||
+  process.env.DISABLE_PMA === "1";
 const withPWA = require("@ducanh2912/next-pwa").default({
   dest: "public",
-  disable: process.env.NODE_ENV === "development" || process.env.DISABLE_PWA === "1",
+  disable: pwaDisabled,
   register: true,
   skipWaiting: true,
   extendDefaultRuntimeCaching: true,
@@ -48,6 +53,10 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 const nextConfig = {
   // Minificación con SWC (evita error "terser" en build/Vercel)
   swcMinify: true,
+  // No empaquetar pptx2html (usa ./txml interno); cargar desde node_modules en el servidor
+  experimental: {
+    serverComponentsExternalPackages: ["pptx2html"],
+  },
   async rewrites() {
     return [
       // Si algo pide /next/static/* (sin _), servir desde /_next/static/* para evitar 404 y MIME type HTML
@@ -100,7 +109,7 @@ const nextConfig = {
   },
 };
 
-let config = process.env.DISABLE_PWA === "1" ? nextConfig : withPWA(nextConfig);
+let config = pwaDisabled ? nextConfig : withPWA(nextConfig);
 config = withSentryConfig(config, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
