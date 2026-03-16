@@ -8,14 +8,36 @@ import { getDemoMode } from "@/lib/env";
 import { getMfaResolverFromError } from "@/lib/auth/mfa";
 import { MFAChallenge } from "@/components/auth/MFAChallenge";
 import type { MultiFactorResolver } from "firebase/auth";
-import styles from "./login.module.css";
+
+const LOGO_PD = (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="12" cy="12" r="2" fill="currentColor" />
+  </svg>
+);
+
+const LOGO_GOOGLE = (
+  <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
+    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
+    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+  </svg>
+);
+
+const LOGO_MICROSOFT = (
+  <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
+    <rect x="1" y="1" width="10" height="10" fill="#f25022" />
+    <rect x="13" y="1" width="10" height="10" fill="#7fba00" />
+    <rect x="1" y="13" width="10" height="10" fill="#00a4ef" />
+    <rect x="13" y="13" width="10" height="10" fill="#ffb900" />
+  </svg>
+);
 
 export default function LoginPage() {
-  const [isActive, setIsActive] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [institution, setInstitution] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showDemoHint, setShowDemoHint] = useState(false);
@@ -212,177 +234,262 @@ export default function LoginPage() {
     }
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      if (isDemo) {
-        const res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: email?.trim() || "demo@precisar.local",
-            password: password || "",
-          }),
-          credentials: "include",
-        });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          setError((data as { error?: string }).error ?? "No pudimos crear la sesión. Intenta de nuevo.");
-          return;
-        }
-        window.location.href = redirectTo;
-        return;
-      }
-      const auth = getFirebaseAuth();
-      if (!auth) {
-        setError("El registro no está disponible. Contacta a soporte si el problema continúa.");
-        return;
-      }
-      const { createUserWithEmailAndPassword } = await import("firebase/auth");
-      const userCred = await createUserWithEmailAndPassword(auth, email, password);
-      const idToken = await userCred.user.getIdToken();
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Error al crear sesión");
-      window.location.href = "/onboarding/diagnostic";
-      return;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "";
-      if (msg.includes("email-already-in-use")) {
-        setError("Ese correo ya está registrado. Prueba a iniciar sesión o usa otro correo.");
-      } else if (msg.includes("weak-password") || msg.includes("password")) {
-        setError("La contraseña es demasiado corta. Usa al menos 6 caracteres.");
-      } else {
-        setError("No pudimos crear la cuenta. Intenta de nuevo o contacta a soporte.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (mfaResolver) {
     return (
-      <div className={styles["neu-page"]}>
-        <div className={`${styles["neu-box"]} ${styles["neu-box-mfa"]}`}>
-          <div className={`${styles["neu-form"]} ${styles["neu-form-mfa"]}`}>
-            <div className={styles["neu-eyebrow"]}>Verificación en dos pasos</div>
-            <div className={styles["neu-title"]}>Código de verificación</div>
-            <p className={styles["neu-subtitle"]}>Ingresa el código de tu aplicación de autenticación</p>
-            {error && (
-              <p className={`${styles["neu-subtitle"]} ${styles["neu-subtitle-error"]}`} role="alert">
-                {error}
-              </p>
-            )}
-            <MFAChallenge
-              resolver={mfaResolver}
-              onSuccess={handleMfaSuccess}
-              onError={setError}
-            />
-            <button
-              type="button"
-              onClick={() => setMfaResolver(null)}
-              className={`${styles["neu-panel-btn"]} ${styles["neu-panel-btn-back"]}`}
-            >
-              Volver a correo y contraseña
-            </button>
-          </div>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#e8eaf0", padding: 24 }}>
+        <div style={{ background: "#e8eaf0", borderRadius: 24, boxShadow: "8px 8px 24px #c2c8d6, -8px -8px 24px #ffffff", padding: 40, maxWidth: 400, width: "100%" }}>
+          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, color: "#1428d4", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 8 }}>Verificación en dos pasos</p>
+          <h1 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 26, color: "#0a0f8a", marginBottom: 8 }}>Código de verificación</h1>
+          <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 16 }}>Ingresa el código de tu aplicación de autenticación</p>
+          {error && <p style={{ fontSize: 13, color: "#b91c1c", marginBottom: 12 }} role="alert">{error}</p>}
+          <MFAChallenge resolver={mfaResolver} onSuccess={handleMfaSuccess} onError={setError} />
+          <button
+            type="button"
+            onClick={() => setMfaResolver(null)}
+            style={{ marginTop: 20, background: "transparent", border: "1.5px solid #c2c8d6", borderRadius: 12, padding: "10px 20px", fontFamily: "'Syne', sans-serif", fontSize: 13, color: "#0a0f8a", cursor: "pointer" }}
+          >
+            Volver a correo y contraseña
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles["neu-page"]}>
-      <div className={styles["neu-box"]}>
-        <div className={`${styles["neu-slider"]}${isActive ? " " + styles.active : ""}`}>
-          {/* Slide 1: Ingresar — formulario izquierda, panel derecha */}
-          <div className={styles["neu-slide"]}>
-            <div className={styles["neu-form"]}>
-            <div className={styles["neu-logo"]}>
-              <div className={styles["neu-logo-mark"]}>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-                  <circle cx="10" cy="10" r="8" stroke="#1428d4" strokeWidth="1.2" />
-                  <path d="M10 4l1.6 4.9H16l-4.2 3.1 1.6 4.9L10 13.9l-4.4 3 1.6-4.9L3 9l5.4-.1z" fill="#1428d4" fillOpacity="0.7" />
-                </svg>
+    <>
+      <style>{`
+        @keyframes slideFromLeft {
+          from { transform: translateX(-100%); opacity: 0; }
+          to   { transform: translateX(0);     opacity: 1; }
+        }
+        @keyframes fadeInRight {
+          from { opacity: 0; transform: translateX(20px); }
+          to   { opacity: 1; transform: translateX(0);    }
+        }
+        .login-form-col input::placeholder { color: #b0b8c8; }
+        @media (max-width: 767px) {
+          .login-card { flex-direction: column; max-width: 100%; height: auto; min-height: 560px; }
+          .login-panel-azul { display: none; }
+          .login-form-col { width: 100%; }
+        }
+      `}</style>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#e8eaf0",
+          padding: 24,
+        }}
+      >
+        <div
+          className="login-card"
+          style={{
+            display: "flex",
+            width: "100%",
+            maxWidth: 820,
+            height: 560,
+            borderRadius: 24,
+            overflow: "hidden",
+            boxShadow: "8px 8px 24px #c2c8d6, -8px -8px 24px #ffffff",
+          }}
+        >
+          {/* Panel izquierdo azul */}
+          <div
+            className="login-panel-azul"
+            style={{
+              width: "45%",
+              background: "linear-gradient(145deg, #1428d4, #0a0f8a)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "40px 32px",
+              animation: "slideFromLeft 0.6s ease-out",
+              gap: 20,
+            }}
+          >
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", color: "#1428d4" }}>
+              {LOGO_PD}
+            </div>
+            <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 800, color: "#ffffff", textAlign: "center", margin: 0 }}>
+              ¿Primera vez aquí?
+            </h2>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", textAlign: "center", margin: 0, maxWidth: 260 }}>
+              Únete al programa de formación para servidores públicos de México.
+            </p>
+            <Link
+              href="/registro"
+              style={{
+                border: "1.5px solid rgba(255,255,255,0.6)",
+                borderRadius: 50,
+                color: "#ffffff",
+                padding: "10px 28px",
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 13,
+                fontWeight: 700,
+                background: "transparent",
+                textDecoration: "none",
+                transition: "background 0.2s",
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
+            >
+              Crear cuenta →
+            </Link>
+            <div style={{ display: "flex", gap: 8 }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#00e5a0" }} />
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(255,255,255,0.3)" }} />
+            </div>
+          </div>
+
+          {/* Panel derecho formulario */}
+          <div
+            className="login-form-col"
+            style={{
+              flex: 1,
+              background: "#e8eaf0",
+              padding: "36px 40px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              gap: 14,
+              animation: "fadeInRight 0.6s ease-out 0.2s both",
+              overflowY: "auto",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  background: "#e8eaf0",
+                  boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#1428d4",
+                }}
+              >
+                {LOGO_PD}
               </div>
               <div>
-                <span className={styles["neu-logo-name"]}>Política Digital</span>
-                <span className={styles["neu-logo-sub"]}>Innovación Pública · México</span>
+                <p style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, color: "#1428d4", letterSpacing: "2px", textTransform: "uppercase", margin: 0 }}>
+                  BIENVENIDO DE VUELTA
+                </p>
+                <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 26, fontWeight: 800, color: "#0a0f8a", margin: "4px 0 0 0" }}>
+                  Ingresa a tu cuenta
+                </h1>
               </div>
             </div>
-
-            <div className={styles["neu-eyebrow"]}>Bienvenido de vuelta</div>
-            <div className={styles["neu-title"]}>Ingresa a tu cuenta</div>
-            <div className={styles["neu-subtitle"]}>Continúa donde lo dejaste</div>
+            <p style={{ fontSize: 13, color: "#8892b0", margin: "0 0 8px 0" }}>Continúa donde lo dejaste</p>
             {searchParams.get("reason") === "inactividad" && (
-              <p className={styles["neu-subtitle"]} style={{ color: "#0a0f8a", fontWeight: 600 }} role="alert">
+              <p style={{ fontSize: 13, color: "#0a0f8a", fontWeight: 600, margin: 0 }} role="alert">
                 Tu sesión cerró por inactividad. Por seguridad, vuelve a ingresar.
               </p>
             )}
 
             <a
               href="/api/auth/demo"
-              className={`${styles["neu-btn"]} ${styles["neu-btn-demo"]}`}
-              aria-label="Entrar en modo demo sin correo ni contraseña"
+              style={{
+                display: "block",
+                textAlign: "center",
+                background: "linear-gradient(135deg, #00e5a0, #00c98a)",
+                color: "#0a0f8a",
+                borderRadius: 50,
+                padding: "11px 20px",
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 13,
+                fontWeight: 800,
+                boxShadow: "4px 4px 12px rgba(0,229,160,0.4), -3px -3px 8px #ffffff",
+                width: "100%",
+                textDecoration: "none",
+                boxSizing: "border-box",
+              }}
+              aria-label="Entrar en modo demo sin cuenta"
             >
               Modo demo — entrar sin cuenta
             </a>
-
             {showDemoHint && (
-              <p className={`${styles["neu-subtitle"]} ${styles["neu-subtitle-hint"]}`}>
-                En demo puedes usar cualquier correo y contraseña.
-              </p>
+              <p style={{ fontSize: 12, color: "#8892b0", margin: 0 }}>En demo puedes usar cualquier correo y contraseña.</p>
             )}
 
-            <div className={styles["neu-social"]}>
+            <div style={{ display: "flex", gap: 10 }}>
               <button
                 type="button"
-                className={styles["neu-social-btn"]}
                 onClick={handleGoogleLogin}
                 disabled={loading || isDemo}
                 aria-label="Iniciar sesión con Google"
+                style={{
+                  flex: 1,
+                  background: "#e8eaf0",
+                  border: "none",
+                  borderRadius: 12,
+                  padding: 10,
+                  boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#4a5580",
+                  cursor: loading || isDemo ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+                onMouseDown={(e) => { if (!loading && !isDemo) e.currentTarget.style.boxShadow = "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff"; }}
+                onMouseUp={(e) => { e.currentTarget.style.boxShadow = "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff"; }}
               >
-                <svg viewBox="0 0 24 24" aria-hidden>
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                </svg>
+                {LOGO_GOOGLE}
                 Google
               </button>
               <button
                 type="button"
-                className={styles["neu-social-btn"]}
                 onClick={handleMicrosoftLogin}
                 disabled={loading || isDemo}
                 aria-label="Iniciar sesión con Microsoft"
+                style={{
+                  flex: 1,
+                  background: "#e8eaf0",
+                  border: "none",
+                  borderRadius: 12,
+                  padding: 10,
+                  boxShadow: "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff",
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#4a5580",
+                  cursor: loading || isDemo ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+                onMouseDown={(e) => { if (!loading && !isDemo) e.currentTarget.style.boxShadow = "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff"; }}
+                onMouseUp={(e) => { e.currentTarget.style.boxShadow = "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff"; }}
               >
-                <svg viewBox="0 0 24 24" aria-hidden>
-                  <path d="M11.5 2H2v9.5h9.5V2z" fill="#F25022" />
-                  <path d="M22 2h-9.5v9.5H22V2z" fill="#7FBA00" />
-                  <path d="M11.5 12.5H2V22h9.5v-9.5z" fill="#00A4EF" />
-                  <path d="M22 12.5h-9.5V22H22v-9.5z" fill="#FFB900" />
-                </svg>
+                {LOGO_MICROSOFT}
                 Microsoft
               </button>
             </div>
 
-            <div className={styles["neu-divider"]}>
-              <div className={styles["neu-div-line"]} /><span className={styles["neu-div-text"]}>o con correo</span><div className={styles["neu-div-line"]} />
+            <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "4px 0" }}>
+              <div style={{ flex: 1, height: 1, background: "#c2c8d6" }} />
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: "#8892b0" }}>o con correo</span>
+              <div style={{ flex: 1, height: 1, background: "#c2c8d6" }} />
             </div>
 
             <form onSubmit={handleSignIn} noValidate={isDemo}>
-              <div className={styles["neu-field"]}>
-                <label className={styles["neu-label"]} htmlFor="login-email">Correo institucional</label>
+              <div style={{ marginBottom: 12 }}>
+                <label htmlFor="login-email" style={{ display: "block", fontFamily: "'Space Mono', monospace", fontSize: 9, textTransform: "uppercase", color: "#8892b0", letterSpacing: "1.5px", marginBottom: 6 }}>
+                  Correo institucional
+                </label>
                 <input
                   id="login-email"
-                  className={styles["neu-input"]}
                   type="email"
                   placeholder={isDemo ? "Cualquier correo (demo)" : "nombre@institución.gob.mx"}
                   value={email}
@@ -390,13 +497,33 @@ export default function LoginPage() {
                   required={!isDemo}
                   autoComplete="email"
                   aria-invalid={!!error}
+                  style={{
+                    width: "100%",
+                    boxSizing: "border-box",
+                    background: "#e8eaf0",
+                    boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff",
+                    border: "none",
+                    borderRadius: 12,
+                    padding: "12px 16px",
+                    fontFamily: "'Syne', sans-serif",
+                    fontSize: 13,
+                    color: "#0a0f8a",
+                    outline: "none",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = "inset 4px 4px 10px #c2c8d6, inset -4px -4px 10px #ffffff, 0 0 0 2px rgba(20,40,212,0.2)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff";
+                  }}
                 />
               </div>
-              <div className={styles["neu-field"]}>
-                <label className={styles["neu-label"]} htmlFor="login-password">Contraseña</label>
+              <div style={{ marginBottom: 8 }}>
+                <label htmlFor="login-password" style={{ display: "block", fontFamily: "'Space Mono', monospace", fontSize: 9, textTransform: "uppercase", color: "#8892b0", letterSpacing: "1.5px", marginBottom: 6 }}>
+                  Contraseña
+                </label>
                 <input
                   id="login-password"
-                  className={styles["neu-input"]}
                   type="password"
                   placeholder={isDemo ? "Cualquier contraseña (demo)" : "••••••••"}
                   value={password}
@@ -404,169 +531,80 @@ export default function LoginPage() {
                   required={!isDemo}
                   autoComplete="current-password"
                   aria-invalid={!!error}
+                  style={{
+                    width: "100%",
+                    boxSizing: "border-box",
+                    background: "#e8eaf0",
+                    boxShadow: "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff",
+                    border: "none",
+                    borderRadius: 12,
+                    padding: "12px 16px",
+                    fontFamily: "'Syne', sans-serif",
+                    fontSize: 13,
+                    color: "#0a0f8a",
+                    outline: "none",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = "inset 4px 4px 10px #c2c8d6, inset -4px -4px 10px #ffffff, 0 0 0 2px rgba(20,40,212,0.2)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = "inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff";
+                  }}
                 />
               </div>
-              <Link href="/soporte?tema=contraseña" className={styles["neu-forgot"]}>¿Olvidaste tu contraseña?</Link>
+              <div style={{ textAlign: "right", marginBottom: 8 }}>
+                <Link href="/soporte?tema=contraseña" style={{ fontSize: 12, color: "#1428d4", textDecoration: "none" }}>
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
               {error && (
-                <p className={`${styles["neu-subtitle"]} ${styles["neu-subtitle-error"]}`} role="alert">{error}</p>
+                <p style={{ fontSize: 13, color: "#b91c1c", margin: "0 0 8px 0" }} role="alert">{error}</p>
               )}
-              <button className={styles["neu-btn"]} type="submit" disabled={loading}>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: "100%",
+                  background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: 14,
+                  padding: 13,
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: 14,
+                  fontWeight: 800,
+                  boxShadow: "5px 5px 14px rgba(10,15,138,0.4), -3px -3px 9px rgba(255,255,255,0.7)",
+                  cursor: loading ? "not-allowed" : "pointer",
+                  marginTop: 16,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+                onMouseOver={(e) => { if (!loading) e.currentTarget.style.filter = "brightness(1.1)"; }}
+                onMouseOut={(e) => { e.currentTarget.style.filter = "none"; }}
+                onMouseDown={(e) => { if (!loading) e.currentTarget.style.boxShadow = "inset 4px 4px 10px #c2c8d6, inset -4px -4px 10px #ffffff"; }}
+                onMouseUp={(e) => { e.currentTarget.style.boxShadow = "5px 5px 14px rgba(10,15,138,0.4), -3px -3px 9px rgba(255,255,255,0.7)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "5px 5px 14px rgba(10,15,138,0.4), -3px -3px 9px rgba(255,255,255,0.7)"; }}
+              >
                 {loading ? (
                   <>
-                    <div className={styles["neu-spinner"]} aria-hidden />
+                    <span style={{ width: 18, height: 18, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} aria-hidden />
                     Ingresando…
                   </>
                 ) : (
                   "Ingresar"
                 )}
               </button>
-              <p className={`${styles["neu-subtitle"]} ${styles["neu-subtitle-admin-wrap"]}`}>
-                <Link href="/admin/login" className="text-[var(--primary)] underline hover:no-underline text-sm whitespace-nowrap">
-                  ¿Eres administrador? Ingresa aquí
-                </Link>
-              </p>
-              <p
-                style={{
-                  fontSize: 11,
-                  color: "#8892b0",
-                  textAlign: "center",
-                  marginTop: 20,
-                  fontFamily: "'Syne', sans-serif",
-                }}
-              >
-                Al ingresar aceptas nuestro{" "}
-                <a href="/privacidad" style={{ color: "#1428d4", textDecoration: "none", fontWeight: 600 }}>
-                  Aviso de Privacidad
-                </a>{" "}
-                conforme a la LFPDPPP.
-              </p>
             </form>
-              </div>
-              <div className={styles["neu-panel-wrap"]}>
-                <div className={`${styles["neu-panel"]} ${styles["neu-panel-right-half"]}`}>
-                  <div className={styles["neu-panel-glow"]} aria-hidden />
-                  <div className={`${styles["neu-panel-half"]} ${styles["neu-panel-right"]}`}>
-                    <div className={styles["neu-panel-tag"]}>Política Digital · México</div>
-                    <div className={styles["neu-panel-title"]}>¿Primera<br />vez aquí?</div>
-                    <div className={styles["neu-panel-desc"]}>Únete al programa de formación para servidores públicos de México.</div>
-                    <Link href="/registro" className={`${styles["neu-panel-btn"]} ${styles["neu-panel-btn-link"]}`}>Crear cuenta →</Link>
-                    <div className={styles["neu-dots"]}><div className={`${styles["neu-dot"]} ${styles.on}`} /><div className={`${styles["neu-dot"]} ${styles.off}`} /></div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Slide 2: Crear cuenta — panel izquierda, formulario derecha */}
-            <div className={styles["neu-slide"]}>
-              <div className={styles["neu-panel-wrap"]}>
-                <div className={`${styles["neu-panel"]} ${styles["neu-panel-left-half"]}`}>
-                  <div className={styles["neu-panel-glow"]} aria-hidden />
-                  <div className={`${styles["neu-panel-half"]} ${styles["neu-panel-left"]}`}>
-                    <div className={styles["neu-panel-tag"]}>Política Digital · México</div>
-                    <div className={styles["neu-panel-title"]}>¿Ya tienes<br />cuenta?</div>
-                    <div className={styles["neu-panel-desc"]}>Ingresa para continuar donde lo dejaste y seguir aprendiendo.</div>
-                    <button type="button" className={styles["neu-panel-btn"]} onClick={() => { setIsActive(false); setError(""); }}>← Ingresar</button>
-                    <div className={styles["neu-dots"]}><div className={`${styles["neu-dot"]} ${styles.off}`} /><div className={`${styles["neu-dot"]} ${styles.on}`} /></div>
-                  </div>
-                </div>
-              </div>
-              <div className={styles["neu-form"]}>
-            <div className={styles["neu-logo"]}>
-              <div className={styles["neu-logo-mark"]}>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-                  <circle cx="10" cy="10" r="8" stroke="#1428d4" strokeWidth="1.2" />
-                  <path d="M10 4l1.6 4.9H16l-4.2 3.1 1.6 4.9L10 13.9l-4.4 3 1.6-4.9L3 9l5.4-.1z" fill="#1428d4" fillOpacity="0.7" />
-                </svg>
-              </div>
-              <div>
-                <span className={styles["neu-logo-name"]}>Política Digital</span>
-                <span className={styles["neu-logo-sub"]}>Innovación Pública · México</span>
-              </div>
-            </div>
-
-            <div className={styles["neu-eyebrow"]}>Únete al programa</div>
-            <div className={styles["neu-title"]}>Crea tu cuenta</div>
-            <div className={styles["neu-subtitle"]}>Innovación pública desde adentro</div>
-
-            <a
-              href="/api/auth/demo"
-              className={`${styles["neu-btn"]} ${styles["neu-btn-demo"]}`}
-              aria-label="Entrar en modo demo sin crear cuenta"
-            >
-              Modo demo — entrar sin cuenta
-            </a>
-
-            <form onSubmit={handleSignUp}>
-              <div className={styles["neu-field"]}>
-                <label className={styles["neu-label"]} htmlFor="reg-name">Nombre completo</label>
-                <input
-                  id="reg-name"
-                  className={styles["neu-input"]}
-                  type="text"
-                  placeholder="Tu nombre completo"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  autoComplete="name"
-                />
-              </div>
-              <div className={styles["neu-field"]}>
-                <label className={styles["neu-label"]} htmlFor="reg-email">Correo institucional</label>
-                <input
-                  id="reg-email"
-                  className={styles["neu-input"]}
-                  type="email"
-                  placeholder="nombre@institución.gob.mx"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                  aria-invalid={!!error}
-                />
-              </div>
-              <div className={styles["neu-field"]}>
-                <label className={styles["neu-label"]} htmlFor="reg-org">Dependencia</label>
-                <input
-                  id="reg-org"
-                  className={styles["neu-input"]}
-                  type="text"
-                  placeholder="Ej: SHCP, IMSS, SEP..."
-                  value={institution}
-                  onChange={(e) => setInstitution(e.target.value)}
-                />
-              </div>
-              <div className={`${styles["neu-field"]} ${styles["neu-field-mb20"]}`}>
-                <label className={styles["neu-label"]} htmlFor="reg-password">Contraseña</label>
-                <input
-                  id="reg-password"
-                  className={styles["neu-input"]}
-                  type="password"
-                  placeholder="Mínimo 8 caracteres"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  autoComplete="new-password"
-                  aria-invalid={!!error}
-                />
-              </div>
-              {error && (
-                <p className={`${styles["neu-subtitle"]} ${styles["neu-subtitle-error"]}`} role="alert">{error}</p>
-              )}
-              <button className={styles["neu-btn"]} type="submit" disabled={loading}>
-                {loading ? (
-                  <>
-                    <div className={styles["neu-spinner"]} aria-hidden />
-                    Creando cuenta…
-                  </>
-                ) : (
-                  "Crear cuenta"
-                )}
-              </button>
-            </form>
-              </div>
-            </div>
+            <p style={{ fontSize: 11, color: "#8892b0", textAlign: "center", marginTop: 12, marginBottom: 0 }}>
+              <a href="/privacidad" style={{ color: "#1428d4", textDecoration: "none", fontWeight: 700 }}>Aviso de Privacidad</a>
+            </p>
           </div>
         </div>
-    </div>
+      </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </>
   );
 }

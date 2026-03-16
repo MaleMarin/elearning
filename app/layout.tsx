@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import nextDynamic from "next/dynamic";
 import { Plus_Jakarta_Sans, Syne, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ConditionalLayout } from "@/components/layout/ConditionalLayout";
@@ -7,7 +8,11 @@ import { TenantProvider } from "@/contexts/TenantContext";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { getTenantFromRequest } from "@/lib/tenant-server";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
-import { AxeDev } from "@/components/a11y/AxeDev";
+
+const AxeDev = nextDynamic(
+  () => import("@/components/a11y/AxeDev").then((m) => ({ default: m.AxeDev })),
+  { ssr: false }
+);
 
 export const dynamic = "force-dynamic";
 
@@ -151,7 +156,7 @@ export default async function RootLayout({
         <TenantProvider initialTenant={tenant}>
         <AccessibilityProvider>
         <ThemeProvider>
-          <AxeDev />
+          {process.env.NODE_ENV === "development" && <AxeDev />}
           <AssistantProvider>
             <ConditionalLayout>{children}</ConditionalLayout>
           </AssistantProvider>

@@ -89,16 +89,25 @@ export async function updateSession(request: NextRequest) {
 
   const origin = request.nextUrl.origin;
   const cookieHeader = request.headers.get("cookie") ?? "";
+  const enrolledCookie = request.cookies.get("pd_enrolled")?.value;
+  const ENROLL_CACHE_SEC = 90;
+
   let enrolled = false;
-  try {
-    const statusRes = await fetch(`${origin}/api/enroll/status`, {
-      headers: { cookie: cookieHeader },
-      cache: "no-store",
-    });
-    const data = await statusRes.json();
-    enrolled = data.enrolled === true;
-  } catch {
-    enrolled = false;
+  if (enrolledCookie === "1") {
+    enrolled = true;
+    response.cookies.set("pd_enrolled", "1", { path: "/", maxAge: ENROLL_CACHE_SEC, sameSite: "lax" });
+    return response;
+  } else {
+    try {
+      const statusRes = await fetch(`${origin}/api/enroll/status`, {
+        headers: { cookie: cookieHeader },
+        cache: "no-store",
+      });
+      const data = await statusRes.json();
+      enrolled = data.enrolled === true;
+    } catch {
+      enrolled = false;
+    }
   }
 
   if (!enrolled) {
@@ -106,8 +115,11 @@ export async function updateSession(request: NextRequest) {
     if (process.env.NODE_ENV === "development") {
       return response;
     }
-    return NextResponse.redirect(new URL("/no-inscrito", origin));
+    const redirectRes = NextResponse.redirect(new URL("/no-inscrito", origin));
+    redirectRes.cookies.set("pd_enrolled", "0", { path: "/", maxAge: ENROLL_CACHE_SEC, sameSite: "lax" });
+    return redirectRes;
   }
 
+  response.cookies.set("pd_enrolled", "1", { path: "/", maxAge: ENROLL_CACHE_SEC, sameSite: "lax" });
   return response;
 }

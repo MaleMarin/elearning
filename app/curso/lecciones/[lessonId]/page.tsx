@@ -7,7 +7,6 @@ import {
   SurfaceCard,
   PrimaryButton,
   SecondaryButton,
-  EmptyState,
   PageSection,
   Badge,
   Toast,
@@ -89,6 +88,12 @@ export default function CursoLeccionPage() {
       .catch(() => setApi(null))
       .finally(() => setLoading(false));
   }, [lessonId]);
+
+  useEffect(() => {
+    if (!loading && (!api || api.notFound || !api.lesson)) {
+      router.replace("/curso");
+    }
+  }, [loading, api, router]);
 
   useEffect(() => {
     if (!api?.module) return;
@@ -279,16 +284,8 @@ export default function CursoLeccionPage() {
   }
 
   if (!api || api.notFound || !api.lesson) {
-    return (
-      <div className="max-w-2xl w-full">
-        <EmptyState
-          title="Lección no disponible"
-          description="No tienes acceso a esta lección o no está publicada."
-          ctaLabel="Volver al curso"
-          ctaHref="/curso"
-        />
-      </div>
-    );
+    router.replace("/curso");
+    return null;
   }
 
   const { lesson, module: moduleContext, prevLessonId, nextLessonId, totalLessons, lessonIndex } = api;

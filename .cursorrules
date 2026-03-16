@@ -33,5 +33,18 @@
     "plan_before_execution": true,
     "explain_for_non_coders": true,
     "verify_digital_rights": true
-  }
+  },
+  "git_workflow": [
+    "Antes de cada commit: correr npx tsc --noEmit",
+    "Si hay errores TypeScript: NO hacer commit hasta corregirlos",
+    "Formato de commit: \"feat: descripción\" o \"fix: descripción\"",
+    "Siempre hacer push a origin main después del commit",
+    "Build command: DISABLE_PWA=1 NODE_OPTIONS=--max-old-space-size=4096 npm run build"
+  ],
+  "archivos_intocables": [
+    "components/assistant/* → NO MODIFICAR NUNCA",
+    "app/api/assistant/route.ts, app/api/checkin/route.ts (original) → NO MODIFICAR NUNCA",
+    "lib/firebase/* → NO MODIFICAR NUNCA",
+    "lib/supabase/* → NO MODIFICAR NUNCA"
+  ]
 }
