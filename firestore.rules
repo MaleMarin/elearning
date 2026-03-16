@@ -104,6 +104,16 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
+    // Notas privadas del dashboard (solo el alumno); API escribe con Admin SDK
+    match /users/{userId}/notas/{noteId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Notas por lección (solo el alumno)
+    match /users/{userId}/notas_lecciones/{noteId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
     // Denegar todo lo no listado
     match /{document=**} {
       allow read, write: if false;

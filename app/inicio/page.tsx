@@ -184,12 +184,35 @@ export default function DashboardAlumno() {
   }
   const [nota, setNota] = useState('')
   const [notaGuardada, setNotaGuardada] = useState(false)
+  const [notaLoading, setNotaLoading] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/notas/inicio', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { text?: string } | null) => {
+        if (d?.text != null) setNota(d.text)
+      })
+      .catch(() => {})
+  }, [])
 
   const handleGuardarNota = () => {
-    if (nota.trim()) {
-      setNotaGuardada(true)
-      setTimeout(() => setNotaGuardada(false), 2000)
-    }
+    const text = nota.trim()
+    if (!text) return
+    setNotaLoading(true)
+    fetch('/api/notas/inicio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ text }),
+    })
+      .then((r) => r.ok)
+      .then((ok) => {
+        if (ok) {
+          setNotaGuardada(true)
+          setTimeout(() => setNotaGuardada(false), 2000)
+        }
+      })
+      .finally(() => setNotaLoading(false))
   }
 
   const [showCheckin, setShowCheckin] = useState(false)
@@ -603,13 +626,23 @@ export default function DashboardAlumno() {
           </dl>
         </section>
 
-        {/* Notas */}
+        {/* Notas (privadas: solo el alumno las ve; guardadas en users/{uid}/notas) */}
         <div style={{ background: NM.bg, borderRadius: 16, padding: 14, marginBottom: 12, boxShadow: NM.elevated }}>
           <SectionTitle theme={NM}>Mis notas</SectionTitle>
+          <p
+            style={{
+              fontSize: 10,
+              color: '#8892b0',
+              fontFamily: "'Space Mono', monospace",
+              marginBottom: 10,
+            }}
+          >
+            Solo tú puedes ver tus notas
+          </p>
           <textarea
             value={nota}
             onChange={(e) => setNota(e.target.value)}
-            placeholder="Escribe aquí tus notas y envíalas."
+            placeholder="Escribe aquí tus notas y guárdalas."
             aria-label="Campo de notas personales"
             style={{
               width: '100%', border: 'none', background: NM.bg, borderRadius: 10, padding: 12,
@@ -621,15 +654,16 @@ export default function DashboardAlumno() {
           <button
             type="button"
             onClick={handleGuardarNota}
-            aria-label={notaGuardada ? 'Nota enviada' : 'Enviar nota'}
+            disabled={notaLoading}
+            aria-label={notaGuardada ? 'Nota guardada' : 'Guardar nota'}
             style={{
-              width: '100%', marginTop: 8, padding: '10px', minHeight: 44, borderRadius: 9, border: 'none', cursor: 'pointer',
+              width: '100%', marginTop: 8, padding: '10px', minHeight: 44, borderRadius: 9, border: 'none', cursor: notaLoading ? 'wait' : 'pointer',
               fontFamily: "'Syne', sans-serif", fontSize: f(12), fontWeight: 700,
               background: NM.bg, color: notaGuardada ? '#00b87d' : '#1428d4',
               boxShadow: NM.elevatedSm,
             }}
           >
-            {notaGuardada ? '✓ Enviado' : 'Enviar'}
+            {notaLoading ? 'Guardando…' : notaGuardada ? '✓ Guardado' : 'Guardar nota'}
           </button>
           <div aria-live="polite" aria-atomic={true} className="sr-only">
             {notaGuardada ? 'Nota guardada exitosamente' : ''}
