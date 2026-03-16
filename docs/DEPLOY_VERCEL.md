@@ -35,16 +35,23 @@ NEXT_PUBLIC_SENTRY_DSN=
 1. vercel.com → New Project → Importar repo GitHub
 2. Framework: Next.js (detectado auto)
 3. Build Command: `DISABLE_PWA=1 NODE_OPTIONS=--max-old-space-size=4096 npm run build`  
-   (DISABLE_PWA=1 evita fallo de Terser con el plugin PWA; opcional: activar PWA en runtime con variable sin DISABLE_PWA.)
-4. Settings → Environment Variables → agregar todas las de arriba
-5. Deploy → esperar 3-4 minutos
-6. Verificar: /inicio, /admin/login, /login
+   (Copia exacta: **PWA** no "PMA". DISABLE_PWA=1 evita fallo de Terser con el plugin PWA.)
+4. Node.js Version (Settings → General): **20.x** recomendado (evitar 24.x con Next 14).
+5. Settings → Environment Variables → agregar todas las de arriba.
+6. Deploy → esperar 3-4 minutos.
+7. Verificar: /inicio, /admin/login, /login.
 
 ## Post-deploy
 
 - Actualizar Firebase Auth → Authorized domains → agregar dominio Vercel
 - Verificar Firestore Rules están desplegadas
 - Probar login con usuario demo
+
+## Warnings en build (amarillo)
+
+- **Sentry:** "No auth token / No project" → opcional. Para releases y source maps: configurar `authToken` y `project` en el plugin Sentry.
+- **npm deprecated / glob / next:** Actualizar dependencias cuando se pueda (`npm update`, y Next a una versión parcheada si hay aviso de seguridad).
+- **Webpack cache:** "Caching failed" / "Serializing big strings" → no bloquean el deploy.
 
 ## Comandos útiles pre-deploy
 

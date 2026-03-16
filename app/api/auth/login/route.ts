@@ -3,8 +3,10 @@
  * Demo: body { email, password } -> cookie precisar_session con payload demo firmado.
  * Real: body { idToken } -> verificar con Firebase, session cookie -> precisar_session.
  * Fix 1: rate limit por IP para mitigar fuerza bruta.
+ * Arcjet: protección anti-abuso (movida aquí desde middleware para reducir tamaño del Edge).
  */
 import { NextRequest, NextResponse } from "next/server";
+import arcjet, { tokenBucket, shield } from "@arcjet/next";
 import { getFirebaseAdminAuth, getFirebaseAdminFirestore, ensureFirebaseProfile } from "@/lib/firebase/admin";
 import { getDemoMode } from "@/lib/env";
 import { checkLoginRateLimit } from "@/lib/rate-limit";
@@ -27,6 +29,16 @@ import {
 
 export const dynamic = "force-dynamic";
 
+const arcjetLogin =
+  process.env.ARCJET_KEY &&
+  arcjet({
+    key: process.env.ARCJET_KEY,
+    rules: [
+      tokenBucket({ mode: "LIVE", refillRate: 10, interval: 900, capacity: 10 }),
+      shield({ mode: "LIVE" }),
+    ],
+  });
+
 const SESSION_MAX_AGE = 60 * 60 * 24 * 5; // 5 días (Firebase session)
 const DEMO_SESSION_MAX_AGE = 60 * 60 * 2; // 2h (demo JWT)
 
@@ -39,6 +51,16 @@ function getClientIp(req: NextRequest): string {
 }
 
 export async function POST(req: NextRequest) {
+  if (arcjetLogin) {
+    const decision = await arcjetLogin.protect(req, { requested: 1 });
+    if (decision.isDenied()) {
+      return NextResponse.json(
+        { error: "Demasiados intentos. Espera 15 minutos." },
+        { status: 429 }
+      );
+    }
+  }
+
   const ip = getClientIp(req);
   const { ok: rateOk, remaining } = checkLoginRateLimit(`login:${ip}`);
   if (!rateOk) {

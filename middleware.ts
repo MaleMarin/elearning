@@ -1,21 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import arcjet, { tokenBucket, shield } from "@arcjet/next";
 import { updateSession } from "@/lib/supabase/middleware";
-
-const aj =
-  process.env.ARCJET_KEY &&
-  arcjet({
-    key: process.env.ARCJET_KEY,
-    rules: [
-      tokenBucket({
-        mode: "LIVE",
-        refillRate: 10,
-        interval: 900,
-        capacity: 10,
-      }),
-      shield({ mode: "LIVE" }),
-    ],
-  });
 
 export const config = {
   matcher: [
@@ -37,16 +21,6 @@ function getTenantIdFromHost(request: NextRequest): string | null {
 }
 
 export async function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/api/auth") && aj) {
-    const decision = await aj.protect(request, { requested: 1 });
-    if (decision.isDenied()) {
-      return NextResponse.json(
-        { error: "Demasiados intentos. Espera 15 minutos." },
-        { status: 429 }
-      );
-    }
-  }
-
   try {
     const tenantId = getTenantIdFromHost(request);
     const requestHeaders = new Headers(request.headers);

@@ -1,7 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { useFirebase } from "@/lib/env";
-import { PRECISAR_SESSION_COOKIE } from "@/lib/auth/session-cookie";
-import { verifyDemoSessionCookie, isDemoCookieValue } from "@/lib/auth/session-cookie";
+import {
+  PRECISAR_SESSION_COOKIE,
+  hasSessionCookie,
+  getRoleFromCookie,
+} from "@/lib/auth/session-cookie-edge";
 
 const PRIVATE_APP_PATHS = [
   "/inicio",
@@ -28,21 +31,6 @@ function skipAuthCheck(pathname: string): boolean {
   return SKIP_AUTH_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 
-async function hasSessionCookie(request: NextRequest): Promise<boolean> {
-  const value = request.cookies.get(PRECISAR_SESSION_COOKIE)?.value;
-  if (!value) return false;
-  if (isDemoCookieValue(value)) return (await verifyDemoSessionCookie(value)) !== null;
-  return true;
-}
-
-async function getRoleFromCookie(request: NextRequest): Promise<string | null> {
-  const value = request.cookies.get(PRECISAR_SESSION_COOKIE)?.value;
-  if (!value) return null;
-  const demo = await verifyDemoSessionCookie(value);
-  if (demo) return demo.role;
-  return null;
-}
-
 export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const response = NextResponse.next({ request });
@@ -50,7 +38,7 @@ export async function updateSession(request: NextRequest) {
   if (pathname.startsWith("/api")) return response;
   if (skipAuthCheck(pathname)) return response;
 
-  const hasSession = await hasSessionCookie(request);
+  const hasSession = hasSessionCookie(request);
 
   if (pathname.startsWith("/panel")) {
     if (!hasSession) {
@@ -76,8 +64,8 @@ export async function updateSession(request: NextRequest) {
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
-    // role solo disponible para cookie demo; si es null (sesión Firebase) dejamos pasar y las páginas admin validan rol en servidor
-    const role = await getRoleFromCookie(request);
+    // En Edge no decodificamos JWT; role siempre null. Las páginas admin validan rol en servidor.
+    const role = getRoleFromCookie(request);
     if (role !== null) {
       if (pathname.startsWith("/admin/cohortes") && role !== "admin") {
         return NextResponse.redirect(new URL("/inicio", request.url));
