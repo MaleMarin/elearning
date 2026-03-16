@@ -1,7 +1,8 @@
 {
   "build": {
     "env": {
-      "DISABLE_PWA": "1"
+      "DISABLE_PWA": "1",
+      "DISABLE_PMA": "1"
     }
   },
   "crons": [
