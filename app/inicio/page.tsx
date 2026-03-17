@@ -907,44 +907,17 @@ export default function DashboardAlumno() {
                       {act.time}
                     </p>
                   </div>
-                  {act.puntos != null && (
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: cfg.color,
-                        fontFamily: "'Space Mono', monospace",
-                        background: `${cfg.color}15`,
-                        padding: '2px 8px',
-                        borderRadius: 20,
-                        marginTop: 4,
-                        flexShrink: 0,
-                      }}
-                    >
-                      +{act.puntos}pts
-                    </span>
-                  )}
                 </div>
               )
             })}
           </div>
         </section>
 
-        {/* Botón Continuar sticky */}
-        <div
-          style={{
-            position: 'sticky',
-            bottom: 16,
-            zIndex: 10,
-            padding: '0 4px',
-            marginTop: 20,
-          }}
-        >
+        <div style={{ marginTop: 8, marginBottom: 8 }}>
           <button
             type="button"
-            className="w-full flex items-center justify-center gap-2"
-            aria-label="Continuar con la lección 2: Autenticación"
-            onClick={() => router.push('/curso/lecciones/mod3-leccion-2')}
+            onClick={() => router.push('/curso/lecciones/' + (LESSONS.find((l) => l.status === 'current')?.id ?? 'mod3-leccion-2'))}
+            aria-label={'Continuar con la lección: ' + (LESSONS.find((l) => l.status === 'current')?.title ?? 'siguiente')}
             style={{
               width: '100%',
               padding: 16,
@@ -952,21 +925,19 @@ export default function DashboardAlumno() {
               border: 'none',
               cursor: 'pointer',
               fontFamily: "var(--font-heading)",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 800,
               background: 'linear-gradient(135deg, #1428d4, #0a0f8a)',
               color: 'white',
-              letterSpacing: '-0.3px',
-              boxShadow: '0 8px 24px rgba(10,15,138,0.45), 0 2px 8px rgba(10,15,138,0.2)',
+              boxShadow: '5px 5px 14px rgba(10,15,138,0.4), -3px -3px 9px rgba(255,255,255,0.6)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: 10,
-              backdropFilter: 'blur(10px)',
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-              <polygon points="5 3 19 12 5 21 5 3" />
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+              <polygon points="5 3 19 12 5 21 5 3"/>
             </svg>
             Continuar — {LESSONS.find((l) => l.status === 'current')?.title ?? 'siguiente lección'}
           </button>
@@ -981,12 +952,12 @@ export default function DashboardAlumno() {
         </button>
       </main>
 
-      {/* ── PANEL DERECHO (cards separadas, 300px) ─────────────────────── */}
+      {/* ── PANEL DERECHO (cards separadas, 340px) ─────────────────────── */}
       <aside
         className={`panel-right flex-shrink-0 overflow-y-auto ${showRightPanel ? 'open' : ''}`}
         style={{
-          width: 300,
-          minWidth: 300,
+          width: 340,
+          minWidth: 340,
           background: '#e8eaf0',
           boxShadow: '-5px 0 18px #c2c8d6, -1px 0 4px #ffffff',
           padding: '20px 16px',
