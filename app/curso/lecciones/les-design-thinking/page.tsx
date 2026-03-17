@@ -25,7 +25,12 @@ const DATA = {
       {
         titulo: 'Herramientas clave: mapa de empatía y journey map',
         texto: 'Mapa de empatía: qué piensa, siente, dice y hace el ciudadano al usar un servicio. Journey map: cada paso que da el ciudadano desde que decide hacer el trámite hasta que termina, con los dolores en cada etapa. Estas herramientas hacen visible lo invisible y crean consenso en el equipo.',
-        ejemplo: null,
+        puntosClave: [
+          'Mapa de empatía: 4 cuadrantes — qué piensa, siente, dice y hace el ciudadano.',
+          'Journey map: documenta cada paso del trámite con el dolor específico en cada etapa.',
+          'Ambas herramientas se hacen en taller de 2-3 horas con el equipo, no solos.',
+          'El resultado más valioso: crear empatía dentro del equipo de gobierno, no solo el documento.',
+        ],
       },
       {
         titulo: 'Prototipado rápido en contexto gubernamental',

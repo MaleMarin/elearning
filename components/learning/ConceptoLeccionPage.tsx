@@ -11,6 +11,13 @@ export interface Pregunta {
   explicacion: string
 }
 
+export interface Seccion {
+  titulo: string
+  texto: string
+  ejemplo?: string | null
+  puntosClave?: string[]
+}
+
 export interface ConceptoData {
   id: string
   titulo: string
@@ -19,7 +26,7 @@ export interface ConceptoData {
   duracion: string
   contenido: {
     introduccion: string
-    secciones: { titulo: string; texto: string; ejemplo?: string | null }[]
+    secciones: Seccion[]
     cierre: string
   }
   bibliografia: {
@@ -243,24 +250,36 @@ export function ConceptoLeccionPage({ data }: { data: ConceptoData }) {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                <div
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    flexShrink: 0,
-                    background: colores.light,
-                    border: `2px solid ${colores.text}30`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 13,
-                    fontWeight: 800,
-                    color: colores.text,
-                    fontFamily: "'Space Mono', monospace",
-                  }}
-                >
-                  {i + 1}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: '50%',
+                      background: colores.light,
+                      border: `2px solid ${colores.text}30`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 13,
+                      fontWeight: 800,
+                      color: colores.text,
+                      fontFamily: "'Space Mono', monospace",
+                    }}
+                  >
+                    {i + 1}
+                  </div>
+                  <p
+                    style={{
+                      fontSize: 8,
+                      color: '#8892b0',
+                      fontFamily: "'Space Mono', monospace",
+                      textAlign: 'center',
+                      marginTop: 2,
+                    }}
+                  >
+                    de {data.contenido.secciones.length}
+                  </p>
                 </div>
                 <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0a0f8a', letterSpacing: '-0.3px' }}>
                   {sec.titulo}
@@ -272,18 +291,19 @@ export function ConceptoLeccionPage({ data }: { data: ConceptoData }) {
                   color: '#4a5580',
                   lineHeight: 1.8,
                   fontFamily: 'var(--font-body)',
-                  marginBottom: sec.ejemplo ? 16 : 0,
+                  marginBottom: sec.ejemplo || sec.puntosClave?.length ? 16 : 0,
                 }}
               >
                 {sec.texto}
               </p>
-              {sec.ejemplo && (
+              {sec.ejemplo ? (
                 <div
                   style={{
+                    marginTop: 16,
                     background: '#e8eaf0',
-                    borderRadius: 12,
+                    borderRadius: '0 10px 10px 0',
                     padding: '14px 18px',
-                    boxShadow: 'inset 3px 3px 7px #c2c8d6, inset -3px -3px 7px #ffffff',
+                    boxShadow: 'inset 2px 2px 5px #c2c8d6, inset -2px -2px 5px #ffffff',
                     borderLeft: `3px solid ${colores.text}`,
                   }}
                 >
@@ -304,7 +324,48 @@ export function ConceptoLeccionPage({ data }: { data: ConceptoData }) {
                     {sec.ejemplo}
                   </p>
                 </div>
-              )}
+              ) : sec.puntosClave?.length ? (
+                <div
+                  style={{
+                    marginTop: 16,
+                    background: '#e8eaf0',
+                    borderRadius: 12,
+                    padding: '14px 18px',
+                    boxShadow: 'inset 2px 2px 5px #c2c8d6, inset -2px -2px 5px #ffffff',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: '#8892b0',
+                      fontFamily: "'Space Mono', monospace",
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      marginBottom: 10,
+                    }}
+                  >
+                    Puntos clave
+                  </p>
+                  {sec.puntosClave.map((punto, k) => (
+                    <div key={k} style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
+                      <div
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          flexShrink: 0,
+                          background: colores.text,
+                          marginTop: 6,
+                        }}
+                      />
+                      <p style={{ fontSize: 13, color: '#4a5580', lineHeight: 1.6, fontFamily: 'var(--font-body)' }}>
+                        {punto}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
           ))}
 
