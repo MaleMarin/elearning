@@ -123,6 +123,53 @@ const IcoPlay = () => <svg {...svgAria} width="13" height="13" viewBox="0 0 24 2
 const IcoLayers = () => <svg {...svgAria} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
 const IcoHelp = () => <svg {...svgAria} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
 
+// ─── Íconos neumórficos notificaciones (SVG, sin emojis) ─────────────────
+const IconQuiz = () => (
+  <div style={{ width: 38, height: 38, borderRadius: 12, flexShrink: 0, background: '#e8eaf0', boxShadow: '4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1428d4" strokeWidth="1.8" strokeLinecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+  </div>
+)
+const IconSesion = () => (
+  <div style={{ width: 38, height: 38, borderRadius: 12, flexShrink: 0, background: '#e8eaf0', boxShadow: '4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1428d4" strokeWidth="1.8" strokeLinecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+  </div>
+)
+const IconLogro = () => (
+  <div style={{ width: 38, height: 38, borderRadius: 12, flexShrink: 0, background: '#e8eaf0', boxShadow: '4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00b87d" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+  </div>
+)
+const IconTarea = () => (
+  <div style={{ width: 38, height: 38, borderRadius: 12, flexShrink: 0, background: '#e8eaf0', boxShadow: '4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d84040" strokeWidth="1.8" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </div>
+)
+// Actividad reciente
+const IconActQuiz = () => (
+  <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: '#e8eaf0', boxShadow: '3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c89000" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+)
+const IconActLeccion = () => (
+  <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: '#e8eaf0', boxShadow: '3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1428d4" strokeWidth="2" strokeLinecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+  </div>
+)
+const IconActLogro = () => (
+  <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: '#e8eaf0', boxShadow: '3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00b87d" strokeWidth="2" strokeLinecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+  </div>
+)
+// Logros panel derecho (por nombre)
+const LOGROS_ICONOS: Record<string, JSX.Element> = {
+  'Cifrado': <svg {...svgAria} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1428d4" strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+  'Defensor': <svg {...svgAria} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1428d4" strokeWidth="1.8" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+  'Top 10%': <svg {...svgAria} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c89000" strokeWidth="1.8" strokeLinecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  'Experto': <svg {...svgAria} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8892b0" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>,
+  'Red Gov': <svg {...svgAria} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8892b0" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+  'Graduado': <svg {...svgAria} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8892b0" strokeWidth="1.8" strokeLinecap="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>,
+}
+
 // ─── Navegación franja izquierda (cuadrados neumórficos) ───────────────────────
 const IcoPortfolio = () => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
 const IcoKnowledge = () => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/><path d="M12 5a7 7 0 0 0-7 7c0 2.5 1.5 4 3 5l4-4 4 4c1.5-1 3-2.5 3-5a7 7 0 0 0-7-7z"/></svg>
@@ -173,10 +220,10 @@ const NOTIFS: (NotifItem & { href: string })[] = [
 const CAL_EVENTS = [10, 15, 18, 22, 25]
 
 const ESTADOS = [
-  { id: 'bien', emoji: '😊', label: 'Bien', color: '#00b87d', bg: 'rgba(0,184,125,0.12)' },
-  { id: 'regular', emoji: '😐', label: 'Regular', color: '#c89000', bg: 'rgba(200,144,0,0.12)' },
-  { id: 'dificil', emoji: '😓', label: 'Difícil', color: '#d84040', bg: 'rgba(216,64,64,0.12)' },
-  { id: 'excelente', emoji: '💪', label: 'Excelente', color: '#1428d4', bg: 'rgba(20,40,212,0.12)' },
+  { id: 'bien', label: 'Bien', color: '#00b87d', bg: 'rgba(0,184,125,0.12)', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> },
+  { id: 'regular', label: 'Regular', color: '#c89000', bg: 'rgba(200,144,0,0.12)', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> },
+  { id: 'dificil', label: 'Difícil', color: '#d84040', bg: 'rgba(216,64,64,0.12)', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> },
+  { id: 'excelente', label: 'Excelente', color: '#1428d4', bg: 'rgba(20,40,212,0.12)', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 3 4 3 4-3 4-3"/><path d="M9 9l.01 0"/><path d="M15 9l.01 0"/><path d="M9 9 Q10 7 12 8 Q14 7 15 9"/></svg> },
 ] as const
 
 function getPrioridad(tipo: string) {
@@ -417,7 +464,7 @@ export default function DashboardAlumno() {
       {/* ── MAIN CONTENT ─────────────────────────────────────────────── */}
       <main
         className="main-content flex-1 overflow-y-auto min-w-0"
-        style={{ padding: '20px 20px', display: 'flex', flexDirection: 'column', gap: 28 }}
+        style={{ padding: '20px 28px', display: 'flex', flexDirection: 'column', gap: 20, overflowY: 'auto' }}
         role="main"
         aria-label="Dashboard del alumno"
       >
@@ -513,14 +560,18 @@ export default function DashboardAlumno() {
           style={{
             minHeight: 200,
             background: 'linear-gradient(135deg, #0a0f8a 0%, #1428d4 65%, #1a3ee8 100%)',
-            borderRadius: 18,
-            padding: 24,
+            borderRadius: 20,
+            padding: '28px 32px 28px 32px',
+            marginBottom: 20,
             boxShadow: '7px 7px 18px rgba(10,15,138,0.35), -4px -4px 12px rgba(255,255,255,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 24,
           }}
           aria-label="Bienvenida y progreso"
         >
           <div style={{ position: 'absolute', top: -30, right: -30, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} aria-hidden />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 20, flexWrap: 'wrap', minHeight: 160 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 24, flexWrap: 'wrap', minHeight: 160 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontFamily: "'Space Mono', monospace", textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 4 }}>
                 Buenas tardes
@@ -549,14 +600,15 @@ export default function DashboardAlumno() {
               </div>
               {completionPrediction && (
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 8, fontFamily: "'Space Mono', monospace" }}>
-                  📅 A este ritmo terminas el {completionPrediction.date}
+                  A este ritmo terminas el {completionPrediction.date}
                 </p>
               )}
-              <div className="flex gap-2 mt-4">
-                <button type="button" aria-label="Continuar con la lección 2: Autenticación" style={{ padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(14), fontWeight: 700, background: '#ffffff', color: '#0a0f8a', boxShadow: '3px 3px 8px rgba(0,0,0,0.15)' }}>
-                  Continuar →
+              <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+                <button type="button" aria-label="Continuar con la lección 2: Autenticación" style={{ padding: '11px 24px', borderRadius: 50, border: 'none', cursor: 'pointer', background: 'white', color: '#0a0f8a', fontFamily: "var(--font-heading)", fontSize: 14, fontWeight: 800, boxShadow: '4px 4px 10px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#0a0f8a"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Continuar
                 </button>
-                <button type="button" aria-label="Ver programa del curso" style={{ padding: '10px 20px', borderRadius: 10, border: '2px solid rgba(255,255,255,0.4)', cursor: 'pointer', fontFamily: "var(--font-heading)", fontSize: f(14), fontWeight: 600, background: 'transparent', color: '#ffffff' }}>
+                <button type="button" aria-label="Ver programa del curso" style={{ padding: '11px 24px', borderRadius: 50, border: '1.5px solid rgba(255,255,255,0.5)', cursor: 'pointer', background: 'transparent', color: 'white', fontFamily: "var(--font-heading)", fontSize: 14, fontWeight: 700 }}>
                   Ver programa
                 </button>
               </div>
@@ -591,7 +643,7 @@ export default function DashboardAlumno() {
         <section style={{ background: NM.bg, borderRadius: 16, padding: 24, boxShadow: NM.elevated }} aria-label="Check-in de bienestar">
           <fieldset style={{ border: 'none', margin: 0, padding: 0 }}>
             <legend className="sr-only">¿Cómo llegaste hoy?</legend>
-            <p style={{ fontSize: f(11), fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
               Check-in · ¿Cómo llegaste hoy?
             </p>
             <div className="checkin-grid flex gap-2" role="radiogroup" aria-label="Estado de ánimo">
@@ -609,35 +661,32 @@ export default function DashboardAlumno() {
                   }}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCheckinSelected(estado.id); setSelectedMood(estado.id as MoodValue) } }}
                   style={{
-                    background: '#e8eaf0',
-                    boxShadow: checkinSelected === estado.id
-                      ? 'inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff'
-                      : '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff',
-                    border: 'none',
-                    borderRadius: 16,
-                    padding: '18px 8px',
+                    flex: 1,
+                    padding: '20px 8px',
+                    borderRadius: 18,
+                    border: checkinSelected === estado.id ? `2px solid ${estado.color}` : '2px solid transparent',
                     cursor: 'pointer',
+                    background: '#e8eaf0',
+                    color: checkinSelected === estado.id ? estado.color : '#4a5580',
+                    boxShadow: checkinSelected === estado.id
+                      ? 'inset 4px 4px 10px #c2c8d6, inset -4px -4px 10px #ffffff'
+                      : '5px 5px 13px #c2c8d6, -5px -5px 13px #ffffff',
+                    opacity: checkinSelected !== null && checkinSelected !== estado.id ? 0.5 : 1,
+                    transform: checkinSelected === estado.id ? 'scale(0.97)' : 'scale(1)',
+                    transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     gap: 8,
-                    flex: 1,
-                    transition: 'all 0.2s ease',
                     fontFamily: "var(--font-heading)",
                     fontSize: 14,
-                    fontWeight: 600,
-                    color: checkinSelected === estado.id ? estado.color : '#4a5580',
-                    opacity: checkinSelected !== null && checkinSelected !== estado.id ? 0.5 : 1,
-                    transform: checkinSelected === estado.id ? 'scale(1.03)' : 'scale(1)',
+                    fontWeight: 700,
                   }}
                 >
-                  <span style={{ fontSize: 22 }}>{estado.emoji}</span>
-                  <span>{estado.label}</span>
-                  {checkinSelected === estado.id && (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={estado.color} strokeWidth="3" strokeLinecap="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  )}
+                  <span style={{ color: checkinSelected === estado.id ? estado.color : '#4a5580' }}>
+                    {estado.icon}
+                  </span>
+                  {estado.label}
                 </button>
               ))}
             </div>
@@ -668,7 +717,7 @@ export default function DashboardAlumno() {
         <div className="lessons-notifs-grid grid grid-cols-2 gap-3">
           {/* Lecciones */}
           <section style={{ background: NM.bg, borderRadius: 16, padding: 24, boxShadow: NM.elevated }} aria-labelledby="lecciones-heading">
-            <h3 id="lecciones-heading" style={{ fontSize: f(11), fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
+            <h3 id="lecciones-heading" style={{ fontSize: 13, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
               Módulo 3 · Lecciones
             </h3>
             {LESSONS.map((leccion, i) => {
@@ -738,10 +787,10 @@ export default function DashboardAlumno() {
                     )}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: 13, fontWeight: estaActiva ? 700 : 600, color: estaActiva ? NM.text : estaCompleta ? NM.muted : NM.muted2 }}>
+                    <p style={{ fontSize: 15, fontWeight: estaActiva ? 700 : 600, color: estaActiva ? NM.text : estaCompleta ? NM.muted : NM.muted2 }}>
                       {leccion.title}
                     </p>
-                    <p style={{ fontSize: 11, color: NM.muted, marginTop: 2, fontFamily: "'Space Mono', monospace" }}>
+                    <p style={{ fontSize: 13, color: NM.muted, marginTop: 2, fontFamily: "'Space Mono', monospace" }}>
                       {leccion.duration} · <span style={{ color: estaActiva ? '#1428d4' : estaCompleta ? '#00b87d' : NM.muted, marginLeft: 4 }}>{estaCompleta ? 'Completada' : estaActiva ? 'En curso' : 'Pendiente'}</span>
                     </p>
                   </div>
@@ -757,7 +806,7 @@ export default function DashboardAlumno() {
           {/* Notificaciones */}
           <section style={{ background: NM.bg, borderRadius: 16, padding: 24, boxShadow: NM.elevated }} aria-labelledby="notificaciones-heading">
             <div className="flex items-center justify-between mb-3">
-              <h3 id="notificaciones-heading" style={{ fontSize: f(11), fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: "'Space Mono', monospace", margin: 0 }}>
+              <h3 id="notificaciones-heading" style={{ fontSize: 13, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '2px', fontFamily: "'Space Mono', monospace", margin: 0 }}>
                 Notificaciones
               </h3>
               <Link href="/pendientes" style={{ fontSize: f(10), fontWeight: 600, color: '#1428d4', fontFamily: "var(--font-heading)", textDecoration: 'none' }}>Ver todos</Link>
@@ -787,12 +836,15 @@ export default function DashboardAlumno() {
                   onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff' }}
                   onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff' }}
                 >
-                  <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: prioridad.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 16 }}>{notif.icon}</span>
+                  <div>
+                    {notif.tipo === 'quiz' && <IconQuiz />}
+                    {notif.tipo === 'sesion' && <IconSesion />}
+                    {notif.tipo === 'logro' && <IconLogro />}
+                    {notif.tipo === 'tarea' && <IconTarea />}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: NM.text }}>{notif.title}</p>
-                    <p style={{ fontSize: 11, color: NM.muted, marginTop: 2, fontFamily: "'Space Mono', monospace" }}>{notif.sub}</p>
+                    <p style={{ fontSize: 15, fontWeight: 700, color: NM.text }}>{notif.title}</p>
+                    <p style={{ fontSize: 13, color: NM.muted, marginTop: 2, fontFamily: "'Space Mono', monospace" }}>{notif.sub}</p>
                   </div>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: prioridad.dot, boxShadow: `0 0 0 3px ${prioridad.dot}33` }} />
                 </div>
@@ -803,7 +855,7 @@ export default function DashboardAlumno() {
 
         {/* Actividad reciente — línea de tiempo */}
         <section style={{ background: NM.bg, borderRadius: 18, padding: 24, boxShadow: NM.elevated }} aria-labelledby="actividad-heading">
-          <p id="actividad-heading" style={{ fontSize: 10, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: "'Space Mono', monospace", marginBottom: 20 }}>
+          <p id="actividad-heading" style={{ fontSize: 12, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '2px', fontFamily: "'Space Mono', monospace", marginBottom: 20 }}>
             Actividad reciente
           </p>
           <div style={{ position: 'relative' }}>
@@ -820,7 +872,8 @@ export default function DashboardAlumno() {
               aria-hidden
             />
             {ACTIVITY.map((act, i) => {
-              const cfg = TIPO_CONFIG[act.tipo] ?? { color: NM.muted, emoji: '•' }
+              const cfg = TIPO_CONFIG[act.tipo] ?? { color: NM.muted }
+              const ActIcon = act.tipo === 'quiz' ? IconActQuiz : act.tipo === 'lesson' ? IconActLeccion : IconActLogro
               return (
                 <div
                   key={i}
@@ -836,26 +889,9 @@ export default function DashboardAlumno() {
                   onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateX(3px)' }}
                   onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateX(0)' }}
                 >
-                  <div
-                    style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: '50%',
-                      flexShrink: 0,
-                      background: NM.bg,
-                      boxShadow: '3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff',
-                      border: `2px solid ${cfg.color}22`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      zIndex: 1,
-                      fontSize: 14,
-                    }}
-                  >
-                    {cfg.emoji}
-                  </div>
+                  <ActIcon />
                   <div style={{ flex: 1, paddingTop: 2 }}>
-                    <p style={{ fontSize: 13, color: NM.text, fontWeight: 600 }}>
+                    <p style={{ fontSize: 14, color: NM.text, fontWeight: 600 }}>
                       <span style={{ color: cfg.color }}>{act.title}</span>
                       {' — '}{act.description}
                     </p>
@@ -937,17 +973,19 @@ export default function DashboardAlumno() {
         </button>
       </main>
 
-      {/* ── PANEL DERECHO (cards separadas, 240px) ─────────────────────── */}
+      {/* ── PANEL DERECHO (cards separadas, 300px) ─────────────────────── */}
       <aside
         className={`panel-right flex-shrink-0 overflow-y-auto ${showRightPanel ? 'open' : ''}`}
         style={{
-          width: 240,
+          width: 300,
+          minWidth: 300,
+          background: '#e8eaf0',
+          boxShadow: '-5px 0 18px #c2c8d6, -1px 0 4px #ffffff',
+          padding: '20px 16px',
           display: 'flex',
           flexDirection: 'column',
-          gap: 12,
-          padding: '20px 14px',
-          background: NM.bg,
-          boxShadow: '-4px 0 14px #c2c8d6, -1px 0 4px #ffffff',
+          gap: 14,
+          overflowY: 'auto',
         }}
         role="complementary"
         aria-label="Información del alumno"
@@ -966,16 +1004,16 @@ export default function DashboardAlumno() {
           }}
           aria-labelledby="perfil-stats-heading"
         >
-          <div role="img" aria-label="Avatar de María A. Flores" style={{ width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(135deg, #1428d4, #0a0f8a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: f(18), fontWeight: 800, color: 'white', marginBottom: 10, boxShadow: NM.elevatedSm }}>
+          <div role="img" aria-label="Avatar de María A. Flores" style={{ width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(135deg, #1428d4, #0a0f8a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: 'white', marginBottom: 10, boxShadow: NM.elevatedSm }}>
             MA
           </div>
-          <p style={{ fontSize: f(15), fontWeight: 700, color: NM.text, marginBottom: 10 }}>María A. Flores</p>
+          <p style={{ fontSize: 18, fontWeight: 800, color: NM.text, marginBottom: 10, fontFamily: "var(--font-heading)" }}>María A. Flores</p>
           <h3 id="perfil-stats-heading" className="sr-only">Estadísticas del curso</h3>
           <dl className="grid grid-cols-2 gap-2 w-full" style={{ margin: 0 }}>
             {[['68%','Progreso'],['5','Logros'],['8.7','Calific.'],['7d','Racha']].map(([val,lbl],i) => (
-              <div key={i} style={{ background: NM.bg, borderRadius: 10, padding: '10px 8px', boxShadow: NM.insetSm, textAlign: 'center' }}>
-                <dt style={{ fontSize: f(10), color: NM.muted, textTransform: 'uppercase', letterSpacing: '0.4px', margin: 0 }}>{lbl}</dt>
-                <dd style={{ fontSize: f(16), fontWeight: 800, color: NM.text, fontFamily: "'Space Mono', monospace", lineHeight: 1, marginBottom: 0, marginTop: 2 }}>{val}</dd>
+              <div key={i} style={{ background: '#e8eaf0', borderRadius: 10, padding: '10px 8px', boxShadow: NM.insetSm, textAlign: 'center' }}>
+                <dt style={{ fontSize: 11, color: NM.muted, textTransform: 'uppercase', letterSpacing: '0.4px', margin: 0 }}>{lbl}</dt>
+                <dd style={{ fontSize: 22, fontWeight: 800, color: NM.text, fontFamily: "'Space Mono', monospace", lineHeight: 1, marginBottom: 0, marginTop: 2 }}>{val}</dd>
               </div>
             ))}
           </dl>
@@ -1053,7 +1091,7 @@ export default function DashboardAlumno() {
           }}
           aria-labelledby="logros-heading"
         >
-          <p id="logros-heading" style={{ fontSize: 10, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: "'Space Mono', monospace", marginBottom: 12 }}>
+          <p id="logros-heading" style={{ fontSize: 12, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '2px', fontFamily: "'Space Mono', monospace", marginBottom: 12 }}>
             Mis logros
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
@@ -1061,17 +1099,20 @@ export default function DashboardAlumno() {
               <div
                 key={i}
                 style={{
-                  background: NM.bg,
-                  borderRadius: 12,
-                  padding: '10px 6px',
-                  boxShadow: logro.earned ? '3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff' : 'inset 2px 2px 5px #c2c8d6, inset -2px -2px 5px #ffffff',
-                  textAlign: 'center',
+                  background: '#e8eaf0',
+                  borderRadius: 14,
+                  padding: '12px 8px',
+                  boxShadow: logro.earned ? '4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff' : 'inset 2px 2px 6px #c2c8d6, inset -2px -2px 6px #ffffff',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 6,
                   opacity: logro.earned ? 1 : 0.4,
                   cursor: logro.earned ? 'pointer' : 'default',
                 }}
               >
-                <div style={{ fontSize: 22, marginBottom: 4 }}>{logro.icon}</div>
-                <p style={{ fontSize: 8, fontWeight: 700, color: NM.text, textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.2 }}>{logro.name}</p>
+                {LOGROS_ICONOS[logro.name]}
+                <p style={{ fontSize: 9, fontWeight: 700, color: '#0a0f8a', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'center', lineHeight: 1.2, fontFamily: "var(--font-heading)" }}>{logro.name}</p>
               </div>
             ))}
           </div>
