@@ -370,7 +370,7 @@ export default function DashboardAlumno() {
           style={{
             width: 42, height: 42, borderRadius: 13,
             background: 'linear-gradient(135deg, #1428d4, #0a0f8a)',
-            boxShadow: '5px 5px 12px #c2c8d6, -3px -3px 8px #ffffff',
+            boxShadow: '5px 5px 12px rgba(10,15,138,0.4), -3px -3px 8px rgba(255,255,255,0.5)',
           }}
           aria-hidden
         >
@@ -444,8 +444,8 @@ export default function DashboardAlumno() {
               style={{
                 width: 46, height: 46, borderRadius: 13,
                 border: 'none', cursor: 'pointer',
-                background: NM.bg, color: NM.muted,
-                boxShadow: NM.elevatedSm,
+                background: '#e8eaf0', color: NM.muted,
+                boxShadow: '4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff',
                 transition: 'all 0.18s ease',
               }}
             >
@@ -1228,9 +1228,9 @@ function SidebarNavSquare({ href, label, icon, active, theme }: { href: string; 
         borderRadius: 13,
         border: 'none',
         cursor: 'pointer',
-        background: active ? 'rgba(20,40,212,0.06)' : theme.bg,
+        background: active ? 'rgba(20,40,212,0.06)' : '#e8eaf0',
         color: active ? '#1428d4' : theme.muted,
-        boxShadow: active ? theme.insetSm : theme.elevatedSm,
+        boxShadow: active ? theme.insetSm : '4px 4px 9px #c2c8d6, -4px -4px 9px #ffffff',
         transition: 'all 0.18s ease',
         textDecoration: 'none',
       }}

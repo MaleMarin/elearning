@@ -124,7 +124,7 @@ export function Sidebar() {
       style={{
         width: 240,
         background: "#e8eaf0",
-        boxShadow: "4px 0 16px rgba(194,200,214,0.4), -2px 0 8px rgba(255,255,255,0.6)",
+        boxShadow: "4px 0 16px #c2c8d6, -1px 0 4px #ffffff",
       }}
     >
       <div
