@@ -556,87 +556,95 @@ export default function DashboardAlumno() {
 
         {/* Hero */}
         <section
-          className="relative overflow-hidden"
+          aria-label="Bienvenida y progreso"
           style={{
-            minHeight: 200,
-            background: 'linear-gradient(135deg, #0a0f8a 0%, #1428d4 65%, #1a3ee8 100%)',
+            background: 'linear-gradient(135deg, #0a0f8a, #1428d4)',
             borderRadius: 20,
-            padding: '28px 32px 28px 32px',
+            padding: '32px 36px',
             marginBottom: 20,
             boxShadow: '7px 7px 18px rgba(10,15,138,0.35), -4px -4px 12px rgba(255,255,255,0.6)',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'space-between',
             gap: 24,
+            minHeight: 220,
+            overflow: 'hidden',
+            position: 'relative',
           }}
-          aria-label="Bienvenida y progreso"
         >
-          <div style={{ position: 'absolute', top: -30, right: -30, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} aria-hidden />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 24, flexWrap: 'wrap', minHeight: 160 }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontFamily: "'Space Mono', monospace", textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 4 }}>
-                Buenas tardes
-              </p>
-              <h2 style={{ fontSize: 24, fontWeight: 800, color: 'white', marginBottom: 3, letterSpacing: '-0.3px', fontFamily: "var(--font-heading)" }}>
-                María Antonia Flores
-              </h2>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 16, fontFamily: "var(--font-body)" }}>
-                Ciberseguridad para Gobierno Digital · La innovación no es un destino, es una forma de caminar.
-              </p>
-              <div className="flex justify-between mb-2">
-                <span style={{ fontSize: f(12), color: 'rgba(255,255,255,0.5)', fontFamily: "'Space Mono', monospace" }}>Progreso del curso</span>
-                <span style={{ fontSize: f(14), fontWeight: 700, color: '#00e5a0', fontFamily: "'Space Mono', monospace" }}>68%</span>
-              </div>
-              <div
-                role="progressbar"
-                aria-valuenow={68}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label="Progreso del curso: 68%"
-                style={{ height: 5, background: 'rgba(255,255,255,0.15)', borderRadius: 3, position: 'relative' }}
-              >
-                <div style={{ height: '100%', width: '68%', background: 'linear-gradient(90deg, #00e5a0, #00c98a)', borderRadius: 3, position: 'relative' }}>
-                  <span style={{ position: 'absolute', right: -4, top: -4, width: 13, height: 13, background: '#00e5a0', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', boxShadow: '0 0 8px rgba(0,229,160,0.9)', display: 'block' }} aria-hidden />
+          {(() => {
+            const progreso = dashboardProgress && dashboardProgress.lessonsTotal > 0
+              ? Math.round((dashboardProgress.lessonsDone / dashboardProgress.lessonsTotal) * 100)
+              : 68
+            const proximaLeccionId = LESSONS.find((l) => l.status === 'current')?.id ?? 'mod3-leccion-2'
+            const diasRestantes = completionPrediction
+              ? Math.ceil((new Date(completionPrediction.date).getTime() - Date.now()) / (24 * 60 * 60 * 1000))
+              : 14
+            const nombreAlumno = 'María Antonia Flores'
+            const cursoTitulo = 'Ciberseguridad para Gobierno Digital · La innovación no es un destino, es una forma de caminar.'
+            const continuarLabel = 'Continuar con la lección: ' + (LESSONS.find((l) => l.status === 'current')?.title ?? 'siguiente')
+            return (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, width: '100%', minWidth: 0 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontFamily: "'Space Mono', monospace", textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 8 }}>
+                    Buenas tardes
+                  </p>
+                  <h2 style={{ fontSize: 26, fontWeight: 800, color: 'white', fontFamily: "var(--font-heading)", letterSpacing: '-0.5px', marginBottom: 6 }}>
+                    {nombreAlumno}
+                  </h2>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', fontFamily: "var(--font-body)", marginBottom: 20, lineHeight: 1.5 }}>
+                    {cursoTitulo}
+                  </p>
+                  <div style={{ marginBottom: 20 }} role="progressbar" aria-valuenow={progreso} aria-valuemin={0} aria-valuemax={100} aria-label={'Progreso del curso: ' + progreso + '%'}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', fontFamily: "'Space Mono', monospace" }}>Progreso del curso</span>
+                      <span style={{ fontSize: 12, color: '#00e5a0', fontWeight: 700, fontFamily: "'Space Mono', monospace" }}>{progreso}%</span>
+                    </div>
+                    <div style={{ height: 8, background: 'rgba(255,255,255,0.15)', borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: progreso + '%', background: 'linear-gradient(90deg, #00e5a0, #00c98a)', borderRadius: 4, transition: 'width 1s ease' }} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <button
+                      type="button"
+                      onClick={() => router.push('/curso/lecciones/' + proximaLeccionId)}
+                      aria-label={continuarLabel}
+                      style={{
+                        padding: '11px 24px', borderRadius: 50, border: 'none', cursor: 'pointer', background: 'white', color: '#0a0f8a',
+                        fontFamily: "var(--font-heading)", fontSize: 14, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 8,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)', whiteSpace: 'nowrap',
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="#0a0f8a"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      Continuar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => router.push('/curso')}
+                      aria-label="Ver programa del curso"
+                      style={{
+                        padding: '11px 24px', borderRadius: 50, border: '1.5px solid rgba(255,255,255,0.5)', cursor: 'pointer', background: 'transparent', color: 'white',
+                        fontFamily: "var(--font-heading)", fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Ver programa
+                    </button>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  <svg width="90" height="90" viewBox="0 0 90 90" aria-hidden>
+                    <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="7" />
+                    <circle cx="45" cy="45" r="36" fill="none" stroke="#00e5a0" strokeWidth="7" strokeLinecap="round" strokeDasharray={2 * Math.PI * 36} strokeDashoffset={2 * Math.PI * 36 * (1 - progreso / 100)} transform="rotate(-90 45 45)" style={{ transition: 'stroke-dashoffset 1.2s ease' }} />
+                    <text x="45" y="41" textAnchor="middle" fill="white" fontSize="18" fontWeight="800" fontFamily="Space Mono, monospace">{progreso}%</text>
+                    <text x="45" y="55" textAnchor="middle" fill="rgba(255,255,255,0.55)" fontSize="9" fontFamily="Raleway, sans-serif">progreso</text>
+                  </svg>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontFamily: "'Space Mono', monospace", textAlign: 'center', lineHeight: 1.4 }}>
+                    {diasRestantes} días<br />restantes
+                  </p>
                 </div>
               </div>
-              {completionPrediction && (
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 8, fontFamily: "'Space Mono', monospace" }}>
-                  A este ritmo terminas el {completionPrediction.date}
-                </p>
-              )}
-              <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-                <button type="button" aria-label="Continuar con la lección 2: Autenticación" style={{ padding: '11px 24px', borderRadius: 50, border: 'none', cursor: 'pointer', background: 'white', color: '#0a0f8a', fontFamily: "var(--font-heading)", fontSize: 14, fontWeight: 800, boxShadow: '4px 4px 10px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#0a0f8a"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  Continuar
-                </button>
-                <button type="button" aria-label="Ver programa del curso" style={{ padding: '11px 24px', borderRadius: 50, border: '1.5px solid rgba(255,255,255,0.5)', cursor: 'pointer', background: 'transparent', color: 'white', fontFamily: "var(--font-heading)", fontSize: 14, fontWeight: 700 }}>
-                  Ver programa
-                </button>
-              </div>
-            </div>
-            <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
-              <svg width="80" height="80" viewBox="0 0 80 80" aria-hidden>
-                <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="6" />
-                <circle
-                  cx="40"
-                  cy="40"
-                  r="32"
-                  fill="none"
-                  stroke="#00e5a0"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  strokeDasharray={2 * Math.PI * 32}
-                  strokeDashoffset={2 * Math.PI * 32 * (1 - 68 / 100)}
-                  transform="rotate(-90 40 40)"
-                  style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
-                />
-                <text x="40" y="38" textAnchor="middle" fill="white" fontSize="16" fontWeight="800" fontFamily="Space Mono, monospace">68%</text>
-                <text x="40" y="52" textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize="9" fontFamily="Raleway, sans-serif">progreso</text>
-              </svg>
-              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontFamily: "'Space Mono', monospace", textAlign: 'center', marginTop: 4 }}>
-                {completionPrediction ? Math.ceil((new Date(completionPrediction.date).getTime() - Date.now()) / (24 * 60 * 60 * 1000)) : 14} días restantes
-              </p>
-            </div>
-          </div>
+            )
+          })()}
         </section>
 
         {/* Check-in */}
