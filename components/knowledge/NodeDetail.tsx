@@ -1,10 +1,7 @@
 'use client'
 
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type { KnowledgeNode } from '@/app/api/knowledge/route'
-
-const svgAria = { 'aria-hidden': true, focusable: false }
-const IcoBook = () => <svg {...svgAria} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
 
 interface NodeDetailProps {
   node: KnowledgeNode | null
@@ -12,10 +9,12 @@ interface NodeDetailProps {
   getLessonHref?: (lessonId: string) => string
 }
 
-export default function NodeDetail({ node, onClose, getLessonHref }: NodeDetailProps) {
+export default function NodeDetail({ node, onClose }: NodeDetailProps) {
+  const router = useRouter()
   if (!node) return null
 
-  const lessonHref = (id: string) => getLessonHref?.(id) ?? `/curso/lecciones/${id}`
+  const completado = node.status === 'completed'
+  const lessonId = node.lessonIds?.[0] ?? ''
 
   return (
     <aside
@@ -25,19 +24,16 @@ export default function NodeDetail({ node, onClose, getLessonHref }: NodeDetailP
         width: 280,
         flexShrink: 0,
         background: '#e8eaf0',
-        borderRadius: 16,
-        padding: 20,
-        boxShadow: 'inset 3px 3px 8px #c2c8d6, inset -3px -3px 8px #ffffff',
+        borderRadius: 20,
+        padding: 24,
+        boxShadow: '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff',
         fontFamily: "var(--font-heading)",
         display: 'flex',
         flexDirection: 'column',
-        gap: 16,
+        gap: 0,
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#0a0f8a', lineHeight: 1.3 }}>
-          {node.label}
-        </h3>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
         <button
           type="button"
           onClick={onClose}
@@ -57,113 +53,82 @@ export default function NodeDetail({ node, onClose, getLessonHref }: NodeDetailP
         </button>
       </div>
 
+      <span
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          color: '#1428d4',
+          fontFamily: "'Space Mono', monospace",
+          textTransform: 'uppercase',
+          letterSpacing: '1.5px',
+          background: 'rgba(20,40,212,0.08)',
+          padding: '3px 10px',
+          borderRadius: 20,
+          display: 'inline-block',
+        }}
+      >
+        {node.type === 'modulo' ? 'Módulo' : node.type === 'habilidad' ? 'Habilidad' : 'Concepto'}
+      </span>
+
+      <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0a0f8a', fontFamily: "var(--font-heading)", marginTop: 12, marginBottom: 8 }}>
+        {node.label}
+      </h3>
+
       {node.descripcion && (
-        <p style={{ margin: 0, fontSize: 13, color: '#4a5580', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 13, color: '#4a5580', lineHeight: 1.7, fontFamily: "var(--font-body)", marginBottom: 20 }}>
           {node.descripcion}
         </p>
       )}
 
-      {node.moduloNombre && (
-        <div style={{ fontSize: 12, color: '#8892b0' }}>
-          Módulo: <span style={{ fontWeight: 600, color: '#0a0f8a' }}>{node.moduloNombre}</span>
-        </div>
-      )}
-
-      {node.dominioPercent != null && (
-        <div>
-          <div style={{ fontSize: 11, color: '#8892b0', marginBottom: 6 }}>Dominio</div>
-          <div
-            role="progressbar"
-            aria-valuenow={node.dominioPercent}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label={`${node.dominioPercent}% de dominio`}
-            style={{
-              height: 6,
-              background: '#e8eaf0',
-              borderRadius: 4,
-              boxShadow: 'inset 2px 2px 5px #c2c8d6, inset -2px -2px 5px #ffffff',
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                height: '100%',
-                width: `${node.dominioPercent}%`,
-                background: node.status === 'completed' ? '#1428d4' : node.status === 'in-progress' ? '#00e5a0' : '#8892b0',
-                borderRadius: 4,
-                boxShadow: '0 0 8px rgba(20,40,212,0.3)',
-                transition: 'width 0.3s ease',
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {node.lessonIds && node.lessonIds.length > 0 && (
-        <div>
-          <div style={{ fontSize: 11, color: '#8892b0', marginBottom: 6 }}>Lecciones relacionadas</div>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#0a0f8a' }}>
-            {node.lessonIds.map((id) => (
-              <li key={id} style={{ marginBottom: 4 }}>
-                <Link
-                  href={lessonHref(id)}
-                  style={{ color: '#1428d4', textDecoration: 'none', fontWeight: 500 }}
-                >
-                  Lección {id.replace('lec-', '')}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {node.connectedIds && node.connectedIds.length > 0 && (
-        <div>
-          <div style={{ fontSize: 11, color: '#8892b0', marginBottom: 6 }}>Conceptos conectados</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {node.connectedIds.map((id) => (
-              <span
-                key={id}
-                style={{
-                  background: '#e8eaf0',
-                  borderRadius: 12,
-                  padding: '4px 10px',
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: '#4a5580',
-                  boxShadow: 'inset 2px 2px 5px #c2c8d6, inset -2px -2px 5px #ffffff',
-                }}
-              >
-                {id}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {node.lessonIds && node.lessonIds[0] && (
-        <Link
-          href={lessonHref(node.lessonIds[0])}
+      <div
+        style={{
+          background: '#e8eaf0',
+          borderRadius: 12,
+          padding: '10px 14px',
+          boxShadow: 'inset 2px 2px 6px #c2c8d6, inset -2px -2px 6px #ffffff',
+          marginBottom: 16,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+      >
+        <div
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            marginTop: 'auto',
-            padding: '10px 16px',
-            background: 'linear-gradient(135deg, #1428d4, #2b4fff)',
-            color: '#fff',
-            borderRadius: 50,
-            fontSize: 13,
-            fontWeight: 600,
-            textDecoration: 'none',
-            boxShadow: '4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff',
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            background: completado ? '#00e5a0' : '#c2c8d6',
           }}
-        >
-          <IcoBook />
-          Ir a la lección
-        </Link>
-      )}
+        />
+        <span style={{ fontSize: 12, color: '#4a5580', fontFamily: "'Space Mono', monospace" }}>
+          {completado ? '✓ Concepto dominado' : 'Pendiente de aprender'}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => lessonId && router.push(`/curso/lecciones/${lessonId}`)}
+        disabled={!lessonId}
+        style={{
+          width: '100%',
+          padding: '13px',
+          borderRadius: 14,
+          border: 'none',
+          cursor: lessonId ? 'pointer' : 'not-allowed',
+          fontFamily: "var(--font-heading)",
+          fontSize: 14,
+          fontWeight: 700,
+          background: completado
+            ? '#e8eaf0'
+            : 'linear-gradient(135deg, #1428d4, #0a0f8a)',
+          color: completado ? '#4a5580' : 'white',
+          boxShadow: completado
+            ? '4px 4px 10px #c2c8d6, -4px -4px 10px #ffffff'
+            : '5px 5px 12px rgba(10,15,138,0.35)',
+        }}
+      >
+        {completado ? '↺ Repasar este concepto' : '→ Ir a aprender esto'}
+      </button>
     </aside>
   )
 }
