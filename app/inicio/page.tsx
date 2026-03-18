@@ -552,7 +552,7 @@ export default function DashboardAlumno() {
           {[
             { label: 'Continuar lección', color: '#1428d4', href: '/curso', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="#1428d4"><polygon points="5 3 19 12 5 21 5 3"/></svg> },
             { label: 'Mi portafolio', color: '#533ab7', href: '/portafolio', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#533ab7" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> },
-            { label: 'Ir al Laboratorio', color: '#006289', href: '/laboratorio', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#006289" strokeWidth="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11l-4 7h14l-4-7V3"/></svg> },
+            { label: 'El Laboratorio', color: '#006289', href: '/laboratorio', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#006289" strokeWidth="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11l-4 7h14l-4-7V3"/></svg> },
             { label: 'Ver mi grafo', color: '#00b87d', href: '/conocimiento', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00b87d" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M17.66 17.66l2.12 2.12"/></svg> },
           ].map((item, i) => (
             <Link key={i} href={item.href} style={{
@@ -574,12 +574,12 @@ export default function DashboardAlumno() {
           ))}
         </div>
 
-        {/* Check-in — franja horizontal compacta */}
+        {/* Check-in — franja horizontal compacta (pill) */}
         <div
           style={{
             background: '#e8eaf0',
             borderRadius: 16,
-            padding: '14px 20px',
+            padding: 14,
             marginBottom: 20,
             boxShadow: '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff',
             display: 'flex',
