@@ -189,14 +189,15 @@ function SidebarItem({
       <Link
         href={item.href}
         style={{
-          width: collapsed ? 44 : "88%",
-          height: 44,
+          width: collapsed ? 44 : "calc(100% - 16px)",
+          minHeight: 44,
           borderRadius: 12,
           display: "flex",
           alignItems: "center",
           justifyContent: collapsed ? "center" : "flex-start",
           gap: 10,
-          padding: collapsed ? 0 : "0 12px",
+          padding: collapsed ? 0 : "10px 14px",
+          margin: collapsed ? 0 : "2px 8px",
           textDecoration: "none",
           background: active
             ? "linear-gradient(135deg, #1428d4, #0a0f8a)"
@@ -205,22 +206,24 @@ function SidebarItem({
             ? "4px 4px 10px rgba(10,15,138,0.3), -2px -2px 6px rgba(255,255,255,0.5)"
             : hovered
               ? "3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff"
-              : "none",
+              : "3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff",
           transition: "all 0.15s ease",
         }}
         aria-current={active ? "page" : undefined}
       >
-        <span style={{ color: active ? "white" : "#4a5580", flexShrink: 0 }}>
+        <span style={{ color: active ? "white" : "#4a5580", display: "flex", alignItems: "center", flexShrink: 0 }}>
           {item.icon}
         </span>
         {!collapsed && (
           <span
             style={{
               fontSize: 13,
-              fontWeight: 600,
+              fontWeight: active ? 700 : 500,
               color: active ? "white" : "#4a5580",
-              fontFamily: "var(--font-heading)",
+              fontFamily: "'Raleway', sans-serif",
               whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
             {item.label}
@@ -342,8 +345,8 @@ export function Sidebar({ collapsed = true }: SidebarProps) {
     <aside
       aria-label="Navegación principal"
       style={{
-        width: collapsed ? 64 : 200,
-        minWidth: collapsed ? 64 : 200,
+        width: collapsed ? 64 : 180,
+        minWidth: collapsed ? 64 : 180,
         background: "#e8eaf0",
         boxShadow: "4px 0 14px #c2c8d6, -1px 0 4px #ffffff",
         display: "flex",

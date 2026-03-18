@@ -543,87 +543,118 @@ export default function DashboardAlumno() {
           })()}
         </section>
 
-        {/* Check-in */}
-        <section style={{ background: NM.bg, borderRadius: 16, padding: 24, boxShadow: NM.elevated }} aria-label="Check-in de bienestar">
-          <fieldset style={{ border: 'none', margin: 0, padding: 0 }}>
-            <legend className="sr-only">¿Cómo llegaste hoy?</legend>
-            <p style={{ fontSize: 12, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
-              Check-in · ¿Cómo llegaste hoy?
-            </p>
-            <div className="checkin-grid flex gap-2" role="radiogroup" aria-label="Estado de ánimo">
-              {ESTADOS.map((estado) => (
-                <button
-                  key={estado.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={checkinSelected === estado.id}
-                  aria-label={estado.label}
-                  onClick={() => {
-                    setCheckinSelected(estado.id)
-                    setSelectedMood(estado.id as MoodValue)
-                    fetch('/api/checkin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ mood: estado.id }) }).catch(() => {})
-                  }}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCheckinSelected(estado.id); setSelectedMood(estado.id as MoodValue) } }}
-                  style={{
-                    flex: 1,
-                    padding: '20px 8px',
-                    borderRadius: 18,
-                    border: checkinSelected === estado.id ? `2px solid ${estado.color}` : '2px solid transparent',
-                    cursor: 'pointer',
-                    background: '#e8eaf0',
-                    color: checkinSelected === estado.id ? estado.color : '#4a5580',
-                    boxShadow: checkinSelected === estado.id
-                      ? 'inset 4px 4px 10px #c2c8d6, inset -4px -4px 10px #ffffff'
-                      : '5px 5px 13px #c2c8d6, -5px -5px 13px #ffffff',
-                    opacity: checkinSelected !== null && checkinSelected !== estado.id ? 0.5 : 1,
-                    transform: checkinSelected === estado.id ? 'scale(0.97)' : 'scale(1)',
-                    transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 8,
-                    fontFamily: "var(--font-heading)",
-                    fontSize: 14,
-                    fontWeight: 700,
-                  }}
-                >
-                  <span style={{ color: checkinSelected === estado.id ? estado.color : '#4a5580' }}>
-                    {estado.icon}
-                  </span>
-                  {estado.label}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-          {checkinSelected && (
-            <div
+        {/* Acción rápida — 4 botones */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 10, marginBottom: 20,
+        }}>
+          {[
+            { label: 'Continuar lección', color: '#1428d4', href: '/curso', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="#1428d4"><polygon points="5 3 19 12 5 21 5 3"/></svg> },
+            { label: 'Mi portafolio', color: '#533ab7', href: '/portafolio', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#533ab7" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> },
+            { label: 'Ir al Laboratorio', color: '#006289', href: '/laboratorio', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#006289" strokeWidth="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11l-4 7h14l-4-7V3"/></svg> },
+            { label: 'Ver mi grafo', color: '#00b87d', href: '/conocimiento', icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00b87d" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M17.66 17.66l2.12 2.12"/></svg> },
+          ].map((item, i) => (
+            <Link key={i} href={item.href} style={{
+              background: '#e8eaf0', borderRadius: 14, padding: '14px 16px',
+              textDecoration: 'none',
+              boxShadow: '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff',
+              display: 'flex', alignItems: 'center', gap: 10,
+              borderLeft: `3px solid ${item.color}`,
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '7px 7px 16px #c2c8d6, -7px -7px 16px #ffffff' }}
+            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '5px 5px 12px #c2c8d6, -5px -5px 12px #ffffff' }}
+            >
+              {item.icon}
+              <span style={{ fontSize: 12, fontWeight: 700, color: item.color, fontFamily: "'Raleway', sans-serif" }}>
+                {item.label}
+              </span>
+            </Link>
+          ))}
+        </div>
+
+        {/* Check-in — franja horizontal compacta */}
+        <div
+          style={{
+            background: '#e8eaf0',
+            borderRadius: 16,
+            padding: '14px 20px',
+            marginBottom: 20,
+            boxShadow: '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}
+          aria-label="Check-in de bienestar"
+        >
+          <p style={{
+            fontSize: 10, fontWeight: 700, color: '#8892b0',
+            fontFamily: "'Space Mono', monospace",
+            textTransform: 'uppercase', letterSpacing: '1.5px',
+            whiteSpace: 'nowrap', marginRight: 8,
+          }}>
+            ¿Cómo llegaste hoy?
+          </p>
+          {[
+            { id: 'bien', label: '😊 Bien', color: '#00b87d', bg: 'rgba(0,184,125,0.12)' },
+            { id: 'regular', label: '😐 Regular', color: '#c89000', bg: 'rgba(200,144,0,0.12)' },
+            { id: 'dificil', label: '😓 Difícil', color: '#d84040', bg: 'rgba(216,64,64,0.12)' },
+            { id: 'excelente', label: '💪 Excelente', color: '#1428d4', bg: 'rgba(20,40,212,0.1)' },
+          ].map((estado) => (
+            <button
+              key={estado.id}
+              type="button"
+              onClick={() => {
+                setCheckinSelected(estado.id)
+                setSelectedMood(estado.id as MoodValue)
+                fetch('/api/checkin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ mood: estado.id }) }).catch(() => {})
+              }}
               style={{
-                marginTop: 12,
-                padding: '10px 16px',
-                borderRadius: 12,
-                background: NM.bg,
-                boxShadow: 'inset 2px 2px 6px #c2c8d6, inset -2px -2px 6px #ffffff',
-                textAlign: 'center',
-                animation: 'fadeIn 0.3s ease',
+                padding: '8px 16px',
+                borderRadius: 50,
+                border: checkinSelected === estado.id ? `2px solid ${estado.color}` : '2px solid transparent',
+                cursor: 'pointer',
+                fontFamily: "'Raleway', sans-serif",
+                fontSize: 13, fontWeight: 600,
+                background: checkinSelected === estado.id ? estado.bg : '#e8eaf0',
+                color: checkinSelected === estado.id ? estado.color : '#4a5580',
+                boxShadow: checkinSelected === estado.id ? 'inset 3px 3px 7px #c2c8d6, inset -3px -3px 7px #ffffff' : '3px 3px 8px #c2c8d6, -3px -3px 8px #ffffff',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap',
               }}
             >
-              <p style={{ fontSize: 12, color: '#4a5580', fontFamily: "var(--font-heading)" }}>
-                ✓ Check-in registrado. ¡Gracias!
-              </p>
-            </div>
+              {estado.label}
+            </button>
+          ))}
+          {checkinSelected && (
+            <span style={{
+              fontSize: 11, color: '#00b87d',
+              fontFamily: "'Space Mono', monospace",
+              marginLeft: 'auto',
+            }}>
+              ✓ Registrado
+            </span>
           )}
-          <div aria-live="polite" aria-atomic className="sr-only">
-            {checkinSelected ? `Seleccionaste: ${ESTADOS.find(e => e.id === checkinSelected)?.label ?? checkinSelected}` : ''}
-          </div>
-        </section>
+        </div>
 
         {/* Lecciones + Notificaciones */}
         <div className="lessons-notifs-grid grid grid-cols-2 gap-3">
           {/* Lecciones */}
-          <section style={{ background: NM.bg, borderRadius: 16, padding: 24, boxShadow: NM.elevated }} aria-labelledby="lecciones-heading">
-            <h3 id="lecciones-heading" style={{ fontSize: 13, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: 12, fontFamily: "'Space Mono', monospace" }}>
-              Módulo 3 · Lecciones
-            </h3>
+          <section style={{ background: NM.bg, borderRadius: 20, overflow: 'hidden', boxShadow: '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff' }} aria-labelledby="lecciones-heading">
+            <div style={{
+              background: 'linear-gradient(135deg, #0a0f8a, #1428d4)',
+              padding: '14px 20px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.9)', fontFamily: "'Space Mono', monospace", textTransform: 'uppercase', letterSpacing: '1.5px', margin: 0 }}>
+                Módulo 3 · Lecciones
+              </p>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontFamily: "'Space Mono', monospace" }}>
+                {dashboardProgress && dashboardProgress.lessonsTotal > 0 ? `${dashboardProgress.lessonsDone}/${dashboardProgress.lessonsTotal} completadas` : '1/3 completadas'}
+              </span>
+            </div>
+            <div style={{ padding: 24 }}>
             {LESSONS.map((leccion, i) => {
               const estado = lessonEstado(leccion.status)
               const primeraPendiente = LESSONS.findIndex((l) => l.status === 'current') >= 0 ? LESSONS.findIndex((l) => l.status === 'current') : LESSONS.findIndex((l) => l.status === 'locked')
@@ -706,15 +737,30 @@ export default function DashboardAlumno() {
                 </div>
               )
             })}
+            </div>
           </section>
           {/* Notificaciones */}
-          <section style={{ background: NM.bg, borderRadius: 16, padding: 24, boxShadow: NM.elevated }} aria-labelledby="notificaciones-heading">
-            <div className="flex items-center justify-between mb-3">
-              <h3 id="notificaciones-heading" style={{ fontSize: 13, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '2px', fontFamily: "'Space Mono', monospace", margin: 0 }}>
-                Notificaciones
-              </h3>
-              <Link href="/pendientes" style={{ fontSize: f(10), fontWeight: 600, color: '#1428d4', fontFamily: "var(--font-heading)", textDecoration: 'none' }}>Ver todos</Link>
+          <section style={{ background: NM.bg, borderRadius: 20, overflow: 'hidden', boxShadow: '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff' }} aria-labelledby="notificaciones-heading">
+            <div style={{
+              padding: '14px 20px',
+              borderBottom: '1px solid rgba(194,200,214,0.4)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: '#d84040',
+                  boxShadow: '0 0 0 3px rgba(216,64,64,0.2)',
+                }} />
+                <p id="notificaciones-heading" style={{ fontSize: 11, fontWeight: 700, color: '#0a0f8a', fontFamily: "'Space Mono', monospace", textTransform: 'uppercase', letterSpacing: '1.5px', margin: 0 }}>
+                  Notificaciones
+                </p>
+              </div>
+              <Link href="/notificaciones" style={{ fontSize: 11, color: '#1428d4', fontFamily: "'Raleway', sans-serif", fontWeight: 600, textDecoration: 'none' }}>
+                Ver todos →
+              </Link>
             </div>
+            <div style={{ padding: 24 }}>
             {NOTIFS.map((notif, i) => {
               const prioridad = getPrioridad(notif.tipo)
               return (
@@ -754,11 +800,12 @@ export default function DashboardAlumno() {
                 </div>
               )
             })}
+            </div>
           </section>
         </div>
 
         {/* Actividad reciente — línea de tiempo */}
-        <section style={{ background: NM.bg, borderRadius: 18, padding: 24, boxShadow: NM.elevated }} aria-labelledby="actividad-heading">
+        <section style={{ background: NM.bg, borderRadius: 20, padding: 24, boxShadow: '6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff', borderTop: '3px solid #00e5a0' }} aria-labelledby="actividad-heading">
           <p id="actividad-heading" style={{ fontSize: 12, fontWeight: 700, color: NM.muted, textTransform: 'uppercase', letterSpacing: '2px', fontFamily: "'Space Mono', monospace", marginBottom: 20 }}>
             Actividad reciente
           </p>
