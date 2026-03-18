@@ -7,7 +7,6 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import arcjet, { tokenBucket, shield } from "@arcjet/next";
-import { getFirebaseAdminAuth, getFirebaseAdminFirestore, ensureFirebaseProfile } from "@/lib/firebase/admin";
 import { getDemoMode } from "@/lib/env";
 import { checkLoginRateLimit } from "@/lib/rate-limit";
 import {
@@ -115,6 +114,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Falta idToken" }, { status: 400 });
     }
 
+    const { getFirebaseAdminAuth, getFirebaseAdminFirestore, ensureFirebaseProfile } = await import("@/lib/firebase/admin");
     const auth = getFirebaseAdminAuth();
     const decoded = await auth.verifyIdToken(idToken);
     await ensureFirebaseProfile(decoded.uid, decoded.email ?? null);

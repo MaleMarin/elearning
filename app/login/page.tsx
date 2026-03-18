@@ -60,6 +60,30 @@ export default function LoginPage() {
     setShowDemoHint(getDemoMode());
   }, []);
 
+  const handleDemoClick = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "demo@precisar.local", password: "demo" }),
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError((data as { error?: string }).error ?? "No pudimos iniciar sesión en demo. Intenta de nuevo.");
+        return;
+      }
+      router.push(redirectTo);
+      router.refresh();
+    } catch {
+      setError("No pudimos iniciar sesión en demo. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -76,7 +100,8 @@ export default function LoginPage() {
           setError("No pudimos iniciar sesión. Intenta de nuevo.");
           return;
         }
-        window.location.href = redirectTo;
+        router.push(redirectTo);
+        router.refresh();
         return;
       }
       const auth = getFirebaseAuth();
@@ -391,8 +416,10 @@ export default function LoginPage() {
               </p>
             )}
 
-            <a
-              href="/api/auth/demo"
+            <button
+              type="button"
+              onClick={handleDemoClick}
+              disabled={loading}
               style={{
                 display: "block",
                 textAlign: "center",
@@ -405,13 +432,14 @@ export default function LoginPage() {
                 fontWeight: 800,
                 boxShadow: "4px 4px 12px rgba(0,229,160,0.4), -3px -3px 8px #ffffff",
                 width: "100%",
-                textDecoration: "none",
+                border: "none",
+                cursor: loading ? "wait" : "pointer",
                 boxSizing: "border-box",
               }}
               aria-label="Entrar en modo demo sin cuenta"
             >
-              Modo demo — entrar sin cuenta
-            </a>
+              {loading ? "Entrando…" : "Modo demo — entrar sin cuenta"}
+            </button>
             {showDemoHint && (
               <p style={{ fontSize: 12, color: "#8892b0", margin: 0 }}>En demo puedes usar cualquier correo y contraseña.</p>
             )}
