@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-const STORAGE_KEY = "theme";
+const STORAGE_KEY = "tema";
 
 function getTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "light";
@@ -13,8 +13,10 @@ function getTheme(): "light" | "dark" {
 
 function applyTheme(theme: "light" | "dark") {
   if (typeof document === "undefined") return;
-  if (theme === "dark") document.documentElement.classList.add("dark");
-  else document.documentElement.classList.remove("dark");
+  const html = document.documentElement;
+  html.setAttribute("data-theme", theme);
+  if (theme === "dark") html.classList.add("dark");
+  else html.classList.remove("dark");
 }
 
 /**

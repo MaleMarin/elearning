@@ -45,13 +45,13 @@ export const metadata: Metadata = {
 
 /* Neumorfismo: fondo base #f0f2f5 para que las sombras se vean. */
 const defaultRootVars = `
-  --neu-bg: #f0f2f5;
+  --neu-bg: #e8eaf0;
   --primary: #1428d4;
   --primary-hover: #2b4fff;
   --primary-soft: rgba(20,40,212,0.08);
   --accent: #00e5a0;
   --success: #00b87d;
-  --bg: #f0f2f5;
+  --bg: #e8eaf0;
   --surface: #f0f2f5;
   --surface-soft: #f0f2f5;
   --ink: #1428d4;
@@ -71,7 +71,7 @@ const criticalCss = `
     ${defaultRootVars}
   }
   html, body, #__next, #main-content, .main-content, main {
-    background: #f0f2f5 !important;
+    background: var(--bg) !important;
     font-family: var(--font-body) !important;
   }
   html { font-size: 18px; box-sizing: border-box; }
@@ -82,7 +82,7 @@ const criticalCss = `
     font-size: 18px;
     font-weight: 300;
     color: var(--ink);
-    background: #f0f2f5 !important;
+    background: var(--bg) !important;
     font-family: var(--font-body) !important;
   }
   a { color: inherit; text-decoration: none; }
@@ -145,8 +145,29 @@ export default async function RootLayout({
       : "";
 
   return (
-    <html lang="es" data-tenant={tenant?.tenantId ?? undefined} className={`${raleway.variable} ${sourceSans.variable} ${spaceMono.variable}`}>
-      <body className="min-h-screen text-[var(--ink)] antialiased" style={{ background: "#f0f2f5" }}>
+    <html
+      lang="es"
+      suppressHydrationWarning
+      data-tenant={tenant?.tenantId ?? undefined}
+      className={`${raleway.variable} ${sourceSans.variable} ${spaceMono.variable}`}
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function() {
+  var tema = localStorage.getItem('tema') || localStorage.getItem('theme') || 'light';
+  if (tema !== 'dark') tema = 'light';
+  localStorage.setItem('tema', tema);
+  document.documentElement.setAttribute('data-theme', tema);
+  if (tema === 'dark') document.documentElement.classList.add('dark');
+  else document.documentElement.classList.remove('dark');
+})();
+`,
+          }}
+        />
+      </head>
+      <body className="min-h-screen text-[var(--ink)] antialiased" style={{ background: "var(--bg)" }}>
         <style dangerouslySetInnerHTML={{ __html: criticalCss + tenantCss }} />
         <a
           href="#main-content"

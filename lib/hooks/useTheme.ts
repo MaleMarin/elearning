@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 
 export type Theme = "light" | "dark";
 
-const STORAGE_KEY = "theme";
+const STORAGE_KEY = "tema";
 
 function getSystemTheme(): Theme {
   if (typeof window === "undefined") return "light";
@@ -27,6 +27,7 @@ function getEffectiveTheme(): Theme {
 function applyTheme(theme: Theme) {
   if (typeof document === "undefined") return;
   const html = document.documentElement;
+  html.setAttribute("data-theme", theme);
   if (theme === "dark") {
     html.classList.add("dark");
   } else {

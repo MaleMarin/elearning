@@ -133,17 +133,54 @@
   --shadow-list-row-hover: var(--neu-glow);
   --focus-ring: 0 0 0 3px rgba(43, 79, 255, 0.4);
   --focus-ring-offset: 2px;
+
+  /* Modo claro — variables para tema (body, cards, sombras) */
+  --bg: #e8eaf0;
+  --sombra-dark: #c2c8d6;
+  --sombra-light: #ffffff;
+  --texto-principal: #0a0f8a;
+  --texto-secundario: #4a5580;
+  --texto-muted: #8892b0;
 }
 
-/* ---------- Fondo global — #f0f2f5 para que las sombras neumórficas se vean ---------- */
+/* Modo oscuro — data-theme="dark" (toggle desde la app) */
+[data-theme="dark"] {
+  --bg: #1a1d2e;
+  --sombra-dark: #141624;
+  --sombra-light: #20243a;
+  --texto-principal: #e8eaf0;
+  --texto-secundario: #a0aec0;
+  --texto-muted: #6b7280;
+  --neu-bg: #1a1d2e;
+  --neu-shadow-out: 6px 6px 14px #141624, -6px -6px 14px #20243a;
+  --neu-shadow-out-sm: 4px 4px 10px #141624, -4px -4px 10px #20243a;
+  --neu-shadow-in: inset 3px 3px 8px #141624, inset -3px -3px 8px #20243a;
+  --neu-shadow-in-sm: inset 2px 2px 6px #141624, inset -2px -2px 6px #20243a;
+  --texto: #e8eaf0;
+  --texto-sub: #a0aec0;
+  --ink: #e8eaf0;
+  --muted: #6b7280;
+  --surface: #1a1d2e;
+  --surface-soft: #1e2235;
+  --card: #1a1d2e;
+  --ink-muted: #6b7280;
+}
+
+/* ---------- Fondo global — usa variables para respetar tema ---------- */
 html,
 body,
 #__next,
 #main-content,
 .main-content,
 main {
-  background: #f0f2f5 !important;
+  background: var(--bg) !important;
   font-family: var(--font-body) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  background-color: var(--bg) !important;
+  color: var(--texto-principal);
 }
 
 /* Eliminar bordes de cards; el neumorfismo los reemplaza por sombras */
@@ -161,10 +198,12 @@ main {
   box-shadow: 8px 8px 18px rgba(174, 183, 194, 0.65), -8px -8px 18px rgba(255, 255, 255, 0.92) !important;
 }
 
-/* Modo oscuro (toggle desde la app: html.dark) */
+/* Modo oscuro (toggle: html.dark o data-theme="dark") */
 html.dark,
-html.dark body {
-  background: #1a1f2e !important;
+html.dark body,
+[data-theme="dark"],
+[data-theme="dark"] body {
+  background: var(--bg) !important;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -184,6 +223,31 @@ html.dark body {
     --surface: #1a1f2e;
     --surface-soft: #1a1f2e;
   }
+}
+
+/* Clases neumórficas que cambian con el tema */
+.elevada {
+  box-shadow: 6px 6px 14px var(--sombra-dark), -6px -6px 14px var(--sombra-light);
+}
+
+.hundida {
+  box-shadow: inset 3px 3px 8px var(--sombra-dark), inset -3px -3px 8px var(--sombra-light);
+}
+
+[data-theme="dark"] .elevada {
+  box-shadow: 6px 6px 14px #141624, -6px -6px 14px #20243a;
+}
+
+[data-theme="dark"] .hundida {
+  box-shadow: inset 3px 3px 8px #141624, inset -3px -3px 8px #20243a;
+}
+
+.bg-neuro {
+  background: var(--bg) !important;
+}
+
+[data-theme="dark"] .card-neuro {
+  background: #1e2235 !important;
 }
 
 /* Móvil — sombras más suaves */
