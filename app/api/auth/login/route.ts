@@ -82,8 +82,14 @@ export async function POST(req: NextRequest) {
     const hasIdToken = idToken && typeof idToken === "string";
     emailFromBody = (body.email as string)?.trim?.();
 
-    // Bloqueo por 5 intentos fallidos (solo si tenemos email)
-    if (emailFromBody) {
+    // Modo demo: botón "Modo demo" envía demo: true; o cuando está activo getDemoMode() o en desarrollo email sin idToken
+    const isDemoRequest =
+      (!hasIdToken && (body.demo === true || body.demo === "true")) ||
+      getDemoMode() ||
+      (!hasIdToken && body.email != null && process.env.NODE_ENV === "development");
+
+    // Bloqueo por 5 intentos fallidos (solo si tenemos email y NO es petición demo)
+    if (emailFromBody && !isDemoRequest) {
       const { blocked, remainingMinutes } = await checkLoginAttempts(emailFromBody);
       if (blocked) {
         return NextResponse.json(
@@ -95,8 +101,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Modo demo: cuando está activo o cuando en desarrollo se envía email/password sin idToken
-    const isDemoRequest = getDemoMode() || (!hasIdToken && body.email != null && process.env.NODE_ENV === "development");
     if (isDemoRequest && !hasIdToken) {
       const email = (body.email ?? "demo@precisar.local") as string;
       const role = (body.role as string) ?? "student";

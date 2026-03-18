@@ -67,7 +67,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "demo@precisar.local", password: "demo" }),
+        body: JSON.stringify({ email: "demo@precisar.local", password: "demo", demo: true }),
         credentials: "include",
       });
       if (!res.ok) {
@@ -75,8 +75,8 @@ export default function LoginPage() {
         setError((data as { error?: string }).error ?? "No pudimos iniciar sesión en demo. Intenta de nuevo.");
         return;
       }
-      router.push(redirectTo);
-      router.refresh();
+      // Recarga completa para que el navegador envíe la cookie en la siguiente petición
+      window.location.href = redirectTo;
     } catch {
       setError("No pudimos iniciar sesión en demo. Intenta de nuevo.");
     } finally {
