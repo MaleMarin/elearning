@@ -4,11 +4,27 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { QuizPlayer } from "@/components/quiz/QuizPlayer";
-import { SurfaceCard, EmptyState } from "@/components/ui";
 import { getDemoMode } from "@/lib/env";
 
 type QuizMeta = { id: string; title: string; questionCount: number; passingScore: number; timeLimit: number; maxAttempts: number };
 type QuestionForPlayer = { id: string; question: string; type: string; options: string[]; correctAnswer: string | string[]; explanation: string; difficulty: string; tags: string[] };
+
+const LayoutWrap = ({ children }: { children: React.ReactNode }) => (
+  <div
+    style={{
+      flex: 1,
+      padding: "24px 32px",
+      background: "#e8eaf0",
+      minHeight: "100vh",
+      fontFamily: "'Raleway', sans-serif",
+      maxWidth: 1100,
+      margin: "0 auto",
+      width: "100%",
+    }}
+  >
+    {children}
+  </div>
+);
 
 export default function CursoQuizPage() {
   const params = useParams();
@@ -78,16 +94,16 @@ export default function CursoQuizPage() {
 
   if (loading && phase === "info") {
     return (
-      <div className="max-w-2xl mx-auto py-12 text-center">
-        <p className="text-[var(--text-muted)]">Cargando…</p>
-      </div>
+      <LayoutWrap>
+        <p style={{ fontSize: 14, color: "#8892b0", textAlign: "center", padding: 48 }}>Cargando…</p>
+      </LayoutWrap>
     );
   }
 
   if (phase === "playing" && attemptId && questions.length > 0) {
     return (
-      <div className="max-w-2xl mx-auto py-8 px-4">
-        <h1 className="heading-hero text-[var(--ink)] mb-6">{quiz?.title ?? "Quiz"}</h1>
+      <LayoutWrap>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 24 }}>{quiz?.title ?? "Quiz"}</h1>
         <QuizPlayer
           quizId={quizId}
           attemptId={attemptId}
@@ -100,40 +116,100 @@ export default function CursoQuizPage() {
           onRetry={canStart ? () => { setPhase("info"); setAttemptId(null); setQuestions([]); } : undefined}
           demo={getDemoMode()}
         />
-      </div>
+      </LayoutWrap>
     );
   }
 
   if (!quiz) {
     return (
-      <div className="max-w-2xl mx-auto py-12">
-        <EmptyState title="Quiz no encontrado" description="No tienes acceso o el quiz no existe." ctaLabel="Volver al curso" ctaHref="/curso" />
-      </div>
+      <LayoutWrap>
+        <div
+          style={{
+            background: "#e8eaf0",
+            borderRadius: 20,
+            padding: 40,
+            textAlign: "center",
+            maxWidth: 480,
+            margin: "0 auto",
+            boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
+          }}
+        >
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>Quiz no encontrado</h2>
+          <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24 }}>No tienes acceso o el quiz no existe.</p>
+          <Link
+            href="/curso"
+            style={{
+              display: "inline-block",
+              padding: "12px 24px",
+              borderRadius: 14,
+              background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+              color: "white",
+              fontFamily: "'Raleway', sans-serif",
+              fontSize: 14,
+              fontWeight: 700,
+              textDecoration: "none",
+              boxShadow: "5px 5px 14px rgba(10,15,138,0.35)",
+            }}
+          >
+            Volver al curso
+          </Link>
+        </div>
+      </LayoutWrap>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-12 px-4">
-      <SurfaceCard padding="lg" clickable={false}>
-        <h1 className="heading-hero text-[var(--ink)] mb-2">{quiz.title}</h1>
-        <p className="text-[var(--text-muted)] mb-4">
+    <LayoutWrap>
+      <div
+        style={{
+          background: "#e8eaf0",
+          borderRadius: 20,
+          padding: 32,
+          maxWidth: 560,
+          margin: "0 auto",
+          boxShadow: "6px 6px 14px #c2c8d6, -6px -6px 14px #ffffff",
+        }}
+      >
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0a0f8a", marginBottom: 8 }}>{quiz.title}</h1>
+        <p style={{ fontSize: 13, color: "#8892b0", marginBottom: 24, fontFamily: "'Source Sans 3', sans-serif" }}>
           {quiz.questionCount} preguntas · Aprobación al {quiz.passingScore}%
           {quiz.timeLimit > 0 && ` · Límite ${quiz.timeLimit} min`}
           {quiz.maxAttempts > 0 && ` · ${attemptsLeft} intentos restantes`}
         </p>
         {canStart ? (
-          <button type="button" onClick={handleStart} disabled={loading} className="btn-primary">
+          <button
+            type="button"
+            onClick={handleStart}
+            disabled={loading}
+            style={{
+              padding: "14px 28px",
+              borderRadius: 14,
+              border: "none",
+              cursor: loading ? "wait" : "pointer",
+              fontFamily: "'Raleway', sans-serif",
+              fontSize: 15,
+              fontWeight: 800,
+              background: "linear-gradient(135deg, #1428d4, #0a0f8a)",
+              color: "white",
+              boxShadow: "5px 5px 14px rgba(10,15,138,0.35)",
+            }}
+          >
             {loading ? "Iniciando…" : "Comenzar quiz"}
           </button>
         ) : (
-          <p className="text-[var(--text-muted)]">
+          <p style={{ fontSize: 13, color: "#8892b0", fontFamily: "'Source Sans 3', sans-serif" }}>
             No puedes iniciar este quiz ahora. Puedes intentarlo de nuevo en 24 h si ya usaste tus intentos.
           </p>
         )}
-        <div className="mt-4">
-          <Link href="/curso" className="text-[var(--primary)] hover:underline">Volver al curso</Link>
+        <div style={{ marginTop: 20 }}>
+          <Link
+            href="/curso"
+            style={{ fontSize: 13, fontWeight: 600, color: "#1428d4", textDecoration: "none" }}
+          >
+            ← Volver al curso
+          </Link>
         </div>
-      </SurfaceCard>
-    </div>
+      </div>
+    </LayoutWrap>
   );
 }

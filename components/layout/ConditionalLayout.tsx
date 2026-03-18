@@ -14,6 +14,7 @@ const STANDALONE_PATHS = [
   "/registro",
   "/privacidad",
   "/recuperar-contrasena",
+  "/recuperar",
   "/no-inscrito",
 ];
 
